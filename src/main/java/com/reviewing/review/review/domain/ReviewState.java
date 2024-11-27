@@ -19,14 +19,12 @@ public class ReviewState {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long reviewId;
     @Enumerated(EnumType.STRING)
     private ReviewStateType state;
     private String rejectionReason;
 
     @Builder
-    public ReviewState(Long reviewId, ReviewStateType state, String rejectionReason) {
-        this.reviewId = reviewId;
+    public ReviewState( ReviewStateType state, String rejectionReason) {
         this.state = state;
         this.rejectionReason = rejectionReason;
     }

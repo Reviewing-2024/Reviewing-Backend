@@ -15,10 +15,10 @@ import org.springframework.stereotype.Service;
 public class ReviewService {
 
     public void createReview(Long courseId, Long memberId, ReviewRequestDto reviewRequestDto) {
-        Review review = new Review(memberId, courseId, reviewRequestDto.getContents(),
-                reviewRequestDto.getRating(), LocalDateTime.now());
-
-        ReviewState reviewState = new ReviewState();
+//        Review review = new Review(memberId, courseId, reviewRequestDto.getContents(),
+//                reviewRequestDto.getRating(), LocalDateTime.now());
+//
+//        ReviewState reviewState = new ReviewState();
     }
 
     public ReviewStateType checkReviewState(String reviewState) {

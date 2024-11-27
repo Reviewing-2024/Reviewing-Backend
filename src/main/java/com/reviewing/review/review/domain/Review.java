@@ -1,10 +1,14 @@
 package com.reviewing.review.review.domain;
 
+import com.reviewing.review.course.domain.Course;
+import com.reviewing.review.member.domain.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import java.time.LocalDateTime;
@@ -21,23 +25,33 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long memberId;
-    private Long courseId;
+    @ManyToOne
+    private Member member;
+
+    @ManyToOne
+    private Course course;
+
     @Column(columnDefinition = "text")
     private String contents;
     private float rating;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(updatable = false)
     private LocalDateTime createdAt;
+
+    @OneToOne
+    private ReviewState reviewState;
+
     // certification
 
     @Builder
-    public Review(Long memberId, Long courseId, String contents, float rating, LocalDateTime createdAt) {
-        this.memberId = memberId;
-        this.courseId = courseId;
+    public Review(Member member, Course course, String contents, float rating,
+            LocalDateTime createdAt, ReviewState reviewState) {
+        this.member = member;
+        this.course = course;
         this.contents = contents;
         this.rating = rating;
         this.createdAt = createdAt;
+        this.reviewState = reviewState;
     }
 
 }
