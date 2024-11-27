@@ -15,16 +15,16 @@ public class CourseService {
 
     private final CourseRepository courseRepository;
 
-    public List<CourseResponseDto> findAllCoursesBySorting() {
-        return courseRepository.findAllCoursesBySorting();
+    public List<CourseResponseDto> findAllCoursesBySorting(String sortType) {
+        return courseRepository.findAllCoursesBySorting(sortType);
     }
 
-    public List<CourseResponseDto> findCoursesByPlatform(String platform) {
-        return courseRepository.findCoursesByPlatform(platform);
+    public List<CourseResponseDto> findCoursesByPlatform(String platform, String sortType) {
+        return courseRepository.findCoursesByPlatform(platform, sortType);
     }
 
     public List<CourseResponseDto> findCoursesByPlatformAndCategory(String platform,
-            String category) {
-        return courseRepository.findCoursesByPlatformAndCategory(platform, category);
+            String category, String sortType) {
+        return courseRepository.findCoursesByPlatformAndCategory(platform, category, sortType);
     }
 }
