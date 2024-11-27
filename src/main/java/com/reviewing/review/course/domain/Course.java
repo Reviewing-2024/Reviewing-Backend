@@ -14,6 +14,9 @@ public class Course {
     private Long id;
 
     @ManyToOne
+    private Platform platform;
+
+    @ManyToOne
     private Category category;
 
     @Column(columnDefinition = "text")
