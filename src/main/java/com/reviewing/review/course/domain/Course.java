@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -19,12 +20,13 @@ public class Course {
 
     private Long platformId;
     private Long categoryId;
+    @Column(columnDefinition = "text")
     private String title;
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "text")
     private String url;
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "text")
     private String thumbnailImage;
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "text")
     private String thumbnailVideo;
     private String teacher;
     private String slug;
