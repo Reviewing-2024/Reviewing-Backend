@@ -3,6 +3,7 @@ package com.reviewing.review.course.domain;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import lombok.Data;
 
 @Entity
@@ -12,8 +13,9 @@ public class Course {
     @Id
     private Long id;
 
-    private Long platformId;
-    private Long categoryId;
+    @ManyToOne
+    private Category category;
+
     @Column(columnDefinition = "text")
     private String title;
     @Column(columnDefinition = "text")
