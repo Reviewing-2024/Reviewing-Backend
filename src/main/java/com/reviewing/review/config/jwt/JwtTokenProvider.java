@@ -39,33 +39,30 @@ public class JwtTokenProvider {
     }
 
     // 모든 token에 대한 사용자 속성정보 조회
-//    public Member getMemberByAccessToken(String token) {
-//        Claims claims = parserBuilder()
-//                .setSigningKey(jwtSecretKey)
-//                .build()
-//                .parseClaimsJws(token)
-//                .getBody();
-//
-//        Long memberId = (Long) claims.get("id");
-//        String nickname = (String) claims.get("nickname");
-//        String thumbnailImageUrl = (String) claims.get("thumbnailImageUrl");
-//
-//        return new Member(memberId, nickname, thumbnailImageUrl);
-//
-//    }
+    public Member getMemberByAccessToken(String token) {
+        Claims claims = parserBuilder()
+                .setSigningKey(jwtSecretKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        Long memberId = (Long) claims.get("id");
+        String nickname = (String) claims.get("nickname");
+
+        return new Member(memberId, nickname);
+
+    }
 
     // 토큰에서 memberId 조회
-    public Long getMemberIdByRefreshToken(String refreshToken) {
+    public Long getMemberIdByRefreshToken(String token) {
 
         Claims claims =  parserBuilder()
                 .setSigningKey(jwtSecretKey)
                 .build()
-                .parseClaimsJws(refreshToken)
+                .parseClaimsJws(token)
                 .getBody();
 
-        Long memberId = (Long) claims.get("id");
-
-        return memberId;
+        return (Long) claims.get("id");
     }
 
     public boolean validateToken(String token) {
