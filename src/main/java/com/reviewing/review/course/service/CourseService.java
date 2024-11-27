@@ -1,6 +1,7 @@
 package com.reviewing.review.course.service;
 
 import com.reviewing.review.course.domain.Course;
+import com.reviewing.review.course.domain.CourseResponseDto;
 import com.reviewing.review.course.repository.CourseRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +15,11 @@ public class CourseService {
 
     private final CourseRepository courseRepository;
 
-    public List<Course> getAllCourses() {
+    public List<CourseResponseDto> findAllCoursesBySorting() {
         return courseRepository.findAllCoursesBySorting();
     }
 
+    public List<CourseResponseDto> findCoursesByPlatform(String platform) {
+        return courseRepository.findCoursesByPlatform(platform);
+    }
 }
