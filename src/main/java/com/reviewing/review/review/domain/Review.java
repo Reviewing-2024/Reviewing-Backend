@@ -44,14 +44,10 @@ public class Review {
     // certification
 
     @Builder
-    public Review(Member member, Course course, String contents, float rating,
-            LocalDateTime createdAt, ReviewState reviewState) {
-        this.member = member;
-        this.course = course;
+    public Review(String contents, float rating, LocalDateTime createdAt) {
         this.contents = contents;
         this.rating = rating;
         this.createdAt = createdAt;
-        this.reviewState = reviewState;
     }
 
 }

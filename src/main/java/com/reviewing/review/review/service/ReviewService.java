@@ -4,6 +4,7 @@ import com.reviewing.review.review.domain.Review;
 import com.reviewing.review.review.domain.ReviewRequestDto;
 import com.reviewing.review.review.domain.ReviewState;
 import com.reviewing.review.review.domain.ReviewStateType;
+import com.reviewing.review.review.repository.ReviewRepository;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,11 +15,16 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class ReviewService {
 
+    private final ReviewRepository reviewRepository;
+
     public void createReview(Long courseId, Long memberId, ReviewRequestDto reviewRequestDto) {
-//        Review review = new Review(memberId, courseId, reviewRequestDto.getContents(),
-//                reviewRequestDto.getRating(), LocalDateTime.now());
-//
-//        ReviewState reviewState = new ReviewState();
+
+        ReviewState reviewState = new ReviewState(ReviewStateType.PENDING);
+
+        Review review = new Review(reviewRequestDto.getContents(),
+                reviewRequestDto.getRating(), LocalDateTime.now());
+
+        reviewRepository.createReview(courseId, memberId, reviewState, review);
     }
 
     public ReviewStateType checkReviewState(String reviewState) {
