@@ -22,4 +22,9 @@ public class CourseService {
     public List<CourseResponseDto> findCoursesByPlatform(String platform) {
         return courseRepository.findCoursesByPlatform(platform);
     }
+
+    public List<CourseResponseDto> findCoursesByPlatformAndCategory(String platform,
+            String category) {
+        return courseRepository.findCoursesByPlatformAndCategory(platform, category);
+    }
 }

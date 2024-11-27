@@ -30,4 +30,12 @@ public class CourseController {
         return ResponseEntity.ok().body(courses);
     }
 
+    @GetMapping("/courses/{platform}/{category}")
+    public ResponseEntity<List<CourseResponseDto>> findCoursesByPlatformAndCategory(
+            @PathVariable("platform") String platform, @PathVariable("category") String category) {
+        List<CourseResponseDto> courses = courseService.findCoursesByPlatformAndCategory(platform,
+                category);
+        return ResponseEntity.ok().body(courses);
+    }
+
 }
