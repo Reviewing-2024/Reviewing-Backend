@@ -24,9 +24,8 @@ public class ReviewState {
     private String rejectionReason;
 
     @Builder
-    public ReviewState( ReviewStateType state, String rejectionReason) {
+    public ReviewState( ReviewStateType state) {
         this.state = state;
-        this.rejectionReason = rejectionReason;
     }
 
 }
