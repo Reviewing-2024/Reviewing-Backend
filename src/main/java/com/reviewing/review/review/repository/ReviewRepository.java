@@ -3,8 +3,10 @@ package com.reviewing.review.review.repository;
 import com.reviewing.review.course.domain.Course;
 import com.reviewing.review.member.domain.Member;
 import com.reviewing.review.review.domain.Review;
+import com.reviewing.review.review.domain.ReviewResponseDto;
 import com.reviewing.review.review.domain.ReviewState;
 import jakarta.persistence.EntityManager;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -31,5 +33,16 @@ public class ReviewRepository {
         review.setReviewState(reviewState);
 
         em.persist(review);
+    }
+
+    public List<ReviewResponseDto> findReviewsByCourse(Long courseId) {
+
+        return em.createQuery("select new com.reviewing.review.review.domain.ReviewResponseDto (r.id, m.nickname, r.contents, r.rating) "
+                        + "from Review r join Member m on r.member.id = m.id "
+                        + "join Course c on r.course.id = c.id "
+                        + "join ReviewState rs on r.reviewState.id = rs.id "
+                        + "where c.id = :courseId and rs.state = 'APPROVED'", ReviewResponseDto.class)
+                .setParameter("courseId",courseId)
+                .getResultList();
     }
 }

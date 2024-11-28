@@ -2,10 +2,12 @@ package com.reviewing.review.review.service;
 
 import com.reviewing.review.review.domain.Review;
 import com.reviewing.review.review.domain.ReviewRequestDto;
+import com.reviewing.review.review.domain.ReviewResponseDto;
 import com.reviewing.review.review.domain.ReviewState;
 import com.reviewing.review.review.domain.ReviewStateType;
 import com.reviewing.review.review.repository.ReviewRepository;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,10 @@ public class ReviewService {
         }
         // 예외 처리
         return null;
+    }
+
+    public List<ReviewResponseDto> findReviewsByCourse(Long courseId) {
+        return reviewRepository.findReviewsByCourse(courseId);
     }
 
 }

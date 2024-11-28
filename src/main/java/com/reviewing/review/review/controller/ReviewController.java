@@ -2,10 +2,14 @@ package com.reviewing.review.review.controller;
 
 import com.reviewing.review.config.jwt.JwtTokenProvider;
 import com.reviewing.review.review.domain.ReviewRequestDto;
+import com.reviewing.review.review.domain.ReviewResponseDto;
 import com.reviewing.review.review.service.ReviewService;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,7 +26,7 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @PostMapping("/{courseId}")
-    public void createReview(@PathVariable Long courseId, ReviewRequestDto reviewRequestDto,
+    public void createReview(@PathVariable Long courseId, @RequestBody ReviewRequestDto reviewRequestDto,
             HttpServletRequest request) {
 
         String jwtHeader = request.getHeader("Authorization");
@@ -40,5 +44,13 @@ public class ReviewController {
 //
 //        reviewService.createReview(courseId, memberId, reviewRequestDto);
 //    }
+
+    @GetMapping("/{courseId}")
+    public ResponseEntity<List<ReviewResponseDto>> findReviewsByCourse(@PathVariable Long courseId) {
+
+        List<ReviewResponseDto> reviews = reviewService.findReviewsByCourse(courseId);
+
+        return ResponseEntity.ok().body(reviews);
+    }
 
 }
