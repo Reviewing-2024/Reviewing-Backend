@@ -29,16 +29,6 @@ public class ReviewService {
         reviewRepository.createReview(courseId, memberId, reviewState, review);
     }
 
-    public ReviewStateType checkReviewState(String reviewState) {
-        for (ReviewStateType value : ReviewStateType.values()) {
-            if (value.getReviewState().equals(reviewState)) {
-                return value;
-            }
-        }
-        // 예외 처리
-        return null;
-    }
-
     public List<ReviewResponseDto> findReviewsByCourse(Long courseId) {
         return reviewRepository.findReviewsByCourse(courseId);
     }
