@@ -1,6 +1,7 @@
 package com.reviewing.review.admin.repository;
 
 import com.reviewing.review.admin.domain.AdminReviewResponseDto;
+import com.reviewing.review.review.domain.Review;
 import com.reviewing.review.review.domain.ReviewStateType;
 import jakarta.persistence.EntityManager;
 import java.util.List;
@@ -27,5 +28,17 @@ public class AdminRepository {
                 .setParameter("status", status)
                 .getResultList();
 
+    }
+
+    public void changeReviewApprove(Long reviewId) {
+        Review fineReview = em.find(Review.class, reviewId);
+
+        fineReview.getReviewState().setState(ReviewStateType.APPROVED);
+    }
+
+    public void changeReviewReject(Long reviewId) {
+        Review fineReview = em.find(Review.class, reviewId);
+
+        fineReview.getReviewState().setState(ReviewStateType.REJECTED);
     }
 }

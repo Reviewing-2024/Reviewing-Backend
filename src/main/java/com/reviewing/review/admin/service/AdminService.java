@@ -28,4 +28,12 @@ public class AdminService {
         // 예외 처리
         return null;
     }
+
+    public void changeReviewApprove(Long reviewId) {
+        adminRepository.changeReviewApprove(reviewId);
+    }
+
+    public void changeReviewReject(Long reviewId) {
+        adminRepository.changeReviewReject(reviewId);
+    }
 }
