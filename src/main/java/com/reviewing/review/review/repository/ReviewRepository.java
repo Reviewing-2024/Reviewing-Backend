@@ -3,6 +3,8 @@ package com.reviewing.review.review.repository;
 import com.reviewing.review.course.domain.Course;
 import com.reviewing.review.member.domain.Member;
 import com.reviewing.review.review.domain.Review;
+import com.reviewing.review.review.domain.ReviewDislike;
+import com.reviewing.review.review.domain.ReviewLike;
 import com.reviewing.review.review.domain.ReviewResponseDto;
 import com.reviewing.review.review.domain.ReviewState;
 import jakarta.persistence.EntityManager;
@@ -44,5 +46,53 @@ public class ReviewRepository {
                         + "where c.id = :courseId and rs.state = 'APPROVED'", ReviewResponseDto.class)
                 .setParameter("courseId",courseId)
                 .getResultList();
+    }
+
+    public void createReviewLike(Long reviewId, Long memberId) {
+        Review review = em.find(Review.class, reviewId);
+        Member member = em.find(Member.class, memberId);
+
+        ReviewLike reviewLike = ReviewLike.builder()
+                .review(review)
+                .member(member)
+                .build();
+
+        em.persist(reviewLike);
+    }
+
+    public void removeReviewLike(Long reviewId, Long memberId) {
+
+        ReviewLike reviewLike = em.createQuery(
+                        "select rl from ReviewLike rl where rl.review.id = :reviewId and rl.member.id = :memberId",
+                        ReviewLike.class)
+                .setParameter("reviewId", reviewId)
+                .setParameter("memberId",memberId)
+                .getSingleResult();
+
+        em.remove(reviewLike);
+    }
+
+    public void createReviewDislike(Long reviewId, Long memberId) {
+        Review review = em.find(Review.class, reviewId);
+        Member member = em.find(Member.class, memberId);
+
+        ReviewDislike reviewDislike = ReviewDislike.builder()
+                .review(review)
+                .member(member)
+                .build();
+
+        em.persist(reviewDislike);
+    }
+
+    public void removeReviewDislike(Long reviewId, Long memberId) {
+
+        ReviewDislike reviewDislike = em.createQuery(
+                        "select rd from ReviewDislike rd where rd.review.id = :reviewId and rd.member.id = :memberId",
+                        ReviewDislike.class)
+                .setParameter("reviewId", reviewId)
+                .setParameter("memberId",memberId)
+                .getSingleResult();
+
+        em.remove(reviewDislike);
     }
 }

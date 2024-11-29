@@ -43,4 +43,19 @@ public class ReviewService {
         return reviewRepository.findReviewsByCourse(courseId);
     }
 
+    public void createReviewLike(Long reviewId, Long memberId) {
+        reviewRepository.createReviewLike(reviewId, memberId);
+    }
+
+    public void removeReviewLike(Long reviewId, Long memberId) {
+        reviewRepository.removeReviewLike(reviewId, memberId);
+    }
+
+    public void createReviewDislike(Long reviewId, Long memberId) {
+        reviewRepository.createReviewDislike(reviewId, memberId);
+    }
+
+    public void removeReviewDislike(Long reviewId, Long memberId) {
+        reviewRepository.removeReviewDislike(reviewId, memberId);
+    }
 }

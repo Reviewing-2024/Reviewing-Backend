@@ -9,6 +9,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,7 +27,8 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @PostMapping("/{courseId}")
-    public void createReview(@PathVariable Long courseId, @RequestBody ReviewRequestDto reviewRequestDto,
+    public void createReview(@PathVariable Long courseId,
+            @RequestBody ReviewRequestDto reviewRequestDto,
             HttpServletRequest request) {
 
         String jwtHeader = request.getHeader("Authorization");
@@ -46,11 +48,56 @@ public class ReviewController {
 //    }
 
     @GetMapping("/{courseId}")
-    public ResponseEntity<List<ReviewResponseDto>> findReviewsByCourse(@PathVariable Long courseId) {
+    public ResponseEntity<List<ReviewResponseDto>> findReviewsByCourse(
+            @PathVariable Long courseId) {
 
         List<ReviewResponseDto> reviews = reviewService.findReviewsByCourse(courseId);
 
         return ResponseEntity.ok().body(reviews);
+    }
+
+    @PostMapping("/{reviewId}/like")
+    public void createReviewLike(@PathVariable Long reviewId,
+            HttpServletRequest request) {
+
+        String jwtHeader = request.getHeader("Authorization");
+        String token = jwtHeader.replace("Bearer ", "");
+        Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
+
+        reviewService.createReviewLike(reviewId, memberId);
+    }
+
+    @DeleteMapping("/{reviewId}/like")
+    public void removeReviewLike(@PathVariable Long reviewId,
+            HttpServletRequest request) {
+
+        String jwtHeader = request.getHeader("Authorization");
+        String token = jwtHeader.replace("Bearer ", "");
+        Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
+
+        reviewService.removeReviewLike(reviewId, memberId);
+    }
+
+    @PostMapping("/{reviewId}/dislike")
+    public void createReviewDislike(@PathVariable Long reviewId,
+            HttpServletRequest request) {
+
+        String jwtHeader = request.getHeader("Authorization");
+        String token = jwtHeader.replace("Bearer ", "");
+        Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
+
+        reviewService.createReviewDislike(reviewId, memberId);
+    }
+
+    @DeleteMapping("/{reviewId}/dislike")
+    public void removeReviewDislike(@PathVariable Long reviewId,
+            HttpServletRequest request) {
+
+        String jwtHeader = request.getHeader("Authorization");
+        String token = jwtHeader.replace("Bearer ", "");
+        Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
+
+        reviewService.removeReviewDislike(reviewId, memberId);
     }
 
 }
