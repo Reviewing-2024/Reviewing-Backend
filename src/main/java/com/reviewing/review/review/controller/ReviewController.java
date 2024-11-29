@@ -16,9 +16,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,33 +31,33 @@ public class ReviewController {
     private final ReviewService reviewService;
     private final S3Service s3Service;
 
-//    @PostMapping(value = "/{courseId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-//    public void createReview(@PathVariable Long courseId,
-//            @RequestPart ReviewRequestDto reviewRequestDto,
-//            @RequestPart MultipartFile certificationFile,
-//            HttpServletRequest request) throws IOException {
-//
-//        String jwtHeader = request.getHeader("Authorization");
-//        String token = jwtHeader.replace("Bearer ", "");
-//        Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
-//
-//        String certification = s3Service.saveFile(certificationFile);
-//
-//        reviewService.createReview(courseId, memberId, reviewRequestDto, certification);
-//    }
-
-    // 테스트용
     @PostMapping(value = "/{courseId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public void createReview(@PathVariable Long courseId,
             @RequestPart ReviewRequestDto reviewRequestDto,
-            @RequestPart MultipartFile certificationFile) throws IOException {
+            @RequestPart MultipartFile certificationFile,
+            HttpServletRequest request) throws IOException {
 
-        Long memberId = 3783566065L;
+        String jwtHeader = request.getHeader("Authorization");
+        String token = jwtHeader.replace("Bearer ", "");
+        Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
 
         String certification = s3Service.saveFile(certificationFile);
 
         reviewService.createReview(courseId, memberId, reviewRequestDto, certification);
     }
+
+    // 테스트용
+//    @PostMapping(value = "/{courseId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+//    public void createReview(@PathVariable Long courseId,
+//            @RequestPart ReviewRequestDto reviewRequestDto,
+//            @RequestPart MultipartFile certificationFile) throws IOException {
+//
+//        Long memberId = ;
+//
+//        String certification = s3Service.saveFile(certificationFile);
+//
+//        reviewService.createReview(courseId, memberId, reviewRequestDto, certification);
+//    }
 
     @GetMapping("/{courseId}")
     public ResponseEntity<List<ReviewResponseDto>> findReviewsByCourse(
