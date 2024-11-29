@@ -39,12 +39,21 @@ public class ReviewRepository {
 
     public List<ReviewResponseDto> findReviewsByCourse(Long courseId) {
 
-        return em.createQuery("select new com.reviewing.review.review.domain.ReviewResponseDto (r.id, m.nickname, r.contents, r.rating) "
-                        + "from Review r join Member m on r.member.id = m.id "
-                        + "join Course c on r.course.id = c.id "
-                        + "join ReviewState rs on r.reviewState.id = rs.id "
-                        + "where c.id = :courseId and rs.state = 'APPROVED'", ReviewResponseDto.class)
-                .setParameter("courseId",courseId)
+        return em.createQuery("select new com.reviewing.review.review.domain.ReviewResponseDto( "
+                                + "r.id, m.nickname, r.contents, r.rating, "
+                                + "count(rl.id), "
+                                + "count(rd.id), "
+                                + "r.createdAt) "
+                                + "from Review r "
+                                + "join r.member m "
+                                + "join r.course c "
+                                + "join r.reviewState rs "
+                                + "left join ReviewLike rl on rl.review.id = r.id "
+                                + "left join ReviewDislike rd on rd.review.id = r.id "
+                                + "where c.id = :courseId and rs.state = 'APPROVED' "
+                                + "group by r.id, m.nickname, r.contents, r.rating, r.createdAt",
+                        ReviewResponseDto.class)
+                .setParameter("courseId", courseId)
                 .getResultList();
     }
 

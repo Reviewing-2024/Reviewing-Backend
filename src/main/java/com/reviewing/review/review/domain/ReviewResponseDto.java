@@ -1,5 +1,8 @@
 package com.reviewing.review.review.domain;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -11,8 +14,19 @@ public class ReviewResponseDto {
     private String nickname;
     private String contents;
     private float rating;
-//    private int likes;
-//    private int dislikes;
-//    private String createdAt;
+    private int likes;
+    private int dislikes;
+    private String createdAt;
+
+    public ReviewResponseDto(Long id, String nickname, String contents, float rating,
+            long likes, long dislikes, LocalDateTime createdAt) {
+        this.id = id;
+        this.nickname = nickname;
+        this.contents = contents;
+        this.rating = rating;
+        this.likes = (int) likes;
+        this.dislikes = (int) dislikes;
+        this.createdAt = createdAt.format(DateTimeFormatter.ofPattern("yyyy.MM.dd hh.mm a", Locale.US));
+    }
 
 }
