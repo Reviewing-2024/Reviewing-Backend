@@ -19,12 +19,17 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
 
-    public void createReview(Long courseId, Long memberId, ReviewRequestDto reviewRequestDto) {
+    public void createReview(Long courseId, Long memberId, ReviewRequestDto reviewRequestDto,
+            String certification) {
 
         ReviewState reviewState = new ReviewState(ReviewStateType.PENDING);
 
-        Review review = new Review(reviewRequestDto.getContents(),
-                reviewRequestDto.getRating(), LocalDateTime.now());
+        Review review = Review.builder()
+                .contents(reviewRequestDto.getContents())
+                .rating(reviewRequestDto.getRating())
+                .createdAt(LocalDateTime.now())
+                .certification(certification)
+                .build();
 
         reviewRepository.createReview(courseId, memberId, reviewState, review);
     }
