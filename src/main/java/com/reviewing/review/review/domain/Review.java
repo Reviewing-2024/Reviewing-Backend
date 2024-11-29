@@ -41,13 +41,15 @@ public class Review {
     @OneToOne
     private ReviewState reviewState;
 
-    // certification
+    @Column(columnDefinition = "text")
+    private String certification;
 
     @Builder
-    public Review(String contents, float rating, LocalDateTime createdAt) {
+    public Review(String contents, float rating, LocalDateTime createdAt, String certification) {
         this.contents = contents;
         this.rating = rating;
         this.createdAt = createdAt;
+        this.certification = certification;
     }
 
 }
