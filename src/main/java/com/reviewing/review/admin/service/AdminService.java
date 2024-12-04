@@ -2,6 +2,7 @@ package com.reviewing.review.admin.service;
 
 import com.reviewing.review.admin.domain.AdminReviewResponseDto;
 import com.reviewing.review.admin.repository.AdminRepository;
+import com.reviewing.review.review.domain.Review;
 import com.reviewing.review.review.domain.ReviewStateType;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,20 @@ public class AdminService {
     }
 
     public void changeReviewApprove(Long reviewId) {
-        adminRepository.changeReviewApprove(reviewId);
+
+        Review findReview = adminRepository.findReviewById(reviewId);
+
+        float thisReviewRating = findReview.getRating();
+        float courseRating = findReview.getCourse().getRating();
+
+        adminRepository.updateReviewRating(findReview,
+                calculateReviewRating(thisReviewRating, courseRating));
+
+        adminRepository.changeReviewApprove(findReview);
+    }
+
+    public float calculateReviewRating(float thisReviewRating, float courseRating) {
+        return Math.round((thisReviewRating + courseRating) / 2 * 10) / 10.0f;
     }
 
     public void changeReviewReject(Long reviewId) {

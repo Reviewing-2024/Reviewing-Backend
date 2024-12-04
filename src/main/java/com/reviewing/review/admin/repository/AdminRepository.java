@@ -30,15 +30,21 @@ public class AdminRepository {
 
     }
 
-    public void changeReviewApprove(Long reviewId) {
-        Review fineReview = em.find(Review.class, reviewId);
+    public Review findReviewById(Long reviewId) {
+        return em.find(Review.class, reviewId);
+    }
 
-        fineReview.getReviewState().setState(ReviewStateType.APPROVED);
+    public void changeReviewApprove(Review review) {
+        review.getReviewState().setState(ReviewStateType.APPROVED);
     }
 
     public void changeReviewReject(Long reviewId) {
         Review fineReview = em.find(Review.class, reviewId);
 
         fineReview.getReviewState().setState(ReviewStateType.REJECTED);
+    }
+
+    public void updateReviewRating(Review review, float newReviewRating) {
+        review.getCourse().setRating(newReviewRating);
     }
 }
