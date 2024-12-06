@@ -38,6 +38,11 @@ public class ReviewService {
         return reviewRepository.findReviewsByCourse(courseId);
     }
 
+    public List<ReviewResponseDto> findReviewsWithLikedAndDislikedByCourse(Long courseId,
+            Long memberId) {
+        return reviewRepository.findReviewsWithLikedAndDislikedByCourse(courseId, memberId);
+    }
+
     public void createReviewLike(Long reviewId, Long memberId) {
         reviewRepository.createReviewLike(reviewId, memberId);
     }
@@ -53,4 +58,5 @@ public class ReviewService {
     public void removeReviewDislike(Long reviewId, Long memberId) {
         reviewRepository.removeReviewDislike(reviewId, memberId);
     }
+
 }

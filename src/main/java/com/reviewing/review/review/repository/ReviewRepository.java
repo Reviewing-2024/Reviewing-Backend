@@ -57,6 +57,30 @@ public class ReviewRepository {
                 .getResultList();
     }
 
+    public List<ReviewResponseDto> findReviewsWithLikedAndDislikedByCourse(Long courseId,
+            Long memberId) {
+
+        return em.createQuery("select new com.reviewing.review.review.domain.ReviewResponseDto( "
+                                + "r.id, m.nickname, r.contents, r.rating, "
+                                + "count(rl.id), "
+                                + "count(rd.id), "
+                                + "(case when rl.member.id = :memberId then true else false end), "
+                                + "(case when rd.member.id = :memberId then true else false end), "
+                                + "r.createdAt) "
+                                + "from Review r "
+                                + "join r.member m "
+                                + "join r.course c "
+                                + "join r.reviewState rs "
+                                + "left join ReviewLike rl on rl.review.id = r.id "
+                                + "left join ReviewDislike rd on rd.review.id = r.id "
+                                + "where c.id = :courseId and rs.state = 'APPROVED' "
+                                + "group by r.id, m.nickname, r.contents, r.rating, r.createdAt, rl.member.id, rd.member.id",
+                        ReviewResponseDto.class)
+                .setParameter("courseId", courseId)
+                .setParameter("memberId", memberId)
+                .getResultList();
+    }
+
     public void createReviewLike(Long reviewId, Long memberId) {
         Review review = em.find(Review.class, reviewId);
         Member member = em.find(Member.class, memberId);
@@ -104,4 +128,5 @@ public class ReviewRepository {
 
         em.remove(reviewDislike);
     }
+
 }
