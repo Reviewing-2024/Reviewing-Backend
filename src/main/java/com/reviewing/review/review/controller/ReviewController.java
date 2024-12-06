@@ -43,7 +43,7 @@ public class ReviewController {
         String token = jwtHeader.replace("Bearer ", "");
         Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
 
-        String certification = s3Service.saveFile(certificationFile, memberId);
+        String certification = s3Service.saveFile(certificationFile, memberId, courseId);
 
         reviewService.createReview(courseId, memberId, reviewRequestDto, certification);
     }
