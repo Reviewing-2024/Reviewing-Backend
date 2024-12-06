@@ -1,6 +1,7 @@
 package com.reviewing.review.admin.service;
 
 import com.reviewing.review.admin.domain.AdminReviewResponseDto;
+import com.reviewing.review.admin.domain.RejectionDto;
 import com.reviewing.review.admin.repository.AdminRepository;
 import com.reviewing.review.review.domain.Review;
 import com.reviewing.review.review.domain.ReviewStateType;
@@ -47,7 +48,7 @@ public class AdminService {
         return Math.round((thisReviewRating + courseRating) / 2 * 10) / 10.0f;
     }
 
-    public void changeReviewReject(Long reviewId) {
-        adminRepository.changeReviewReject(reviewId);
+    public void changeReviewReject(Long reviewId, String rejectionReason) {
+        adminRepository.changeReviewReject(reviewId, rejectionReason);
     }
 }

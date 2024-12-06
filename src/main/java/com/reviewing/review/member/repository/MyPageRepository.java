@@ -22,6 +22,7 @@ public class MyPageRepository {
                         + "r.id, c.id, r.contents, rs.state, r.rating, "
                         + "count(rl.id), "
                         + "count(rd.id), "
+                        + "rs.rejectionReason, "
                         + "r.createdAt) "
                         + "from Review r "
                         + "join r.member m "

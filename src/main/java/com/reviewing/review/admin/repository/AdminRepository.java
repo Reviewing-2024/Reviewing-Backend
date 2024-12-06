@@ -38,10 +38,12 @@ public class AdminRepository {
         review.getReviewState().setState(ReviewStateType.APPROVED);
     }
 
-    public void changeReviewReject(Long reviewId) {
+    public void changeReviewReject(Long reviewId, String rejectionReason) {
+
         Review fineReview = em.find(Review.class, reviewId);
 
         fineReview.getReviewState().setState(ReviewStateType.REJECTED);
+        fineReview.getReviewState().setRejectionReason(rejectionReason);
     }
 
     public void updateReviewRating(Review review, float newReviewRating) {

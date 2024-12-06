@@ -16,6 +16,8 @@ public class ReviewResponseDto {
     private float rating;
     private int likes;
     private int dislikes;
+    private boolean liked;
+    private boolean disliked;
     private String createdAt;
 
     public ReviewResponseDto(Long id, String nickname, String contents, float rating,
@@ -27,6 +29,20 @@ public class ReviewResponseDto {
         this.likes = (int) likes;
         this.dislikes = (int) dislikes;
         this.createdAt = createdAt.format(DateTimeFormatter.ofPattern("yyyy.MM.dd hh.mm a", Locale.US));
+    }
+
+    public ReviewResponseDto(Long id, String nickname, String contents, float rating,
+            long likes, long dislikes, boolean liked, boolean disliked, LocalDateTime createdAt) {
+        this.id = id;
+        this.nickname = nickname;
+        this.contents = contents;
+        this.rating = rating;
+        this.likes = (int) likes;
+        this.dislikes = (int) dislikes;
+        this.liked = liked;
+        this.disliked = disliked;
+        this.createdAt = createdAt.format(
+                DateTimeFormatter.ofPattern("yyyy.MM.dd hh.mm a", Locale.US));
     }
 
 }
