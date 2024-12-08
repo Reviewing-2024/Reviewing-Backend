@@ -17,11 +17,12 @@ public class S3Service {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    public String saveFile(MultipartFile multipartFile, Long memberId) throws IOException {
-
+    public String saveFile(MultipartFile multipartFile, Long memberId, Long courseId)
+            throws IOException {
         String dirName = "certification";
 
-        String originalFilename = dirName + memberId + multipartFile.getOriginalFilename();
+        String originalFilename =
+                dirName + memberId + courseId + multipartFile.getOriginalFilename();
 
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(multipartFile.getSize());

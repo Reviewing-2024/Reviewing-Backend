@@ -1,6 +1,7 @@
 package com.reviewing.review.member.controller;
 
 import com.reviewing.review.config.jwt.JwtTokenProvider;
+import com.reviewing.review.member.domain.MemberNicknameDto;
 import com.reviewing.review.member.domain.MyReviewResponseDto;
 import com.reviewing.review.member.service.MyPageService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,6 +37,17 @@ public class MyPageController {
         List<MyReviewResponseDto> myReviews = myPageService.findMyReviewsByStatus(status, memberId);
 
         return ResponseEntity.ok().body(myReviews);
+    }
+
+    @PutMapping("/nickname")
+    public void updateUserNickname(@RequestBody MemberNicknameDto memberNicknameDto,
+            HttpServletRequest request) {
+
+        String jwtHeader = request.getHeader("Authorization");
+        String token = jwtHeader.replace("Bearer ", "");
+        Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
+
+        myPageService.updateUserNickname(memberId, memberNicknameDto.getNickName());
     }
 
 }

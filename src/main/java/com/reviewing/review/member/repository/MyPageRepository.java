@@ -1,5 +1,6 @@
 package com.reviewing.review.member.repository;
 
+import com.reviewing.review.member.domain.Member;
 import com.reviewing.review.member.domain.MyReviewResponseDto;
 import com.reviewing.review.review.domain.ReviewStateType;
 import jakarta.persistence.EntityManager;
@@ -50,4 +51,8 @@ public class MyPageRepository {
     }
 
 
+    public void updateUserNickname(Long memberId, String nickName) {
+        Member findMember = em.find(Member.class, memberId);
+        findMember.setNickname(nickName);
+    }
 }
