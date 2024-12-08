@@ -29,4 +29,7 @@ public class MyPageService {
         return null;
     }
 
+    public void updateUserNickname(Long memberId, String nickName) {
+        myPageRepository.updateUserNickname(memberId, nickName);
+    }
 }
