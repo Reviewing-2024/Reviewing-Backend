@@ -13,6 +13,7 @@ public class CorsConfig implements WebMvcConfigurer {
                 .allowedOrigins("http://localhost:3000", "http://localhost:8080") // 허용할 도메인 지정
                 .allowedMethods("GET", "POST", "PATCH", "DELETE", "HEAD", "OPTIONS","PUT") // 허용할 HTTP 메서드 지정
                 .allowedHeaders("*") // 허용할 헤더 지정
+                .exposedHeaders("Authorization")
                 .allowCredentials(true);
     }
 }
