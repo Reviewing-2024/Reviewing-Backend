@@ -22,7 +22,8 @@ public class S3Service {
         String dirName = "certification";
 
         String originalFilename =
-                dirName + memberId + courseId + multipartFile.getOriginalFilename();
+                dirName + "/" + memberId + "/" + courseId + "/"
+                        + multipartFile.getOriginalFilename();
 
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(multipartFile.getSize());
