@@ -30,5 +30,7 @@ public class Course {
     private String teacher;
     private String slug;
     private float rating;
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean updated;
 
 }
