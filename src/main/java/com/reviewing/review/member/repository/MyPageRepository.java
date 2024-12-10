@@ -37,7 +37,8 @@ public class MyPageRepository {
             query.append("and rs.state = :status ");
         }
 
-        query.append("group by r.id, c.id, r.contents, rs.state, r.rating, r.createdAt");
+        query.append(
+                "group by r.id, c.id, r.contents, rs.state,rs.rejectionReason, r.rating, r.createdAt");
 
         // 쿼리 실행
         var queryResult = em.createQuery(query.toString(), MyReviewResponseDto.class)
