@@ -90,14 +90,16 @@ public class CourseRepository {
 
     public List<CourseResponseDto> findCoursesByPlatformAndCategory(String platform,
             String category, String sortType) {
-        Platform finePlatform = em.createQuery("select p from Platform p where p.name = :name",
+        Platform findPlatform = em.createQuery("select p from Platform p where p.name = :name",
                         Platform.class)
                 .setParameter("name", platform)
                 .getSingleResult();
 
-        Category findCategory = em.createQuery("select c from Category c where c.name = :name",
+        Category findCategory = em.createQuery(
+                        "select c from Category c where c.name = :name and c.platform.id = :platformId",
                         Category.class)
                 .setParameter("name", category)
+                .setParameter("platformId", findPlatform.getId()) // 플랫폼 조건 추가
                 .getSingleResult();
 
         if (sortType != null && sortType.equals("rating")) {
@@ -107,7 +109,7 @@ public class CourseRepository {
                                     + "where c.platform = :platform and c.category = :category "
                                     + "order by c.rating desc ",
                             CourseResponseDto.class)
-                    .setParameter("platform", finePlatform)
+                    .setParameter("platform", findPlatform)
                     .setParameter("category", findCategory)
                     .getResultList();
         }
@@ -123,7 +125,7 @@ public class CourseRepository {
                                     +
                                     "order by count(r.id) desc",
                             CourseResponseDto.class)
-                    .setParameter("platform", finePlatform)
+                    .setParameter("platform", findPlatform)
                     .setParameter("category", findCategory)
                     .getResultList();
         }
@@ -133,7 +135,7 @@ public class CourseRepository {
                                 + "(c.id,c.title,c.teacher,c.thumbnailImage,c.thumbnailVideo,c.rating,c.slug,c.url) from Course c "
                                 + "where c.platform = :platform and c.category = :category",
                         CourseResponseDto.class)
-                .setParameter("platform", finePlatform)
+                .setParameter("platform", findPlatform)
                 .setParameter("category", findCategory)
                 .getResultList();
     }
