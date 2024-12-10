@@ -131,6 +131,6 @@ public class ReviewRepository {
 
     public void changeCourseUpdated(Long reviewId) {
         Review findReview = em.find(Review.class, reviewId);
-        findReview.getCourse().set
+        findReview.getCourse().setUpdated(true);
     }
 }
