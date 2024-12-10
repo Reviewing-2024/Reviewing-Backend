@@ -49,4 +49,9 @@ public class AdminRepository {
     public void updateReviewRating(Review review, float newReviewRating) {
         review.getCourse().setRating(newReviewRating);
     }
+
+    public void changeCourseUpdated(Long reviewId) {
+        Review findReview = em.find(Review.class, reviewId);
+        findReview.getCourse().setUpdated(true);
+    }
 }
