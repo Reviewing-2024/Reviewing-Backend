@@ -42,6 +42,8 @@ public class AdminService {
                 calculateReviewRating(thisReviewRating, courseRating));
 
         adminRepository.changeReviewApprove(findReview);
+
+        adminRepository.changeCourseUpdated(reviewId);
     }
 
     public float calculateReviewRating(float thisReviewRating, float courseRating) {
