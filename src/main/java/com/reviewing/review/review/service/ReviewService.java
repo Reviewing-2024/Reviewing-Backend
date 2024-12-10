@@ -45,18 +45,26 @@ public class ReviewService {
 
     public void createReviewLike(Long reviewId, Long memberId) {
         reviewRepository.createReviewLike(reviewId, memberId);
+
+        reviewRepository.changeCourseUpdated(reviewId);
     }
 
     public void removeReviewLike(Long reviewId, Long memberId) {
         reviewRepository.removeReviewLike(reviewId, memberId);
+
+        reviewRepository.changeCourseUpdated(reviewId);
     }
 
     public void createReviewDislike(Long reviewId, Long memberId) {
         reviewRepository.createReviewDislike(reviewId, memberId);
+
+        reviewRepository.changeCourseUpdated(reviewId);
     }
 
     public void removeReviewDislike(Long reviewId, Long memberId) {
         reviewRepository.removeReviewDislike(reviewId, memberId);
+
+        reviewRepository.changeCourseUpdated(reviewId);
     }
 
 }

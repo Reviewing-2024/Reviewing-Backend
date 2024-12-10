@@ -56,7 +56,7 @@ public class ReviewController {
 //
 //        Long memberId = ;
 //
-//        String certification = s3Service.saveFile(certificationFile);
+//        String certification = s3Service.saveFile(certificationFile, memberId, courseId);
 //
 //        reviewService.createReview(courseId, memberId, reviewRequestDto, certification);
 //    }
