@@ -94,7 +94,7 @@ public class CourseController {
     }
 
     @PostMapping("/courses/{courseId}/wish")
-    public ResponseEntity<String> createCourseWish(@PathVariable Long courseId,
+    public ResponseEntity<CourseResponseDto> createCourseWish(@PathVariable Long courseId,
             @RequestParam(value = "wished") boolean wished,
             HttpServletRequest request) {
 
@@ -104,12 +104,13 @@ public class CourseController {
 
         if (wished) {
             courseService.removeCourseWish(courseId, memberId);
-            return ResponseEntity.ok().body("찜 삭제 성공");
+            CourseResponseDto courseResponseDto = courseService.findCourseById(courseId,memberId);
+            return ResponseEntity.ok().body(courseResponseDto);
         }
 
         courseService.createCourseWish(courseId, memberId);
-        return ResponseEntity.ok().body("찜 추가 성공");
-
+        CourseResponseDto courseResponseDto = courseService.findCourseById(courseId,memberId);
+        return ResponseEntity.ok().body(courseResponseDto);
     }
 
     @GetMapping("/courses/{courseId}")
