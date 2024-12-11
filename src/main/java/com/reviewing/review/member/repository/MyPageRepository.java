@@ -1,5 +1,6 @@
 package com.reviewing.review.member.repository;
 
+import com.reviewing.review.course.domain.CourseResponseDto;
 import com.reviewing.review.member.domain.Member;
 import com.reviewing.review.member.domain.MyReviewResponseDto;
 import com.reviewing.review.review.domain.ReviewStateType;
@@ -59,5 +60,20 @@ public class MyPageRepository {
 
     public Member findMemberById(Long memberId) {
         return em.find(Member.class, memberId);
+    }
+
+    public List<CourseResponseDto> findWishCourseByMember(Long memberId) {
+        return em.createQuery(
+                        "select new com.reviewing.review.course.domain.CourseResponseDto("
+                                + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, "
+                                + "count(w.id), true) "
+                                + "from Course c "
+                                + "join CourseWish w on w.course.id = c.id "
+                                + "where w.member.id = :memberId "
+                                + "group by c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, "
+                                + "c.rating, c.slug, c.url",
+                        CourseResponseDto.class)
+                .setParameter("memberId", memberId)
+                .getResultList();
     }
 }

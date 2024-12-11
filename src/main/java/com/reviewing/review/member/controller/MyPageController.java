@@ -1,6 +1,7 @@
 package com.reviewing.review.member.controller;
 
 import com.reviewing.review.config.jwt.JwtTokenProvider;
+import com.reviewing.review.course.domain.CourseResponseDto;
 import com.reviewing.review.member.domain.Member;
 import com.reviewing.review.member.domain.MemberNicknameDto;
 import com.reviewing.review.member.domain.MyReviewResponseDto;
@@ -40,6 +41,19 @@ public class MyPageController {
         List<MyReviewResponseDto> myReviews = myPageService.findMyReviewsByStatus(status, memberId);
 
         return ResponseEntity.ok().body(myReviews);
+    }
+
+    @GetMapping("/wish/courses")
+    public ResponseEntity<List<CourseResponseDto>> findWishCourseByMember(
+            HttpServletRequest request) {
+
+        String jwtHeader = request.getHeader("Authorization");
+        String token = jwtHeader.replace("Bearer ", "");
+        Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
+
+        List<CourseResponseDto> courses = myPageService.findWishCourseByMember(memberId);
+
+        return ResponseEntity.ok().body(courses);
     }
 
     @PutMapping("/nickname")
