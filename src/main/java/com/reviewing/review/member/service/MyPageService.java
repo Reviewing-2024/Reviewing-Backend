@@ -1,5 +1,6 @@
 package com.reviewing.review.member.service;
 
+import com.reviewing.review.member.domain.Member;
 import com.reviewing.review.member.domain.MyReviewResponseDto;
 import com.reviewing.review.member.repository.MyPageRepository;
 import com.reviewing.review.review.domain.ReviewStateType;
@@ -31,5 +32,9 @@ public class MyPageService {
 
     public void updateUserNickname(Long memberId, String nickName) {
         myPageRepository.updateUserNickname(memberId, nickName);
+    }
+
+    public Member findMemberById(Long memberId) {
+        return myPageRepository.findMemberById(memberId);
     }
 }

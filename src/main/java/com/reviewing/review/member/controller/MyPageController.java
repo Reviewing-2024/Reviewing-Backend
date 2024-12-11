@@ -1,13 +1,16 @@
 package com.reviewing.review.member.controller;
 
 import com.reviewing.review.config.jwt.JwtTokenProvider;
+import com.reviewing.review.member.domain.Member;
 import com.reviewing.review.member.domain.MemberNicknameDto;
 import com.reviewing.review.member.domain.MyReviewResponseDto;
+import com.reviewing.review.member.service.MemberService;
 import com.reviewing.review.member.service.MyPageService;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -40,7 +43,7 @@ public class MyPageController {
     }
 
     @PutMapping("/nickname")
-    public void updateUserNickname(@RequestBody MemberNicknameDto memberNicknameDto,
+    public ResponseEntity<Member> updateUserNickname(@RequestBody MemberNicknameDto memberNicknameDto,
             HttpServletRequest request) {
 
         String jwtHeader = request.getHeader("Authorization");
@@ -48,6 +51,15 @@ public class MyPageController {
         Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
 
         myPageService.updateUserNickname(memberId, memberNicknameDto.getNickName());
+
+        Member member = myPageService.findMemberById(memberId);
+
+        String accessToken = jwtTokenProvider.createAccessToken(member);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + accessToken);
+
+        return ResponseEntity.ok().headers(headers).body(member);
     }
 
 }

@@ -56,4 +56,8 @@ public class MyPageRepository {
         Member findMember = em.find(Member.class, memberId);
         findMember.setNickname(nickName);
     }
+
+    public Member findMemberById(Long memberId) {
+        return em.find(Member.class, memberId);
+    }
 }
