@@ -1,8 +1,11 @@
 package com.reviewing.review.course.repository;
 
 import com.reviewing.review.course.domain.Category;
+import com.reviewing.review.course.domain.Course;
 import com.reviewing.review.course.domain.CourseResponseDto;
+import com.reviewing.review.course.domain.CourseWish;
 import com.reviewing.review.course.domain.Platform;
+import com.reviewing.review.member.domain.Member;
 import jakarta.persistence.EntityManager;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -138,5 +141,31 @@ public class CourseRepository {
                 .setParameter("platform", findPlatform)
                 .setParameter("category", findCategory)
                 .getResultList();
+    }
+
+    public void createCourseWish(Long courseId, Long memberId) {
+        Course course = em.find(Course.class, courseId);
+        Member member = em.find(Member.class, memberId);
+
+        CourseWish courseWish = CourseWish.builder()
+                .course(course)
+                .member(member)
+                .build();
+
+        em.persist(courseWish);
+    }
+
+    public void removeCourseWish(Long courseId, Long memberId) {
+        CourseWish courseWish = em.createQuery("select cw from CourseWish cw where cw.course.id = :courseId and cw.member.id = :memberId",CourseWish.class)
+                .setParameter("courseId",courseId)
+                .setParameter("memberId",memberId)
+                .getSingleResult();
+
+        em.remove(courseWish);
+    }
+
+    public void changeCourseUpdated(Long courseId) {
+        Course findCourse = em.find(Course.class, courseId);
+        findCourse.setUpdated(true);
     }
 }

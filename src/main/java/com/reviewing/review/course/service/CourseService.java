@@ -27,4 +27,16 @@ public class CourseService {
             String category, String sortType) {
         return courseRepository.findCoursesByPlatformAndCategory(platform, category, sortType);
     }
+
+    public void createCourseWish(Long courseId, Long memberId) {
+        courseRepository.createCourseWish(courseId, memberId);
+
+        courseRepository.changeCourseUpdated(courseId);
+    }
+
+    public void removeCourseWish(Long courseId, Long memberId) {
+        courseRepository.removeCourseWish(courseId, memberId);
+
+        courseRepository.changeCourseUpdated(courseId);
+    }
 }
