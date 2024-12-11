@@ -59,4 +59,8 @@ public class ReviewService {
         reviewRepository.removeReviewDislike(reviewId, memberId);
     }
 
+    public ReviewResponseDto findReviewById(Long reviewId, Long memberId) {
+        return reviewRepository.findReviewById(reviewId, memberId);
+    }
+
 }
