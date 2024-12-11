@@ -24,19 +24,25 @@ public class CourseRepository {
         if (sortType != null && sortType.equals("rating")) {
             return em.createQuery(
                             "select new com.reviewing.review.course.domain.CourseResponseDto"
-                                    + "(c.id,c.title,c.teacher,c.thumbnailImage,c.thumbnailVideo,c.rating,c.slug,c.url) "
-                                    + "from Course c order by c.rating desc",
+                                    + "(c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, "
+                                    + "count(w.id)) "
+                                    + "from Course c "
+                                    + "left join CourseWish w on w.course.id = c.id "
+                                    + "group by c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, "
+                                    + "c.rating, c.slug, c.url "
+                                    + "order by c.rating desc",
                             CourseResponseDto.class)
                     .getResultList();
         }
 
         if (sortType != null && sortType.equals("comments")) {
             return em.createQuery(
-                            "select new com.reviewing.review.course.domain.CourseResponseDto" +
-                                    "(c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url) "
-                                    +
-                                    "from Course c " +
-                                    "left join Review r on c.id = r.course.id " +
+                            "select new com.reviewing.review.course.domain.CourseResponseDto"
+                                    + "(c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, "
+                                    + "count(w.id)) "
+                                    + "from Course c "
+                                    + "left join Review r on c.id = r.course.id "
+                                    + "left join CourseWish w on w.course.id = c.id " +
                                     "group by c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url "
                                     +
                                     "order by count(r.id) desc",
@@ -46,8 +52,62 @@ public class CourseRepository {
 
         return em.createQuery(
                         "select new com.reviewing.review.course.domain.CourseResponseDto"
-                                + "(c.id,c.title,c.teacher,c.thumbnailImage,c.thumbnailVideo,c.rating,c.slug,c.url) from Course c",
+                                + "(c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, "
+                                + "count(w.id)) "
+                                + "from Course c "
+                                + "left join CourseWish w on w.course.id = c.id "
+                                + "group by c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url ",
                         CourseResponseDto.class)
+                .getResultList();
+    }
+
+    public List<CourseResponseDto> findAllCoursesBySorting(String sortType, Long memberId) {
+
+        if (sortType != null && sortType.equals("rating")) {
+            return em.createQuery(
+                            "select new com.reviewing.review.course.domain.CourseResponseDto("
+                                    + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, "
+                                    + "count(w.id) , "
+                                    + "case when w.member.id = :memberId then true else false end ) "
+                                    + "from Course c "
+                                    + "left join CourseWish w on w.course.id = c.id "
+                                    + "group by c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, "
+                                    + "c.rating, c.slug, c.url, w.member.id "
+                                    + "order by c.rating desc",
+                            CourseResponseDto.class)
+                    .setParameter("memberId", memberId)
+                    .getResultList();
+        }
+
+        if (sortType != null && sortType.equals("comments")) {
+
+            return em.createQuery(
+                            "select new com.reviewing.review.course.domain.CourseResponseDto("
+                                    + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, "
+                                    + "count(w.id), "
+                                    + "case when w.member.id = :memberId then true else false end) "
+                                    + "from Course c "
+                                    + "left join Review r on c.id = r.course.id "
+                                    + "left join CourseWish w on w.course.id = c.id "
+                                    + "group by c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, "
+                                    + "c.rating, c.slug, c.url, w.member.id "
+                                    + "order by count(r.id) desc",
+                            CourseResponseDto.class)
+                    .setParameter("memberId", memberId)
+                    .getResultList();
+        }
+
+        return em.createQuery(
+                        "select new com.reviewing.review.course.domain.CourseResponseDto("
+                                + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, "
+                                + "count(w.id), "
+                                + "case when w.member.id = :memberId then true else false end) "
+                                + "from Course c "
+                                + "left join CourseWish w on w.course.id = c.id "
+                                + "group by c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, "
+                                + "c.rating, c.slug, c.url, w.member.id",
+                        CourseResponseDto.class)
+                .setParameter("memberId", memberId)
                 .getResultList();
     }
 
@@ -59,10 +119,15 @@ public class CourseRepository {
 
         if (sortType != null && sortType.equals("rating")) {
             return em.createQuery(
-                            "select new com.reviewing.review.course.domain.CourseResponseDto"
-                                    + "(c.id,c.title,c.teacher,c.thumbnailImage,c.thumbnailVideo,c.rating,c.slug,c.url) from Course c "
+                            "select new com.reviewing.review.course.domain.CourseResponseDto("
+                                    + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, "
+                                    + "count(w.id)) "
+                                    + "from Course c "
+                                    + "left join CourseWish w on w.course.id = c.id "
                                     + "where c.platform = :platform "
-                                    + "order by c.rating desc ",
+                                    + "group by c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, "
+                                    + "c.rating, c.slug, c.url "
+                                    + "order by c.rating desc",
                             CourseResponseDto.class)
                     .setParameter("platform", finePlatform)
                     .getResultList();
@@ -70,24 +135,93 @@ public class CourseRepository {
 
         if (sortType != null && sortType.equals("comments")) {
             return em.createQuery(
-                            "select new com.reviewing.review.course.domain.CourseResponseDto"
-                                    + "(c.id,c.title,c.teacher,c.thumbnailImage,c.thumbnailVideo,c.rating,c.slug,c.url) from Course c "
-                                    + "left join Review r on c.id = r.course.id " +
-                                    "where c.platform = :platform " +
-                                    "group by c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url "
-                                    +
-                                    "order by count(r.id) desc",
+                            "select new com.reviewing.review.course.domain.CourseResponseDto("
+                                    + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, "
+                                    + "count(w.id)) "
+                                    + "from Course c "
+                                    + "left join Review r on c.id = r.course.id "
+                                    + "left join CourseWish w on w.course.id = c.id "
+                                    + "where c.platform = :platform "
+                                    + "group by c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, "
+                                    + "c.rating, c.slug, c.url "
+                                    + "order by count(r.id) desc",
                             CourseResponseDto.class)
                     .setParameter("platform", finePlatform)
                     .getResultList();
         }
 
         return em.createQuery(
-                        "select new com.reviewing.review.course.domain.CourseResponseDto"
-                                + "(c.id,c.title,c.teacher,c.thumbnailImage,c.thumbnailVideo,c.rating,c.slug,c.url) from Course c "
-                                + "where c.platform = :platform",
+                        "select new com.reviewing.review.course.domain.CourseResponseDto("
+                                + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, "
+                                + "count(w.id)) "
+                                + "from Course c "
+                                + "left join CourseWish w on w.course.id = c.id "
+                                + "where c.platform = :platform "
+                                + "group by c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, "
+                                + "c.rating, c.slug, c.url",
                         CourseResponseDto.class)
                 .setParameter("platform", finePlatform)
+                .getResultList();
+    }
+
+    public List<CourseResponseDto> findCoursesByPlatform(String platform, String sortType,
+            Long memberId) {
+
+        Platform finePlatform = em.createQuery("select p from Platform p where p.name = :name",
+                        Platform.class)
+                .setParameter("name", platform)
+                .getSingleResult();
+
+        if (sortType != null && sortType.equals("rating")) {
+            return em.createQuery(
+                            "select new com.reviewing.review.course.domain.CourseResponseDto("
+                                    + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, "
+                                    + "count(w.id), "
+                                    + "case when w.member.id = :memberId then true else false end) "
+                                    + "from Course c "
+                                    + "left join CourseWish w on w.course.id = c.id "
+                                    + "where c.platform = :platform "
+                                    + "group by c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, "
+                                    + "c.rating, c.slug, c.url, w.member.id "
+                                    + "order by c.rating desc",
+                            CourseResponseDto.class)
+                    .setParameter("platform", finePlatform)
+                    .setParameter("memberId", memberId)
+                    .getResultList();
+        }
+
+        if (sortType != null && sortType.equals("comments")) {
+            return em.createQuery(
+                            "select new com.reviewing.review.course.domain.CourseResponseDto("
+                                    + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, "
+                                    + "count(w.id), "
+                                    + "case when w.member.id = :memberId then true else false end) "
+                                    + "from Course c "
+                                    + "left join Review r on c.id = r.course.id "
+                                    + "left join CourseWish w on w.course.id = c.id "
+                                    + "where c.platform = :platform "
+                                    + "group by c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, "
+                                    + "c.rating, c.slug, c.url, w.member.id "
+                                    + "order by count(r.id) desc",
+                            CourseResponseDto.class)
+                    .setParameter("platform", finePlatform)
+                    .setParameter("memberId", memberId)
+                    .getResultList();
+        }
+
+        return em.createQuery(
+                        "select new com.reviewing.review.course.domain.CourseResponseDto("
+                                + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, "
+                                + "count(w.id), "
+                                + "case when w.member.id = :memberId then true else false end) "
+                                + "from Course c "
+                                + "left join CourseWish w on w.course.id = c.id "
+                                + "where c.platform = :platform "
+                                + "group by c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, "
+                                + "c.rating, c.slug, c.url, w.member.id",
+                        CourseResponseDto.class)
+                .setParameter("platform", finePlatform)
+                .setParameter("memberId", memberId)
                 .getResultList();
     }
 
@@ -107,10 +241,15 @@ public class CourseRepository {
 
         if (sortType != null && sortType.equals("rating")) {
             return em.createQuery(
-                            "select new com.reviewing.review.course.domain.CourseResponseDto"
-                                    + "(c.id,c.title,c.teacher,c.thumbnailImage,c.thumbnailVideo,c.rating,c.slug,c.url) from Course c "
+                            "select new com.reviewing.review.course.domain.CourseResponseDto("
+                                    + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, "
+                                    + "count(w.id)) "
+                                    + "from Course c "
+                                    + "left join CourseWish w on w.course.id = c.id "
                                     + "where c.platform = :platform and c.category = :category "
-                                    + "order by c.rating desc ",
+                                    + "group by c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, "
+                                    + "c.rating, c.slug, c.url "
+                                    + "order by c.rating desc",
                             CourseResponseDto.class)
                     .setParameter("platform", findPlatform)
                     .setParameter("category", findCategory)
@@ -119,14 +258,16 @@ public class CourseRepository {
 
         if (sortType != null && sortType.equals("comments")) {
             return em.createQuery(
-                            "select new com.reviewing.review.course.domain.CourseResponseDto"
-                                    + "(c.id,c.title,c.teacher,c.thumbnailImage,c.thumbnailVideo,c.rating,c.slug,c.url) from Course c "
-                                    +
-                                    "left join Review r on c.id = r.course.id " +
-                                    "where c.platform = :platform and c.category = :category "
-                                    + "group by c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url "
-                                    +
-                                    "order by count(r.id) desc",
+                            "select new com.reviewing.review.course.domain.CourseResponseDto("
+                                    + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, "
+                                    + "count(w.id)) "
+                                    + "from Course c "
+                                    + "left join Review r on c.id = r.course.id "
+                                    + "left join CourseWish w on w.course.id = c.id "
+                                    + "where c.platform = :platform and c.category = :category "
+                                    + "group by c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, "
+                                    + "c.rating, c.slug, c.url "
+                                    + "order by count(r.id) desc",
                             CourseResponseDto.class)
                     .setParameter("platform", findPlatform)
                     .setParameter("category", findCategory)
@@ -134,12 +275,88 @@ public class CourseRepository {
         }
 
         return em.createQuery(
-                        "select new com.reviewing.review.course.domain.CourseResponseDto"
-                                + "(c.id,c.title,c.teacher,c.thumbnailImage,c.thumbnailVideo,c.rating,c.slug,c.url) from Course c "
-                                + "where c.platform = :platform and c.category = :category",
+                        "select new com.reviewing.review.course.domain.CourseResponseDto("
+                                + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, "
+                                + "count(w.id)) "
+                                + "from Course c "
+                                + "left join CourseWish w on w.course.id = c.id "
+                                + "where c.platform = :platform and c.category = :category "
+                                + "group by c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, "
+                                + "c.rating, c.slug, c.url",
                         CourseResponseDto.class)
                 .setParameter("platform", findPlatform)
                 .setParameter("category", findCategory)
+                .getResultList();
+    }
+
+    public List<CourseResponseDto> findCoursesByPlatformAndCategory(String platform,
+            String category, String sortType, Long memberId) {
+
+        Platform findPlatform = em.createQuery("select p from Platform p where p.name = :name",
+                        Platform.class)
+                .setParameter("name", platform)
+                .getSingleResult();
+
+        Category findCategory = em.createQuery(
+                        "select c from Category c where c.name = :name and c.platform.id = :platformId",
+                        Category.class)
+                .setParameter("name", category)
+                .setParameter("platformId", findPlatform.getId()) // 플랫폼 조건 추가
+                .getSingleResult();
+
+        if (sortType != null && sortType.equals("rating")) {
+            return em.createQuery(
+                            "select new com.reviewing.review.course.domain.CourseResponseDto("
+                                    + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, "
+                                    + "count(w.id), "
+                                    + "case when w.member.id = :memberId then true else false end) "
+                                    + "from Course c "
+                                    + "left join CourseWish w on w.course.id = c.id "
+                                    + "where c.platform = :platform and c.category = :category "
+                                    + "group by c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, "
+                                    + "c.rating, c.slug, c.url, w.member.id "
+                                    + "order by c.rating desc",
+                            CourseResponseDto.class)
+                    .setParameter("platform", findPlatform)
+                    .setParameter("category", findCategory)
+                    .setParameter("memberId", memberId)
+                    .getResultList();
+        }
+
+        if (sortType != null && sortType.equals("comments")) {
+            return em.createQuery(
+                            "select new com.reviewing.review.course.domain.CourseResponseDto("
+                                    + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, "
+                                    + "count(w.id), "
+                                    + "case when w.member.id = :memberId then true else false end) "
+                                    + "from Course c "
+                                    + "left join Review r on c.id = r.course.id "
+                                    + "left join CourseWish w on w.course.id = c.id "
+                                    + "where c.platform = :platform and c.category = :category "
+                                    + "group by c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, "
+                                    + "c.rating, c.slug, c.url, w.member.id "
+                                    + "order by count(r.id) desc",
+                            CourseResponseDto.class)
+                    .setParameter("platform", findPlatform)
+                    .setParameter("category", findCategory)
+                    .setParameter("memberId", memberId)
+                    .getResultList();
+        }
+
+        return em.createQuery(
+                        "select new com.reviewing.review.course.domain.CourseResponseDto("
+                                + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, "
+                                + "count(w.id), "
+                                + "case when w.member.id = :memberId then true else false end) "
+                                + "from Course c "
+                                + "left join CourseWish w on w.course.id = c.id "
+                                + "where c.platform = :platform and c.category = :category "
+                                + "group by c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, "
+                                + "c.rating, c.slug, c.url, w.member.id",
+                        CourseResponseDto.class)
+                .setParameter("platform", findPlatform)
+                .setParameter("category", findCategory)
+                .setParameter("memberId", memberId)
                 .getResultList();
     }
 

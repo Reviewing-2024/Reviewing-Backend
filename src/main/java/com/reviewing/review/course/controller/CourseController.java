@@ -5,6 +5,7 @@ import com.reviewing.review.course.domain.Course;
 import com.reviewing.review.course.domain.CourseResponseDto;
 import com.reviewing.review.course.service.CourseService;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,25 +26,70 @@ public class CourseController {
 
     @GetMapping("/")
     public ResponseEntity<List<CourseResponseDto>> findAllCoursesBySorting(
-            @RequestParam(value = "sort", required = false) String sortType) {
-        List<CourseResponseDto> courses = courseService.findAllCoursesBySorting(sortType);
+            @RequestParam(value = "sort", required = false) String sortType,
+            HttpServletRequest request) {
+
+        List<CourseResponseDto> courses;
+
+        String jwtHeader = request.getHeader("Authorization");
+
+        if (jwtHeader == null) {
+            courses = courseService.findAllCoursesBySorting(sortType);
+            return ResponseEntity.ok().body(courses);
+        }
+
+        String token = jwtHeader.replace("Bearer ", "");
+        Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
+
+        courses = courseService.findAllCoursesBySorting(sortType, memberId);
         return ResponseEntity.ok().body(courses);
     }
 
     @GetMapping("/courses/{platform}")
     public ResponseEntity<List<CourseResponseDto>> findCoursesByPlatform(
             @PathVariable String platform,
-            @RequestParam(value = "sort", required = false) String sortType) {
-        List<CourseResponseDto> courses = courseService.findCoursesByPlatform(platform, sortType);
+            @RequestParam(value = "sort", required = false) String sortType
+            , HttpServletRequest request) {
+
+        List<CourseResponseDto> courses;
+
+        String jwtHeader = request.getHeader("Authorization");
+
+        if (jwtHeader == null) {
+            courses = courseService.findCoursesByPlatform(platform, sortType);
+            return ResponseEntity.ok().body(courses);
+        }
+
+        String token = jwtHeader.replace("Bearer ", "");
+        Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
+
+        courses = courseService.findCoursesByPlatform(platform, sortType, memberId);
+
         return ResponseEntity.ok().body(courses);
     }
 
     @GetMapping("/courses/{platform}/{category}")
     public ResponseEntity<List<CourseResponseDto>> findCoursesByPlatformAndCategory(
             @PathVariable("platform") String platform, @PathVariable("category") String category,
-            @RequestParam(value = "sort", required = false) String sortType) {
-        List<CourseResponseDto> courses = courseService.findCoursesByPlatformAndCategory(platform,
-                category, sortType);
+            @RequestParam(value = "sort", required = false) String sortType
+            , HttpServletRequest request) {
+
+        List<CourseResponseDto> courses;
+
+        String jwtHeader = request.getHeader("Authorization");
+
+        if (jwtHeader == null) {
+            courses = courseService.findCoursesByPlatformAndCategory(platform,
+                    category, sortType);
+            return ResponseEntity.ok().body(courses);
+        }
+
+        String token = jwtHeader.replace("Bearer ", "");
+        Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
+
+        courses = courseService.findCoursesByPlatformAndCategory(platform,
+                category, sortType, memberId);
+
         return ResponseEntity.ok().body(courses);
     }
 
