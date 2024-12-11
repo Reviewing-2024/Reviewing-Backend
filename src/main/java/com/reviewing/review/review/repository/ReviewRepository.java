@@ -129,8 +129,4 @@ public class ReviewRepository {
         em.remove(reviewDislike);
     }
 
-    public void changeCourseUpdated(Long reviewId) {
-        Review findReview = em.find(Review.class, reviewId);
-        findReview.getCourse().setUpdated(true);
-    }
 }
