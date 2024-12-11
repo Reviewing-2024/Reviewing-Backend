@@ -112,4 +112,17 @@ public class CourseController {
 
     }
 
+    @GetMapping("/courses/{courseId}")
+    public ResponseEntity<CourseResponseDto> findCourseById(@PathVariable Long courseId,
+            HttpServletRequest request) {
+
+        String jwtHeader = request.getHeader("Authorization");
+        String token = jwtHeader.replace("Bearer ", "");
+        Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
+
+        CourseResponseDto courseResponseDto = courseService.findCourseById(courseId, memberId);
+
+        return ResponseEntity.ok().body(courseResponseDto);
+    }
+
 }

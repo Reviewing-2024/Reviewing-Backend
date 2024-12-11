@@ -385,4 +385,21 @@ public class CourseRepository {
         Course findCourse = em.find(Course.class, courseId);
         findCourse.setUpdated(true);
     }
+
+    public CourseResponseDto findCourseById(Long courseId, Long memberId) {
+        return em.createQuery(
+                        "select new com.reviewing.review.course.domain.CourseResponseDto("
+                                + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, "
+                                + "count(w.id), "
+                                + "case when w.member.id = :memberId then true else false end) "
+                                + "from Course c "
+                                + "left join CourseWish w on w.course.id = c.id "
+                                + "where c.id = :courseId "
+                                + "group by c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, "
+                                + "c.rating, c.slug, c.url, w.member.id",
+                        CourseResponseDto.class)
+                .setParameter("courseId", courseId)
+                .setParameter("memberId", memberId)
+                .getSingleResult();
+    }
 }

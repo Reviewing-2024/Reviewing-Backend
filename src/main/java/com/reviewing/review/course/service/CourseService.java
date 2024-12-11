@@ -55,4 +55,8 @@ public class CourseService {
 
         courseRepository.changeCourseUpdated(courseId);
     }
+
+    public CourseResponseDto findCourseById(Long courseId, Long memberId) {
+        return courseRepository.findCourseById(courseId, memberId);
+    }
 }
