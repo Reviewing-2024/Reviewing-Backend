@@ -113,7 +113,7 @@ public class CourseController {
         return ResponseEntity.ok().body(courseResponseDto);
     }
 
-    @GetMapping("/courses/{courseId}")
+    @GetMapping("/course/{courseId}")
     public ResponseEntity<CourseResponseDto> findCourseById(@PathVariable Long courseId,
             HttpServletRequest request) {
 
