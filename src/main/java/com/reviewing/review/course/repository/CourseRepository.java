@@ -141,10 +141,11 @@ public class CourseRepository {
                                     + "from Course c "
                                     + "left join Review r on c.id = r.course.id "
                                     + "left join CourseWish w on w.course.id = c.id "
+                                    + "left join r.reviewState rs "
                                     + "where c.platform = :platform "
                                     + "group by c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, "
                                     + "c.rating, c.slug, c.url "
-                                    + "order by count(r.id) desc",
+                                    + "order by count(case when rs.state = 'APPROVED' then 1 else null end) desc",
                             CourseResponseDto.class)
                     .setParameter("platform", finePlatform)
                     .getResultList();
@@ -199,10 +200,11 @@ public class CourseRepository {
                                     + "from Course c "
                                     + "left join Review r on c.id = r.course.id "
                                     + "left join CourseWish w on w.course.id = c.id "
+                                    + "left join r.reviewState rs "
                                     + "where c.platform = :platform "
                                     + "group by c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, "
                                     + "c.rating, c.slug, c.url, w.member.id "
-                                    + "order by count(r.id) desc",
+                                    + "order by count(case when rs.state = 'APPROVED' then 1 else null end) desc",
                             CourseResponseDto.class)
                     .setParameter("platform", finePlatform)
                     .setParameter("memberId", memberId)
