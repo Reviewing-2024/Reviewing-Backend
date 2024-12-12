@@ -7,13 +7,11 @@ import com.reviewing.review.review.service.ReviewService;
 import com.reviewing.review.review.service.S3Service;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -84,7 +82,7 @@ public class ReviewController {
     }
 
     @PostMapping("/{reviewId}/like")
-    public void createReviewLike(@PathVariable Long reviewId,
+    public ResponseEntity<ReviewResponseDto> createReviewLike(@PathVariable Long reviewId,
             @RequestParam(value = "liked") boolean liked,
             HttpServletRequest request) {
 
@@ -94,14 +92,17 @@ public class ReviewController {
 
         if (liked) {
             reviewService.removeReviewLike(reviewId, memberId);
-            return;
+            ReviewResponseDto reviewResponseDto =  reviewService.findReviewById(reviewId, memberId);
+            return ResponseEntity.ok().body(reviewResponseDto);
         }
 
         reviewService.createReviewLike(reviewId, memberId);
+        ReviewResponseDto reviewResponseDto =  reviewService.findReviewById(reviewId, memberId);
+        return ResponseEntity.ok().body(reviewResponseDto);
     }
 
     @PostMapping("/{reviewId}/dislike")
-    public void createReviewDislike(@PathVariable Long reviewId,
+    public ResponseEntity<ReviewResponseDto> createReviewDislike(@PathVariable Long reviewId,
             @RequestParam(value = "disliked") boolean disliked,
             HttpServletRequest request) {
 
@@ -111,10 +112,13 @@ public class ReviewController {
 
         if (disliked) {
             reviewService.removeReviewDislike(reviewId, memberId);
-            return;
+            ReviewResponseDto reviewResponseDto =  reviewService.findReviewById(reviewId, memberId);
+            return ResponseEntity.ok().body(reviewResponseDto);
         }
 
         reviewService.createReviewDislike(reviewId, memberId);
+        ReviewResponseDto reviewResponseDto =  reviewService.findReviewById(reviewId, memberId);
+        return ResponseEntity.ok().body(reviewResponseDto);
     }
 
 }

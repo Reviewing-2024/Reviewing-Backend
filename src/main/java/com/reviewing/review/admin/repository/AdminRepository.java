@@ -1,6 +1,7 @@
 package com.reviewing.review.admin.repository;
 
 import com.reviewing.review.admin.domain.AdminReviewResponseDto;
+import com.reviewing.review.course.domain.Course;
 import com.reviewing.review.review.domain.Review;
 import com.reviewing.review.review.domain.ReviewStateType;
 import jakarta.persistence.EntityManager;
@@ -53,5 +54,19 @@ public class AdminRepository {
     public void changeCourseUpdated(Long reviewId) {
         Review findReview = em.find(Review.class, reviewId);
         findReview.getCourse().setUpdated(true);
+    }
+
+    public int getTotalReviewCountByReviewId(Long courseId) {
+
+        return em.createQuery("select r "
+                        + "from Review r "
+                        + "join r.course c "
+                        + "join r.reviewState rs "
+                        + "where rs.state = 'APPROVED' "
+                        + "and c.id = :courseId", Review.class)
+                .setParameter("courseId", courseId)
+                .getResultList()
+                .size();
+
     }
 }
