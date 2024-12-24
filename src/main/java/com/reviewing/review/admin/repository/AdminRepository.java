@@ -20,12 +20,10 @@ public class AdminRepository {
     public List<AdminReviewResponseDto> findReviewByStatus(ReviewStateType status) {
 
         return em.createQuery("select new com.reviewing.review.admin.domain.AdminReviewResponseDto "
-                        + "(c.id,c.title,c.teacher,c.thumbnailImage,c.thumbnailVideo,c.url, "
-                        + "r.id,r.contents,rs.state,r.certification) "
+                        + "(r.course.id, r.course.title, r.course.teacher, r.course.thumbnailImage, r.course.thumbnailVideo,r.course.url, "
+                        + "r.id,r.contents,r.reviewState.state,r.certification) "
                         + "from Review r "
-                        + "join r.course c "
-                        + "join r.reviewState rs "
-                        + "where rs.state = :status", AdminReviewResponseDto.class)
+                        + "where r.reviewState.state = :status", AdminReviewResponseDto.class)
                 .setParameter("status", status)
                 .getResultList();
 
@@ -60,10 +58,8 @@ public class AdminRepository {
 
         return em.createQuery("select r "
                         + "from Review r "
-                        + "join r.course c "
-                        + "join r.reviewState rs "
-                        + "where rs.state = 'APPROVED' "
-                        + "and c.id = :courseId", Review.class)
+                        + "where r.reviewState.state = 'APPROVED' "
+                        + "and r.course.id = :courseId", Review.class)
                 .setParameter("courseId", courseId)
                 .getResultList()
                 .size();
