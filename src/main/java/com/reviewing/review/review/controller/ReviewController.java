@@ -90,12 +90,13 @@ public class ReviewController {
         String token = jwtHeader.replace("Bearer ", "");
         Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
 
-        if (liked) {
+        if (liked) { // liked = true 일 때 -> 좋아요 취소
             reviewService.removeReviewLike(reviewId, memberId);
             ReviewResponseDto reviewResponseDto =  reviewService.findReviewById(reviewId, memberId);
             return ResponseEntity.ok().body(reviewResponseDto);
         }
 
+        // liked = false 일 때 -> 좋아요
         reviewService.createReviewLike(reviewId, memberId);
         ReviewResponseDto reviewResponseDto =  reviewService.findReviewById(reviewId, memberId);
         return ResponseEntity.ok().body(reviewResponseDto);
