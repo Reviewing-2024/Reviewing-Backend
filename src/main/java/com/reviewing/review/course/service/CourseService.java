@@ -1,7 +1,9 @@
 package com.reviewing.review.course.service;
 
+import com.reviewing.review.course.domain.CategoryResponseDto;
 import com.reviewing.review.course.domain.Course;
 import com.reviewing.review.course.domain.CourseResponseDto;
+import com.reviewing.review.course.domain.Platform;
 import com.reviewing.review.course.repository.CourseRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -58,5 +60,13 @@ public class CourseService {
 
     public CourseResponseDto findCourseById(Long courseId, Long memberId) {
         return courseRepository.findCourseById(courseId, memberId);
+    }
+
+    public List<Platform> findPlatforms() {
+        return courseRepository.findPlatforms();
+    }
+
+    public List<CategoryResponseDto> findCategories(String platform) {
+        return courseRepository.findCategories(platform);
     }
 }

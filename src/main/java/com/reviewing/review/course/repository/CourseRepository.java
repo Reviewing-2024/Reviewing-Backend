@@ -1,6 +1,7 @@
 package com.reviewing.review.course.repository;
 
 import com.reviewing.review.course.domain.Category;
+import com.reviewing.review.course.domain.CategoryResponseDto;
 import com.reviewing.review.course.domain.Course;
 import com.reviewing.review.course.domain.CourseResponseDto;
 import com.reviewing.review.course.domain.CourseWish;
@@ -403,5 +404,18 @@ public class CourseRepository {
                 .setParameter("courseId", courseId)
                 .setParameter("memberId", memberId)
                 .getSingleResult();
+    }
+
+    public List<Platform> findPlatforms() {
+        return em.createQuery("select p from Platform p",Platform.class)
+                .getResultList();
+    }
+
+    public List<CategoryResponseDto> findCategories(String platform) {
+        return em.createQuery(
+                        "select new com.reviewing.review.course.domain.CategoryResponseDto (c.name) from Category c "
+                                + "where c.platform.name = :platform", CategoryResponseDto.class)
+                .setParameter("platform", platform)
+                .getResultList();
     }
 }
