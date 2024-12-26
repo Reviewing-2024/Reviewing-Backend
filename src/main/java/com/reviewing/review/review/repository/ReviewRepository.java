@@ -61,10 +61,8 @@ public class ReviewRepository {
                                 + "count(rl.id), "
                                 + "r.createdAt) "
                                 + "from Review r "
-                                + "join r.reviewState rs "
                                 + "left join ReviewLike rl on rl.review.id = r.id "
-                                + "left join ReviewDislike rd on rd.review.id = r.id "
-                                + "where r.course.id = :courseId and rs.state = 'APPROVED' "
+                                + "where r.course.id = :courseId and r.reviewState.state = 'APPROVED' "
                                 + "group by r.id, r.member.nickname "
                                 + "order by r.createdAt desc",
                         ReviewResponseDto.class)
@@ -128,7 +126,6 @@ public class ReviewRepository {
                                 + "r.createdAt) "
                                 + "from Review r "
                                 + "left join ReviewLike rl on rl.review.id = r.id "
-                                + "left join ReviewDislike rd on rd.review.id = r.id "
                                 + "where r.id = :reviewId and r.reviewState.state = 'APPROVED' "
                                 + "group by r.id, r.member.nickname ",
                         ReviewResponseDto.class)
