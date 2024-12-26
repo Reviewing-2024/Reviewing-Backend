@@ -3,6 +3,7 @@ package com.reviewing.review.course.service;
 import com.reviewing.review.course.domain.CategoryResponseDto;
 import com.reviewing.review.course.domain.Course;
 import com.reviewing.review.course.domain.CourseResponseDto;
+import com.reviewing.review.course.domain.CourseWish;
 import com.reviewing.review.course.domain.Platform;
 import com.reviewing.review.course.repository.CourseRepository;
 import java.util.List;
@@ -59,7 +60,16 @@ public class CourseService {
     }
 
     public CourseResponseDto findCourseById(Long courseId, Long memberId) {
-        return courseRepository.findCourseById(courseId, memberId);
+
+        CourseResponseDto courseResponseDto = courseRepository.findCourseById(courseId, memberId);
+
+        CourseWish findCourseWish = courseRepository.checkCourseWish(courseId, memberId);
+
+        if (findCourseWish != null) {
+            courseResponseDto.setWished(true);
+        }
+
+        return courseResponseDto;
     }
 
     public List<Platform> findPlatforms() {

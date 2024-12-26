@@ -119,12 +119,13 @@ public class CourseController {
         String token = jwtHeader.replace("Bearer ", "");
         Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
 
-        if (wished) {
+        if (wished) { // wished=true -> 강의 찜 취소
             courseService.removeCourseWish(courseId, memberId);
             CourseResponseDto courseResponseDto = courseService.findCourseById(courseId,memberId);
             return ResponseEntity.ok().body(courseResponseDto);
         }
 
+        // wished=false -> 강의 찜
         courseService.createCourseWish(courseId, memberId);
         CourseResponseDto courseResponseDto = courseService.findCourseById(courseId,memberId);
         return ResponseEntity.ok().body(courseResponseDto);

@@ -16,7 +16,7 @@ public class CourseResponseDto {
     private String slug;
     private String url;
     private Long wishes;
-    private boolean wished;
+    private boolean wished = false;
 
     public CourseResponseDto(Long id, String title, String teacher, String thumbnailImage,
             String thumbnailVideo, float rating, String slug, String url, Long wishes) {

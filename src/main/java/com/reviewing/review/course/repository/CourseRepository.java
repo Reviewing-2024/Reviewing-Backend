@@ -8,6 +8,7 @@ import com.reviewing.review.course.domain.CourseWish;
 import com.reviewing.review.course.domain.Platform;
 import com.reviewing.review.member.domain.Member;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -376,9 +377,11 @@ public class CourseRepository {
     }
 
     public void removeCourseWish(Long courseId, Long memberId) {
-        CourseWish courseWish = em.createQuery("select cw from CourseWish cw where cw.course.id = :courseId and cw.member.id = :memberId",CourseWish.class)
-                .setParameter("courseId",courseId)
-                .setParameter("memberId",memberId)
+        CourseWish courseWish = em.createQuery(
+                        "select cw from CourseWish cw where cw.course.id = :courseId and cw.member.id = :memberId",
+                        CourseWish.class)
+                .setParameter("courseId", courseId)
+                .setParameter("memberId", memberId)
                 .getSingleResult();
 
         em.remove(courseWish);
@@ -393,16 +396,13 @@ public class CourseRepository {
         return em.createQuery(
                         "select new com.reviewing.review.course.domain.CourseResponseDto("
                                 + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, "
-                                + "count(w.id), "
-                                + "case when w.member.id = :memberId then true else false end) "
+                                + "count(w.id)) "
                                 + "from Course c "
                                 + "left join CourseWish w on w.course.id = c.id "
                                 + "where c.id = :courseId "
-                                + "group by c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, "
-                                + "c.rating, c.slug, c.url, w.member.id",
+                                + "group by c.id, w.member.id",
                         CourseResponseDto.class)
                 .setParameter("courseId", courseId)
-                .setParameter("memberId", memberId)
                 .getSingleResult();
     }
 
@@ -418,4 +418,18 @@ public class CourseRepository {
                 .setParameter("platform", platform)
                 .getResultList();
     }
+
+    public CourseWish checkCourseWish(Long courseId, Long memberId) {
+        try {
+            return em.createQuery(
+                            "select cw from CourseWish cw where cw.course.id = :courseId and cw.member.id = :memberId",
+                            CourseWish.class)
+                    .setParameter("courseId", courseId)
+                    .setParameter("memberId", memberId)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
 }
