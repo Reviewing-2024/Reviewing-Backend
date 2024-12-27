@@ -1,7 +1,6 @@
 package com.reviewing.review.course.service;
 
 import com.reviewing.review.course.domain.CategoryResponseDto;
-import com.reviewing.review.course.domain.Course;
 import com.reviewing.review.course.domain.CourseResponseDto;
 import com.reviewing.review.course.domain.CourseWish;
 import com.reviewing.review.course.domain.Platform;
@@ -10,6 +9,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 
 @Service
 @RequiredArgsConstructor
@@ -18,8 +18,26 @@ public class CourseService {
 
     private final CourseRepository courseRepository;
 
+    // 전체 강의 조회
     public List<CourseResponseDto> findAllCoursesBySorting(String sortType) {
-        return courseRepository.findAllCoursesBySorting(sortType);
+
+        StopWatch stopWatch = new StopWatch();
+
+        stopWatch.start("getAllCourses");
+
+        List<CourseResponseDto> courses = courseRepository.findAllCoursesBySorting(sortType);
+
+        for (CourseResponseDto course : courses) {
+
+            long courseWishes = courseRepository.findCourseWishes(course.getId());
+            course.setWishes(courseWishes);
+        }
+
+        stopWatch.stop();
+
+        log.info(stopWatch.prettyPrint());
+
+        return courses;
     }
 
     public List<CourseResponseDto> findAllCoursesBySorting(String sortType, Long memberId) {
