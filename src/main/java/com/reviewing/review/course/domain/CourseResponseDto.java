@@ -31,16 +31,4 @@ public class CourseResponseDto {
         this.wishes = wishes;
     }
 
-    public CourseResponseDto(Long id, String title, String teacher, String thumbnailImage,
-            String thumbnailVideo, float rating, String slug, String url) {
-        this.id = id;
-        this.title = title;
-        this.teacher=teacher;
-        this.thumbnailImage=thumbnailImage;
-        this.thumbnailVideo=thumbnailVideo;
-        this.rating=rating;
-        this.slug=slug;
-        this.url=url;
-    }
-
 }
