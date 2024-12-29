@@ -8,6 +8,7 @@ import com.reviewing.review.course.domain.CourseWish;
 import com.reviewing.review.course.domain.Platform;
 import com.reviewing.review.member.domain.Member;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -20,8 +21,10 @@ public class CourseRepository {
 
     private final EntityManager em;
 
+    // 모든 강의 조회 - 로그인 안함
     public List<CourseResponseDto> findAllCoursesBySorting(String sortType) {
 
+        // 평점순
         if (sortType != null && sortType.equals("rating")) {
             return em.createQuery(
                             "select new com.reviewing.review.course.domain.CourseResponseDto"
@@ -29,41 +32,42 @@ public class CourseRepository {
                                     + "count(w.id)) "
                                     + "from Course c "
                                     + "left join CourseWish w on w.course.id = c.id "
-                                    + "group by c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, "
-                                    + "c.rating, c.slug, c.url "
+                                    + "group by c.id "
                                     + "order by c.rating desc",
                             CourseResponseDto.class)
                     .getResultList();
         }
 
+        // 댓글순
         if (sortType != null && sortType.equals("comments")) {
             return em.createQuery(
                             "select new com.reviewing.review.course.domain.CourseResponseDto"
-                                    + "(c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, "
-                                    + "count(w.id)) "
+                                    + "(c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url) "
                                     + "from Course c "
                                     + "left join Review r on c.id = r.course.id "
-                                    + "left join CourseWish w on w.course.id = c.id " +
-                                    "group by c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url "
-                                    +
-                                    "order by count(r.id) desc",
+//                                    + "left join CourseWish w on w.course.id = c.id " +
+                                    + "group by c.id "
+                                    + "order by count(r.id) desc",
                             CourseResponseDto.class)
                     .getResultList();
         }
 
+        // 기본
         return em.createQuery(
                         "select new com.reviewing.review.course.domain.CourseResponseDto"
                                 + "(c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, "
                                 + "count(w.id)) "
                                 + "from Course c "
                                 + "left join CourseWish w on w.course.id = c.id "
-                                + "group by c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url ",
+                                + "group by c.id",
                         CourseResponseDto.class)
                 .getResultList();
     }
 
+    // 모든 강의 조회 - 로그인 함
     public List<CourseResponseDto> findAllCoursesBySorting(String sortType, Long memberId) {
 
+        // 평점순
         if (sortType != null && sortType.equals("rating")) {
             return em.createQuery(
                             "select new com.reviewing.review.course.domain.CourseResponseDto("
@@ -80,6 +84,7 @@ public class CourseRepository {
                     .getResultList();
         }
 
+        // 댓글순
         if (sortType != null && sortType.equals("comments")) {
 
             return em.createQuery(
@@ -98,6 +103,7 @@ public class CourseRepository {
                     .getResultList();
         }
 
+        // 기본순
         return em.createQuery(
                         "select new com.reviewing.review.course.domain.CourseResponseDto("
                                 + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, "
@@ -112,6 +118,7 @@ public class CourseRepository {
                 .getResultList();
     }
 
+    // 플랫폼 기준 정렬 - 로그인 안함
     public List<CourseResponseDto> findCoursesByPlatform(String platform, String sortType) {
         Platform finePlatform = em.createQuery("select p from Platform p where p.name = :name",
                         Platform.class)
@@ -166,6 +173,7 @@ public class CourseRepository {
                 .getResultList();
     }
 
+    // 플랫폼 기준 정렬 - 로그인 함
     public List<CourseResponseDto> findCoursesByPlatform(String platform, String sortType,
             Long memberId) {
 
@@ -228,6 +236,7 @@ public class CourseRepository {
                 .getResultList();
     }
 
+    // 플랫폼,카테고리 기준 정렬 - 로그인 안함
     public List<CourseResponseDto> findCoursesByPlatformAndCategory(String platform,
             String category, String sortType) {
         Platform findPlatform = em.createQuery("select p from Platform p where p.name = :name",
@@ -292,6 +301,7 @@ public class CourseRepository {
                 .getResultList();
     }
 
+    // 플랫폼,카테고리 기준 정렬 - 로그인 함
     public List<CourseResponseDto> findCoursesByPlatformAndCategory(String platform,
             String category, String sortType, Long memberId) {
 
@@ -376,9 +386,11 @@ public class CourseRepository {
     }
 
     public void removeCourseWish(Long courseId, Long memberId) {
-        CourseWish courseWish = em.createQuery("select cw from CourseWish cw where cw.course.id = :courseId and cw.member.id = :memberId",CourseWish.class)
-                .setParameter("courseId",courseId)
-                .setParameter("memberId",memberId)
+        CourseWish courseWish = em.createQuery(
+                        "select cw from CourseWish cw where cw.course.id = :courseId and cw.member.id = :memberId",
+                        CourseWish.class)
+                .setParameter("courseId", courseId)
+                .setParameter("memberId", memberId)
                 .getSingleResult();
 
         em.remove(courseWish);
@@ -393,16 +405,13 @@ public class CourseRepository {
         return em.createQuery(
                         "select new com.reviewing.review.course.domain.CourseResponseDto("
                                 + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, "
-                                + "count(w.id), "
-                                + "case when w.member.id = :memberId then true else false end) "
+                                + "count(w.id)) "
                                 + "from Course c "
                                 + "left join CourseWish w on w.course.id = c.id "
                                 + "where c.id = :courseId "
-                                + "group by c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, "
-                                + "c.rating, c.slug, c.url, w.member.id",
+                                + "group by c.id",
                         CourseResponseDto.class)
                 .setParameter("courseId", courseId)
-                .setParameter("memberId", memberId)
                 .getSingleResult();
     }
 
@@ -418,4 +427,26 @@ public class CourseRepository {
                 .setParameter("platform", platform)
                 .getResultList();
     }
+
+    public CourseWish checkCourseWish(Long courseId, Long memberId) {
+        try {
+            return em.createQuery(
+                            "select cw from CourseWish cw where cw.course.id = :courseId and cw.member.id = :memberId",
+                            CourseWish.class)
+                    .setParameter("courseId", courseId)
+                    .setParameter("memberId", memberId)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
+    public long findCourseWishes(Long courseId) {
+        return em.createQuery("select cw from CourseWish cw where cw.course.id = :courseId",
+                        CourseWish.class)
+                .setParameter("courseId", courseId)
+                .getResultList()
+                .size();
+    }
+
 }
