@@ -404,12 +404,13 @@ public class CourseRepository {
     public CourseResponseDto findCourseById(Long courseId, Long memberId) {
         return em.createQuery(
                         "select new com.reviewing.review.course.domain.CourseResponseDto("
-                                + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, "
-                                + "count(w.id)) "
+                                + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes) "
+//                                + "count(w.id)) "
                                 + "from Course c "
-                                + "left join CourseWish w on w.course.id = c.id "
+//                                + "left join CourseWish w on w.course.id = c.id "
                                 + "where c.id = :courseId "
-                                + "group by c.id",
+//                                + "group by c.id"
+                        ,
                         CourseResponseDto.class)
                 .setParameter("courseId", courseId)
                 .getSingleResult();
@@ -449,4 +450,15 @@ public class CourseRepository {
                 .size();
     }
 
+    public void updateCourseWishCount(Long courseId, boolean wished) {
+
+        Course findCourse = em.find(Course.class, courseId);
+        int wishes = findCourse.getWishes();
+
+        if (wished) {
+            findCourse.setWishes(wishes + 1);
+            return;
+        }
+        findCourse.setWishes(wishes - 1);
+    }
 }

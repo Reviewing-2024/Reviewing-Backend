@@ -69,12 +69,14 @@ public class CourseService {
         courseRepository.createCourseWish(courseId, memberId);
 
         courseRepository.changeCourseUpdated(courseId);
+        courseRepository.updateCourseWishCount(courseId, true);
     }
 
     public void removeCourseWish(Long courseId, Long memberId) {
         courseRepository.removeCourseWish(courseId, memberId);
 
         courseRepository.changeCourseUpdated(courseId);
+        courseRepository.updateCourseWishCount(courseId, false);
     }
 
     public CourseResponseDto findCourseById(Long courseId, Long memberId) {
