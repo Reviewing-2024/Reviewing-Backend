@@ -81,9 +81,10 @@ public class CourseRepository {
                                     + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes) "
                                     + "from Course c "
                                     + "left join Review r on c.id = r.course.id "
+                                    + "and (r.reviewState.state = :reviewStateType) "
                                     + "where c.platform = :platform "
                                     + "group by c.id "
-                                    + "order by count(case when r.reviewState.state = :reviewStateType then 1 else null end) desc",
+                                    + "order by count(r.id) desc",
                             CourseResponseDto.class)
                     .setParameter("platform", finePlatform)
                     .setParameter("reviewStateType", ReviewStateType.APPROVED)
@@ -134,9 +135,10 @@ public class CourseRepository {
                                     + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes) "
                                     + "from Course c "
                                     + "left join Review r on c.id = r.course.id "
+                                    + "and (r.reviewState.state = :reviewStateType) "
                                     + "where c.platform = :platform and c.category = :category "
                                     + "group by c.id "
-                                    + "order by count(case when r.reviewState.state = :reviewStateType then 1 else null end) desc",
+                                    + "order by count(r.id) desc",
                             CourseResponseDto.class)
                     .setParameter("platform", findPlatform)
                     .setParameter("category", findCategory)
