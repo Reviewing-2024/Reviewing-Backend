@@ -1,7 +1,9 @@
 package com.reviewing.review.course.service;
 
-import com.reviewing.review.course.domain.Course;
+import com.reviewing.review.course.domain.CategoryResponseDto;
 import com.reviewing.review.course.domain.CourseResponseDto;
+import com.reviewing.review.course.domain.CourseWish;
+import com.reviewing.review.course.domain.Platform;
 import com.reviewing.review.course.repository.CourseRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -15,22 +17,13 @@ public class CourseService {
 
     private final CourseRepository courseRepository;
 
+    // 전체 강의 조회
     public List<CourseResponseDto> findAllCoursesBySorting(String sortType) {
         return courseRepository.findAllCoursesBySorting(sortType);
     }
-
-    public List<CourseResponseDto> findAllCoursesBySorting(String sortType, Long memberId) {
-        return courseRepository.findAllCoursesBySorting(sortType, memberId);
-    }
-
+    // 플랫폼 기준 조회
     public List<CourseResponseDto> findCoursesByPlatform(String platform, String sortType) {
         return courseRepository.findCoursesByPlatform(platform, sortType);
-    }
-
-    public List<CourseResponseDto> findCoursesByPlatform(String platform, String sortType,
-            Long memberId) {
-
-        return courseRepository.findCoursesByPlatform(platform, sortType, memberId);
     }
 
     public List<CourseResponseDto> findCoursesByPlatformAndCategory(String platform,
@@ -38,25 +31,51 @@ public class CourseService {
         return courseRepository.findCoursesByPlatformAndCategory(platform, category, sortType);
     }
 
-    public List<CourseResponseDto> findCoursesByPlatformAndCategory(String platform,
-            String category, String sortType, Long memberId) {
-        return courseRepository.findCoursesByPlatformAndCategory(platform, category, sortType,
-                memberId);
-    }
-
     public void createCourseWish(Long courseId, Long memberId) {
         courseRepository.createCourseWish(courseId, memberId);
 
         courseRepository.changeCourseUpdated(courseId);
+        courseRepository.updateCourseWishCount(courseId, true);
     }
 
     public void removeCourseWish(Long courseId, Long memberId) {
         courseRepository.removeCourseWish(courseId, memberId);
 
         courseRepository.changeCourseUpdated(courseId);
+        courseRepository.updateCourseWishCount(courseId, false);
     }
 
     public CourseResponseDto findCourseById(Long courseId, Long memberId) {
-        return courseRepository.findCourseById(courseId, memberId);
+
+        CourseResponseDto courseResponseDto = courseRepository.findCourseById(courseId, memberId);
+
+        CourseWish findCourseWish = courseRepository.checkCourseWish(courseId, memberId);
+
+        if (findCourseWish != null) {
+            courseResponseDto.setWished(true);
+        }
+
+        return courseResponseDto;
+    }
+
+    public List<Platform> findPlatforms() {
+        return courseRepository.findPlatforms();
+    }
+
+    public List<CategoryResponseDto> findCategories(String platform) {
+        return courseRepository.findCategories(platform);
+    }
+
+    public List<CourseResponseDto> checkCourseWished(List<CourseResponseDto> courses,
+            Long memberId) {
+
+        for (CourseResponseDto course : courses) {
+            CourseWish findCourseWish = courseRepository.findCourseWish(course.getId(), memberId);
+
+            if (findCourseWish != null) {
+                course.setWished(true);
+            }
+        }
+        return courses;
     }
 }

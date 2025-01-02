@@ -8,6 +8,7 @@ import com.reviewing.review.review.domain.ReviewLike;
 import com.reviewing.review.review.domain.ReviewResponseDto;
 import com.reviewing.review.review.domain.ReviewState;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,44 +41,32 @@ public class ReviewRepository {
     public List<ReviewResponseDto> findReviewsByCourse(Long courseId) {
 
         return em.createQuery("select new com.reviewing.review.review.domain.ReviewResponseDto( "
-                                + "r.id, m.nickname, r.contents, r.rating, "
+                                + "r.id, r.member.nickname, r.contents, r.rating, "
                                 + "count(rl.id), "
-                                + "count(rd.id), "
                                 + "r.createdAt) "
                                 + "from Review r "
-                                + "join r.member m "
-                                + "join r.course c "
-                                + "join r.reviewState rs "
                                 + "left join ReviewLike rl on rl.review.id = r.id "
-                                + "left join ReviewDislike rd on rd.review.id = r.id "
-                                + "where c.id = :courseId and rs.state = 'APPROVED' "
-                                + "group by r.id, m.nickname, r.contents, r.rating, r.createdAt",
+                                + "where r.course.id = :courseId and r.reviewState.state = 'APPROVED' "
+                                + "group by r.id, r.member.nickname "
+                                + "order by r.createdAt desc",
                         ReviewResponseDto.class)
                 .setParameter("courseId", courseId)
                 .getResultList();
     }
 
-    public List<ReviewResponseDto> findReviewsWithLikedAndDislikedByCourse(Long courseId,
-            Long memberId) {
+    public List<ReviewResponseDto> findReviewsWithLikedAndDislikedByCourse(Long courseId) {
 
         return em.createQuery("select new com.reviewing.review.review.domain.ReviewResponseDto( "
-                                + "r.id, m.nickname, r.contents, r.rating, "
+                                + "r.id, r.member.nickname, r.contents, r.rating, "
                                 + "count(rl.id), "
-                                + "count(rd.id), "
-                                + "(case when rl.member.id = :memberId then true else false end), "
-                                + "(case when rd.member.id = :memberId then true else false end), "
                                 + "r.createdAt) "
                                 + "from Review r "
-                                + "join r.member m "
-                                + "join r.course c "
-                                + "join r.reviewState rs "
                                 + "left join ReviewLike rl on rl.review.id = r.id "
-                                + "left join ReviewDislike rd on rd.review.id = r.id "
-                                + "where c.id = :courseId and rs.state = 'APPROVED' "
-                                + "group by r.id, m.nickname, r.contents, r.rating, r.createdAt, rl.member.id, rd.member.id",
+                                + "where r.course.id = :courseId and r.reviewState.state = 'APPROVED' "
+                                + "group by r.id, r.member.nickname "
+                                + "order by r.createdAt desc",
                         ReviewResponseDto.class)
                 .setParameter("courseId", courseId)
-                .setParameter("memberId", memberId)
                 .getResultList();
     }
 
@@ -129,26 +118,58 @@ public class ReviewRepository {
         em.remove(reviewDislike);
     }
 
-    public ReviewResponseDto findReviewById(Long reviewId, Long memberId) {
+    public ReviewResponseDto findReviewById(Long reviewId) {
         return em.createQuery(
                         "select new com.reviewing.review.review.domain.ReviewResponseDto( "
-                                + "r.id, m.nickname, r.contents, r.rating, "
+                                + "r.id, r.member.nickname, r.contents, r.rating, "
                                 + "count(rl.id), "
-                                + "count(rd.id), "
-                                + "(case when rl.member.id = :memberId then true else false end), "
-                                + "(case when rd.member.id = :memberId then true else false end), "
                                 + "r.createdAt) "
                                 + "from Review r "
-                                + "join r.member m "
-                                + "join r.course c "
-                                + "join r.reviewState rs "
                                 + "left join ReviewLike rl on rl.review.id = r.id "
-                                + "left join ReviewDislike rd on rd.review.id = r.id "
-                                + "where r.id = :reviewId and rs.state = 'APPROVED' "
-                                + "group by r.id, m.nickname, r.contents, r.rating, r.createdAt, rl.member.id, rd.member.id",
+                                + "where r.id = :reviewId and r.reviewState.state = 'APPROVED' "
+                                + "group by r.id, r.member.nickname ",
                         ReviewResponseDto.class)
                 .setParameter("reviewId", reviewId)
-                .setParameter("memberId", memberId)
                 .getSingleResult();
+    }
+
+    public ReviewLike checkReviewLiked(Long reviewId, Long memberId) {
+
+        try {
+            return em.createQuery(
+                            "select rl from ReviewLike rl where rl.review.id = :reviewId and rl.member.id = :memberId",
+                            ReviewLike.class)
+                    .setParameter("reviewId", reviewId)
+                    .setParameter("memberId", memberId)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+
+    }
+
+    public ReviewDislike checkReviewDisliked(Long reviewId, Long memberId) {
+
+        try {
+            return em.createQuery(
+                            "select rd from ReviewDislike rd where rd.review.id = :reviewId and rd.member.id = :memberId",
+                            ReviewDislike.class)
+                    .setParameter("reviewId", reviewId)
+                    .setParameter("memberId", memberId)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+
+    }
+
+    public int findReviewDislikes(Long reviewId) {
+
+        return em.createQuery("select rd from ReviewDislike rd where rd.review.id = :reviewId",
+                        ReviewDislike.class)
+                .setParameter("reviewId", reviewId)
+                .getResultList()
+                .size();
+
     }
 }

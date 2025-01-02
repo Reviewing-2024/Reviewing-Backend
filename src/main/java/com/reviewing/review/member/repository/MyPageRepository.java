@@ -23,23 +23,18 @@ public class MyPageRepository {
                 "select new com.reviewing.review.member.domain.MyReviewResponseDto( "
                         + "r.id, c.id, c.title, c.slug, r.contents, rs.state, r.rating, "
                         + "count(rl.id), "
-                        + "count(rd.id), "
-                        + "rs.rejectionReason, "
+                        + "r.reviewState.rejectionReason, "
                         + "r.createdAt) "
                         + "from Review r "
-                        + "join r.member m "
-                        + "join r.course c "
-                        + "join r.reviewState rs "
                         + "left join ReviewLike rl on rl.review.id = r.id "
-                        + "left join ReviewDislike rd on rd.review.id = r.id "
                         + "where r.member.id = :memberId ");
 
         if (status != null) {
-            query.append("and rs.state = :status ");
+            query.append("and r.reviewState.state = :status ");
         }
 
         query.append(
-                "group by r.id, c.id, r.contents, rs.state,rs.rejectionReason, r.rating, r.createdAt");
+                "group by r.id, r.reviewState.state, r.reviewState.rejectionReason");
 
         // 쿼리 실행
         var queryResult = em.createQuery(query.toString(), MyReviewResponseDto.class)

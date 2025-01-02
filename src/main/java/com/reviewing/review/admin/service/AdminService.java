@@ -38,16 +38,21 @@ public class AdminService {
         float thisReviewRating = findReview.getRating();
         float courseRating = findReview.getCourse().getRating();
 
+        int totalReviewCount = adminRepository.getTotalReviewCountByReviewId(findReview.getCourse().getId());
+
+        float newTotalRating = thisReviewRating + courseRating;
+        int newTotalReviewCount = totalReviewCount + 1;
+
         adminRepository.updateReviewRating(findReview,
-                calculateReviewRating(thisReviewRating, courseRating));
+                calculateReviewRating(newTotalRating, newTotalReviewCount));
 
         adminRepository.changeReviewApprove(findReview);
 
         adminRepository.changeCourseUpdated(reviewId);
     }
 
-    public float calculateReviewRating(float thisReviewRating, float courseRating) {
-        return Math.round((thisReviewRating + courseRating) / 2 * 10) / 10.0f;
+    public float calculateReviewRating(float newTotalRating, int newTotalReviewCount) {
+        return Math.round(newTotalRating / newTotalReviewCount * 10) / 10.0f;
     }
 
     public void changeReviewReject(Long reviewId, String rejectionReason) {

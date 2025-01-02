@@ -15,11 +15,11 @@ public class CourseResponseDto {
     private float rating;
     private String slug;
     private String url;
-    private Long wishes;
-    private boolean wished;
+    private long wishes;
+    private boolean wished = false;
 
     public CourseResponseDto(Long id, String title, String teacher, String thumbnailImage,
-            String thumbnailVideo, float rating, String slug, String url, Long wishes) {
+            String thumbnailVideo, float rating, String slug, String url, long wishes) {
         this.id = id;
         this.title = title;
         this.teacher=teacher;
