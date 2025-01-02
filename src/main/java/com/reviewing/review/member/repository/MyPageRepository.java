@@ -21,7 +21,7 @@ public class MyPageRepository {
 
         StringBuilder query = new StringBuilder(
                 "select new com.reviewing.review.member.domain.MyReviewResponseDto( "
-                        + "r.id, r.course.id, r.contents, r.reviewState.state, r.rating, "
+                        + "r.id, c.id, c.title, c.slug, r.contents, rs.state, r.rating, "
                         + "count(rl.id), "
                         + "r.reviewState.rejectionReason, "
                         + "r.createdAt) "
