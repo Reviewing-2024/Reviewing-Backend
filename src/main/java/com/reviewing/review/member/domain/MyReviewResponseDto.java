@@ -11,8 +11,10 @@ import lombok.Data;
 @AllArgsConstructor
 public class MyReviewResponseDto {
 
-    private Long id;
+    private Long reviewId;
     private Long courseId;
+    private String courseTitle;
+    private String courseSlug;
     private String contents;
     private ReviewStateType status;
     private float rating;
@@ -21,12 +23,15 @@ public class MyReviewResponseDto {
     private String rejectionReason;
     private String createdAt;
 
-    public MyReviewResponseDto(Long id, Long courseId, String contents, ReviewStateType status,
+    public MyReviewResponseDto(Long reviewId, Long courseId, String courseTitle, String courseSlug, String contents,
+            ReviewStateType status,
             float rating,
             long likes, long dislikes, String rejectionReason, LocalDateTime createdAt) {
 
-        this.id = id;
+        this.reviewId = reviewId;
         this.courseId = courseId;
+        this.courseTitle = courseTitle;
+        this.courseSlug = courseSlug;
         this.contents = contents;
         this.status = status;
         this.rating = rating;
