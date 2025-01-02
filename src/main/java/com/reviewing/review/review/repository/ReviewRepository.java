@@ -41,11 +41,9 @@ public class ReviewRepository {
     public List<ReviewResponseDto> findReviewsByCourse(Long courseId) {
 
         return em.createQuery("select new com.reviewing.review.review.domain.ReviewResponseDto( "
-                                + "r.id, r.member.nickname, r.contents, r.rating, "
-                                + "count(rl.id), "
+                                + "r.id, r.member.nickname, r.contents, r.rating, r.likes, r.dislikes, "
                                 + "r.createdAt) "
                                 + "from Review r "
-                                + "left join ReviewLike rl on rl.review.id = r.id "
                                 + "where r.course.id = :courseId and r.reviewState.state = 'APPROVED' "
                                 + "group by r.id, r.member.nickname "
                                 + "order by r.createdAt desc",
@@ -57,8 +55,7 @@ public class ReviewRepository {
     public List<ReviewResponseDto> findReviewsWithLikedAndDislikedByCourse(Long courseId) {
 
         return em.createQuery("select new com.reviewing.review.review.domain.ReviewResponseDto( "
-                                + "r.id, r.member.nickname, r.contents, r.rating, "
-                                + "count(rl.id), "
+                                + "r.id, r.member.nickname, r.contents, r.rating, r.likes, r.dislikes, "
                                 + "r.createdAt) "
                                 + "from Review r "
                                 + "left join ReviewLike rl on rl.review.id = r.id "
@@ -121,11 +118,9 @@ public class ReviewRepository {
     public ReviewResponseDto findReviewById(Long reviewId) {
         return em.createQuery(
                         "select new com.reviewing.review.review.domain.ReviewResponseDto( "
-                                + "r.id, r.member.nickname, r.contents, r.rating, "
-                                + "count(rl.id), "
+                                + "r.id, r.member.nickname, r.contents, r.rating, r.likes, r.dislikes, "
                                 + "r.createdAt) "
                                 + "from Review r "
-                                + "left join ReviewLike rl on rl.review.id = r.id "
                                 + "where r.id = :reviewId and r.reviewState.state = 'APPROVED' "
                                 + "group by r.id, r.member.nickname ",
                         ReviewResponseDto.class)
@@ -172,4 +167,27 @@ public class ReviewRepository {
                 .size();
 
     }
+
+    public void updateReviewLikeCount(Long reviewId, boolean liked) {
+        Review findReview = em.find(Review.class, reviewId);
+        int likes = findReview.getLikes();
+
+        if (liked) {
+            findReview.setLikes(likes + 1);
+            return;
+        }
+        findReview.setLikes(likes - 1);
+    }
+
+    public void updateReviewDislikeCount(Long reviewId, boolean disliked) {
+        Review findReview = em.find(Review.class, reviewId);
+        int dislikes = findReview.getDislikes();
+
+        if (disliked) {
+            findReview.setDislikes(dislikes + 1);
+            return;
+        }
+        findReview.setDislikes(dislikes - 1);
+    }
+
 }

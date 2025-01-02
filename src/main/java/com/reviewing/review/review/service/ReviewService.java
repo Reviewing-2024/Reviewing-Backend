@@ -37,15 +37,7 @@ public class ReviewService {
     }
 
     public List<ReviewResponseDto> findReviewsByCourse(Long courseId) {
-
-        List<ReviewResponseDto> reviews = reviewRepository.findReviewsByCourse(courseId);
-
-        for (ReviewResponseDto review : reviews) {
-            long findReviewDislikes = reviewRepository.findReviewDislikes(review.getId());
-            review.setDislikes(findReviewDislikes);
-        }
-
-        return reviews;
+        return reviewRepository.findReviewsByCourse(courseId);
     }
 
     public List<ReviewResponseDto> findReviewsWithLikedAndDislikedByCourse(Long courseId,
@@ -65,10 +57,6 @@ public class ReviewService {
             if (findReviewDislike != null) {
                 review.setDisliked(true);
             }
-
-            long findReviewDislikes = reviewRepository.findReviewDislikes(review.getId());
-            review.setDislikes(findReviewDislikes);
-
         }
 
         return reviews;
@@ -76,18 +64,22 @@ public class ReviewService {
 
     public void createReviewLike(Long reviewId, Long memberId) {
         reviewRepository.createReviewLike(reviewId, memberId);
+        reviewRepository.updateReviewLikeCount(reviewId, true);
     }
 
     public void removeReviewLike(Long reviewId, Long memberId) {
         reviewRepository.removeReviewLike(reviewId, memberId);
+        reviewRepository.updateReviewLikeCount(reviewId, false);
     }
 
     public void createReviewDislike(Long reviewId, Long memberId) {
         reviewRepository.createReviewDislike(reviewId, memberId);
+        reviewRepository.updateReviewDislikeCount(reviewId, true);
     }
 
     public void removeReviewDislike(Long reviewId, Long memberId) {
         reviewRepository.removeReviewDislike(reviewId, memberId);
+        reviewRepository.updateReviewDislikeCount(reviewId, false);
     }
 
     public ReviewResponseDto findReviewById(Long reviewId, Long memberId) {
@@ -101,9 +93,6 @@ public class ReviewService {
         if (findReviewDislike != null) {
             reviewResponseDto.setDisliked(true);
         }
-
-        long reviewDislikes = (long) reviewRepository.findReviewDislikes(reviewId);
-        reviewResponseDto.setDislikes(reviewDislikes);
 
         return reviewResponseDto;
     }
