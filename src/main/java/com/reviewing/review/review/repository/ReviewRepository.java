@@ -45,7 +45,6 @@ public class ReviewRepository {
                                 + "r.createdAt) "
                                 + "from Review r "
                                 + "where r.course.id = :courseId and r.reviewState.state = 'APPROVED' "
-                                + "group by r.id, r.member.nickname "
                                 + "order by r.createdAt desc",
                         ReviewResponseDto.class)
                 .setParameter("courseId", courseId)
@@ -60,7 +59,6 @@ public class ReviewRepository {
                                 + "from Review r "
                                 + "left join ReviewLike rl on rl.review.id = r.id "
                                 + "where r.course.id = :courseId and r.reviewState.state = 'APPROVED' "
-                                + "group by r.id, r.member.nickname "
                                 + "order by r.createdAt desc",
                         ReviewResponseDto.class)
                 .setParameter("courseId", courseId)
@@ -121,8 +119,7 @@ public class ReviewRepository {
                                 + "r.id, r.member.nickname, r.contents, r.rating, r.likes, r.dislikes, "
                                 + "r.createdAt) "
                                 + "from Review r "
-                                + "where r.id = :reviewId and r.reviewState.state = 'APPROVED' "
-                                + "group by r.id, r.member.nickname ",
+                                + "where r.id = :reviewId and r.reviewState.state = 'APPROVED' ",
                         ReviewResponseDto.class)
                 .setParameter("reviewId", reviewId)
                 .getSingleResult();
