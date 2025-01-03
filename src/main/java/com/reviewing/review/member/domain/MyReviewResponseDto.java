@@ -18,15 +18,15 @@ public class MyReviewResponseDto {
     private String contents;
     private ReviewStateType status;
     private float rating;
-    private long likes;
-    private long dislikes;
+    private int likes;
+    private int dislikes;
     private String rejectionReason;
     private String createdAt;
 
     public MyReviewResponseDto(Long reviewId, Long courseId, String courseTitle, String courseSlug, String contents,
             ReviewStateType status,
             float rating,
-            long likes, String rejectionReason, LocalDateTime createdAt) {
+            int likes,int dislikes, String rejectionReason, LocalDateTime createdAt) {
 
         this.reviewId = reviewId;
         this.courseId = courseId;
@@ -36,6 +36,7 @@ public class MyReviewResponseDto {
         this.status = status;
         this.rating = rating;
         this.likes = likes;
+        this.dislikes = dislikes;
         this.rejectionReason = rejectionReason;
         this.createdAt = createdAt.format(
                 DateTimeFormatter.ofPattern("yyyy.MM.dd hh.mm a", Locale.US));
