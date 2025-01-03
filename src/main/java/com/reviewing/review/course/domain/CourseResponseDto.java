@@ -15,11 +15,12 @@ public class CourseResponseDto {
     private float rating;
     private String slug;
     private String url;
-    private long wishes;
+    private int wishes;
+    private int comments;
     private boolean wished = false;
 
     public CourseResponseDto(Long id, String title, String teacher, String thumbnailImage,
-            String thumbnailVideo, float rating, String slug, String url, long wishes) {
+            String thumbnailVideo, float rating, String slug, String url, int wishes, int comments) {
         this.id = id;
         this.title = title;
         this.teacher=teacher;
@@ -29,18 +30,7 @@ public class CourseResponseDto {
         this.slug=slug;
         this.url=url;
         this.wishes = wishes;
-    }
-
-    public CourseResponseDto(Long id, String title, String teacher, String thumbnailImage,
-            String thumbnailVideo, float rating, String slug, String url) {
-        this.id = id;
-        this.title = title;
-        this.teacher=teacher;
-        this.thumbnailImage=thumbnailImage;
-        this.thumbnailVideo=thumbnailVideo;
-        this.rating=rating;
-        this.slug=slug;
-        this.url=url;
+        this.comments = comments;
     }
 
 }
