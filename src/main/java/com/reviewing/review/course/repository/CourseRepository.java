@@ -32,7 +32,7 @@ public class CourseRepository {
         if (sortType != null && sortType.equals("rating")) {
             return em.createQuery(
                             "select new com.reviewing.review.course.domain.CourseResponseDto"
-                                    + "(c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes) "
+                                    + "(c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes, c.comments) "
                                     + "from Course c "
                                     + "where (:lastRating is null or (c.rating < :lastRating or (c.rating = :lastRating and c.id < :lastCourseId))) "
                                     + "order by c.rating desc, c.id desc ",
@@ -46,19 +46,20 @@ public class CourseRepository {
         if (sortType != null && sortType.equals("comments")) {
             return em.createQuery(
                             "select new com.reviewing.review.course.domain.CourseResponseDto"
-                                    + "(c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes) "
+                                    + "(c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes, c.comments) "
                                     + "from Course c "
-                                    + "left join Review r on c.id = r.course.id "
-                                    + "group by c.id "
-                                    + "order by count(case when r.reviewState.state = :reviewStateType then 1 else null end) desc",
+                                    + "where (:lastComments is null or (c.comments < :lastComments or (c.comments = :lastComments and c.id < :lastCourseId))) "
+                                    + "order by c.comments desc, c.id desc ",
                             CourseResponseDto.class)
-                    .setParameter("reviewStateType", ReviewStateType.APPROVED)
+                    .setParameter("lastComments", lastComments)
+                    .setParameter("lastCourseId", lastCourseId)
+                    .setMaxResults(PAGE_SIZE)
                     .getResultList();
         }
         // 기본
         return em.createQuery(
                         "select new com.reviewing.review.course.domain.CourseResponseDto"
-                                + "(c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes) "
+                                + "(c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes, c.comments) "
                                 + "from Course c ",
                         CourseResponseDto.class)
                 .getResultList();
@@ -76,7 +77,7 @@ public class CourseRepository {
         if (sortType != null && sortType.equals("rating")) {
             return em.createQuery(
                             "select new com.reviewing.review.course.domain.CourseResponseDto("
-                                    + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes) "
+                                    + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes, c.comments) "
                                     + "from Course c "
                                     + "where c.platform = :platform and (:lastRating is null or (c.rating < :lastRating or (c.rating = :lastRating and c.id < :lastCourseId))) "
                                     + "order by c.rating desc, c.id desc ",
@@ -91,22 +92,21 @@ public class CourseRepository {
         if (sortType != null && sortType.equals("comments")) {
             return em.createQuery(
                             "select new com.reviewing.review.course.domain.CourseResponseDto("
-                                    + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes) "
+                                    + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes, c.comments) "
                                     + "from Course c "
-                                    + "left join Review r on c.id = r.course.id "
-                                    + "and (r.reviewState.state = :reviewStateType) "
-                                    + "where c.platform = :platform "
-                                    + "group by c.id "
-                                    + "order by count(r.id) desc",
+                                    + "where c.platform = :platform and (:lastComments is null or (c.comments < :lastComments or (c.comments = :lastComments and c.id < :lastCourseId)))"
+                                    + "order by c.comments desc, c.id desc ",
                             CourseResponseDto.class)
                     .setParameter("platform", finePlatform)
-                    .setParameter("reviewStateType", ReviewStateType.APPROVED)
+                    .setParameter("lastComments", lastComments)
+                    .setParameter("lastCourseId", lastCourseId)
+                    .setMaxResults(PAGE_SIZE)
                     .getResultList();
         }
 
         return em.createQuery(
                         "select new com.reviewing.review.course.domain.CourseResponseDto("
-                                + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes) "
+                                + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes, c.comments) "
                                 + "from Course c "
                                 + "where c.platform = :platform ",
                         CourseResponseDto.class)
@@ -134,7 +134,7 @@ public class CourseRepository {
         if (sortType != null && sortType.equals("rating")) {
             return em.createQuery(
                             "select new com.reviewing.review.course.domain.CourseResponseDto("
-                                    + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes) "
+                                    + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes, c.comments) "
                                     + "from Course c "
                                     + "where c.platform = :platform and c.category = :category and (:lastRating is null or (c.rating < :lastRating or (c.rating = :lastRating and c.id < :lastCourseId))) "
                                     + "order by c.rating desc, c.id desc ",
@@ -150,23 +150,22 @@ public class CourseRepository {
         if (sortType != null && sortType.equals("comments")) {
             return em.createQuery(
                             "select new com.reviewing.review.course.domain.CourseResponseDto("
-                                    + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes) "
+                                    + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes, c.comments) "
                                     + "from Course c "
-                                    + "left join Review r on c.id = r.course.id "
-                                    + "and (r.reviewState.state = :reviewStateType) "
-                                    + "where c.platform = :platform and c.category = :category "
-                                    + "group by c.id "
-                                    + "order by count(r.id) desc",
+                                    + "where c.platform = :platform and c.category = :category and (:lastComments is null or (c.comments < :lastComments or (c.comments = :lastComments and c.id < :lastCourseId))) "
+                                    + "order by c.comments desc, c.id desc ",
                             CourseResponseDto.class)
                     .setParameter("platform", findPlatform)
                     .setParameter("category", findCategory)
-                    .setParameter("reviewStateType", ReviewStateType.APPROVED)
+                    .setParameter("lastComments", lastComments)
+                    .setParameter("lastCourseId", lastCourseId)
+                    .setMaxResults(PAGE_SIZE)
                     .getResultList();
         }
 
         return em.createQuery(
                         "select new com.reviewing.review.course.domain.CourseResponseDto("
-                                + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes) "
+                                + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes, c.comments) "
                                 + "from Course c "
                                 + "where c.platform = :platform and c.category = :category ",
                         CourseResponseDto.class)
@@ -206,7 +205,7 @@ public class CourseRepository {
     public CourseResponseDto findCourseById(Long courseId, Long memberId) {
         return em.createQuery(
                         "select new com.reviewing.review.course.domain.CourseResponseDto("
-                                + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes) "
+                                + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes, c.comments) "
                                 + "from Course c "
                                 + "where c.id = :courseId ",
                         CourseResponseDto.class)

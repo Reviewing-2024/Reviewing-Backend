@@ -32,6 +32,8 @@ public class Course {
     private float rating;
     @Column(columnDefinition = "integer default 0")
     private int wishes;
+    @Column(columnDefinition = "integer default 0")
+    private int comments;
     @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean updated;
 
