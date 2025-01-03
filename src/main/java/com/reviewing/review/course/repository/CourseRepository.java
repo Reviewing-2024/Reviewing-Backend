@@ -22,16 +22,24 @@ public class CourseRepository {
 
     private final EntityManager em;
 
+    private final int PAGE_SIZE = 10;
+
     // 모든 강의 조회
-    public List<CourseResponseDto> findAllCoursesBySorting(String sortType) {
+    public List<CourseResponseDto> findAllCoursesBySorting(String sortType, Long lastCourseId,
+            Float lastRating, Integer lastComments) {
+
         // 평점순
         if (sortType != null && sortType.equals("rating")) {
             return em.createQuery(
                             "select new com.reviewing.review.course.domain.CourseResponseDto"
                                     + "(c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes) "
                                     + "from Course c "
-                                    + "order by c.rating desc",
+                                    + "where (:lastRating is null or (c.rating < :lastRating or (c.rating = :lastRating and c.id < :lastCourseId))) "
+                                    + "order by c.rating desc, c.id desc ",
                             CourseResponseDto.class)
+                    .setParameter("lastRating", lastRating)
+                    .setParameter("lastCourseId", lastCourseId)
+                    .setMaxResults(PAGE_SIZE)
                     .getResultList();
         }
         // 댓글순
@@ -57,7 +65,9 @@ public class CourseRepository {
     }
 
     // 플랫폼 기준 정렬
-    public List<CourseResponseDto> findCoursesByPlatform(String platform, String sortType) {
+    public List<CourseResponseDto> findCoursesByPlatform(String platform, String sortType, Long lastCourseId,
+            Float lastRating, Integer lastComments) {
+
         Platform finePlatform = em.createQuery("select p from Platform p where p.name = :name",
                         Platform.class)
                 .setParameter("name", platform)
@@ -68,10 +78,13 @@ public class CourseRepository {
                             "select new com.reviewing.review.course.domain.CourseResponseDto("
                                     + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes) "
                                     + "from Course c "
-                                    + "where c.platform = :platform "
-                                    + "order by c.rating desc",
+                                    + "where c.platform = :platform and (:lastRating is null or (c.rating < :lastRating or (c.rating = :lastRating and c.id < :lastCourseId))) "
+                                    + "order by c.rating desc, c.id desc ",
                             CourseResponseDto.class)
                     .setParameter("platform", finePlatform)
+                    .setParameter("lastRating", lastRating)
+                    .setParameter("lastCourseId", lastCourseId)
+                    .setMaxResults(PAGE_SIZE)
                     .getResultList();
         }
 
@@ -103,7 +116,9 @@ public class CourseRepository {
 
     // 플랫폼,카테고리 기준 정렬 - 로그인 안함
     public List<CourseResponseDto> findCoursesByPlatformAndCategory(String platform,
-            String category, String sortType) {
+            String category, String sortType, Long lastCourseId,
+            Float lastRating, Integer lastComments) {
+
         Platform findPlatform = em.createQuery("select p from Platform p where p.name = :name",
                         Platform.class)
                 .setParameter("name", platform)
@@ -121,11 +136,14 @@ public class CourseRepository {
                             "select new com.reviewing.review.course.domain.CourseResponseDto("
                                     + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes) "
                                     + "from Course c "
-                                    + "where c.platform = :platform and c.category = :category "
-                                    + "order by c.rating desc",
+                                    + "where c.platform = :platform and c.category = :category and (:lastRating is null or (c.rating < :lastRating or (c.rating = :lastRating and c.id < :lastCourseId))) "
+                                    + "order by c.rating desc, c.id desc ",
                             CourseResponseDto.class)
                     .setParameter("platform", findPlatform)
                     .setParameter("category", findCategory)
+                    .setParameter("lastRating", lastRating)
+                    .setParameter("lastCourseId", lastCourseId)
+                    .setMaxResults(PAGE_SIZE)
                     .getResultList();
         }
 
