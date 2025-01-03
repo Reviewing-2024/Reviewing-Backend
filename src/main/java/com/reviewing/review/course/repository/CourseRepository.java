@@ -7,7 +7,6 @@ import com.reviewing.review.course.domain.CourseResponseDto;
 import com.reviewing.review.course.domain.CourseWish;
 import com.reviewing.review.course.domain.Platform;
 import com.reviewing.review.member.domain.Member;
-import com.reviewing.review.review.domain.ReviewStateType;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import java.util.List;
@@ -60,8 +59,12 @@ public class CourseRepository {
         return em.createQuery(
                         "select new com.reviewing.review.course.domain.CourseResponseDto"
                                 + "(c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes, c.comments) "
-                                + "from Course c ",
+                                + "from Course c "
+                                + "where (:lastCourseId is null or c.id > :lastCourseId)"
+                                + "order by c.id asc ",
                         CourseResponseDto.class)
+                .setParameter("lastCourseId", lastCourseId)
+                .setMaxResults(PAGE_SIZE)
                 .getResultList();
     }
 
@@ -108,9 +111,12 @@ public class CourseRepository {
                         "select new com.reviewing.review.course.domain.CourseResponseDto("
                                 + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes, c.comments) "
                                 + "from Course c "
-                                + "where c.platform = :platform ",
+                                + "where c.platform = :platform and (:lastCourseId is null or c.id > :lastCourseId)"
+                                + "order by c.id asc ",
                         CourseResponseDto.class)
                 .setParameter("platform", finePlatform)
+                .setParameter("lastCourseId", lastCourseId)
+                .setMaxResults(PAGE_SIZE)
                 .getResultList();
     }
 
@@ -167,10 +173,12 @@ public class CourseRepository {
                         "select new com.reviewing.review.course.domain.CourseResponseDto("
                                 + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes, c.comments) "
                                 + "from Course c "
-                                + "where c.platform = :platform and c.category = :category ",
+                                + "where c.platform = :platform and c.category = :category and (:lastCourseId is null or c.id > :lastCourseId)",
                         CourseResponseDto.class)
                 .setParameter("platform", findPlatform)
                 .setParameter("category", findCategory)
+                .setParameter("lastCourseId", lastCourseId)
+                .setMaxResults(PAGE_SIZE)
                 .getResultList();
     }
 
