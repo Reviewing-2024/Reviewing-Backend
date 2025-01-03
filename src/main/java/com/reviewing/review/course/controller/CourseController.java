@@ -3,6 +3,7 @@ package com.reviewing.review.course.controller;
 import com.reviewing.review.config.jwt.JwtTokenProvider;
 import com.reviewing.review.course.domain.CategoryRequestDto;
 import com.reviewing.review.course.domain.CategoryResponseDto;
+import com.reviewing.review.course.domain.CourseRequestDto;
 import com.reviewing.review.course.domain.CourseResponseDto;
 import com.reviewing.review.course.domain.Platform;
 import com.reviewing.review.course.service.CourseService;
@@ -56,12 +57,12 @@ public class CourseController {
 
     @GetMapping("/")
     public ResponseEntity<List<CourseResponseDto>> findAllCoursesBySorting(
-            @RequestParam(value = "sort", required = false) String sortType,
+            @RequestBody CourseRequestDto courseRequestDto,
             HttpServletRequest request) {
 
         String jwtHeader = request.getHeader("Authorization");
 
-        List<CourseResponseDto> courses = courseService.findAllCoursesBySorting(sortType);;
+        List<CourseResponseDto> courses = courseService.findAllCoursesBySorting(courseRequestDto);
 
         if (jwtHeader == null) {
             return ResponseEntity.ok().body(courses);
@@ -76,12 +77,12 @@ public class CourseController {
     @GetMapping("/courses/{platform}")
     public ResponseEntity<List<CourseResponseDto>> findCoursesByPlatform(
             @PathVariable String platform,
-            @RequestParam(value = "sort", required = false) String sortType
+            @RequestBody CourseRequestDto courseRequestDto
             , HttpServletRequest request) {
 
         String jwtHeader = request.getHeader("Authorization");
 
-        List<CourseResponseDto> courses = courseService.findCoursesByPlatform(platform, sortType);
+        List<CourseResponseDto> courses = courseService.findCoursesByPlatform(platform, courseRequestDto);
 
         if (jwtHeader == null) {
             return ResponseEntity.ok().body(courses);
@@ -96,13 +97,13 @@ public class CourseController {
     @GetMapping("/courses/{platform}/{category}")
     public ResponseEntity<List<CourseResponseDto>> findCoursesByPlatformAndCategory(
             @PathVariable("platform") String platform, @PathVariable("category") String category,
-            @RequestParam(value = "sort", required = false) String sortType
+            @RequestBody CourseRequestDto courseRequestDto
             , HttpServletRequest request) {
 
         String jwtHeader = request.getHeader("Authorization");
 
         List<CourseResponseDto> courses = courseService.findCoursesByPlatformAndCategory(platform,
-                category, sortType);
+                category, courseRequestDto);
 
         if (jwtHeader == null) {
             return ResponseEntity.ok().body(courses);
