@@ -57,7 +57,6 @@ public class ReviewRepository {
                                 + "r.id, r.member.nickname, r.contents, r.rating, r.likes, r.dislikes, "
                                 + "r.createdAt) "
                                 + "from Review r "
-                                + "left join ReviewLike rl on rl.review.id = r.id "
                                 + "where r.course.id = :courseId and r.reviewState.state = 'APPROVED' "
                                 + "order by r.createdAt desc",
                         ReviewResponseDto.class)
