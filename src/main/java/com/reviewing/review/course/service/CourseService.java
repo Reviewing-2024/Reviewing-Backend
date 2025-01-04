@@ -20,23 +20,25 @@ public class CourseService {
     private final CourseRepository courseRepository;
 
     // 전체 강의 조회
-    public List<CourseResponseDto> findAllCoursesBySorting(CourseRequestDto courseRequestDto) {
-        return courseRepository.findAllCoursesBySorting(courseRequestDto.getSort(),
-                courseRequestDto.getLastCourseId(), courseRequestDto.getLastRating(),
-                courseRequestDto.getLastComments());
+    public List<CourseResponseDto> findAllCoursesBySorting(String sortType, Long lastCourseId,
+            Float lastRating, Integer lastComments) {
+
+        return courseRepository.findAllCoursesBySorting(sortType,
+                lastCourseId, lastRating, lastComments);
     }
     // 플랫폼 기준 조회
-    public List<CourseResponseDto> findCoursesByPlatform(String platform, CourseRequestDto courseRequestDto) {
-        return courseRepository.findCoursesByPlatform(platform, courseRequestDto.getSort(),
-                courseRequestDto.getLastCourseId(), courseRequestDto.getLastRating(),
-                courseRequestDto.getLastComments());
+    public List<CourseResponseDto> findCoursesByPlatform(String platform, String sortType, Long lastCourseId,
+            Float lastRating, Integer lastComments) {
+        return courseRepository.findCoursesByPlatform(platform, sortType,
+                lastCourseId, lastRating, lastComments);
     }
 
     public List<CourseResponseDto> findCoursesByPlatformAndCategory(String platform,
-            String category, CourseRequestDto courseRequestDto) {
-        return courseRepository.findCoursesByPlatformAndCategory(platform, category, courseRequestDto.getSort(),
-                courseRequestDto.getLastCourseId(), courseRequestDto.getLastRating(),
-                courseRequestDto.getLastComments());
+            String category, String sortType, Long lastCourseId, Float lastRating,
+            Integer lastComments) {
+
+        return courseRepository.findCoursesByPlatformAndCategory(platform, category, sortType,
+                lastCourseId, lastRating, lastComments);
     }
 
     public void createCourseWish(Long courseId, Long memberId) {
