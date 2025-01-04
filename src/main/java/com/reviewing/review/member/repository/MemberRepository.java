@@ -1,10 +1,9 @@
 package com.reviewing.review.member.repository;
 
-import com.reviewing.review.member.domain.KakaoMemberToken;
 import com.reviewing.review.member.domain.Member;
+import com.reviewing.review.member.domain.kakao.KakaoMemberInfoDto;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,26 +15,23 @@ public class MemberRepository {
 
     private final EntityManager em;
 
-    public void save(Member member) {
-        em.persist(member);
-    }
-
-    public Optional<Member> findMemberById(Long id) {
-        return Optional.ofNullable(em.find(Member.class, id));
-    }
-
-    public void saveKakaoToken(KakaoMemberToken kakaoMemberToken) {
-        em.persist(kakaoMemberToken);
-    }
-
-    public Optional<KakaoMemberToken> findKakaoMemberTokenByMemberId(Long id) {
+    public Member findMemberByKakaoId(Long kakaoId) {
         try {
-            KakaoMemberToken result = em.createQuery("select token from KakaoMemberToken token where token.memberId = :memberId", KakaoMemberToken.class)
-                    .setParameter("memberId", id)
+            return em.createQuery("select m from Member m where m.kakaoId = :kakaoId", Member.class)
+                    .setParameter("kakaoId", kakaoId)
                     .getSingleResult();
-            return Optional.of(result);
         } catch (NoResultException e) {
-            return Optional.empty();
+            return null;
         }
     }
+
+    public Member saveMemberByKakao(KakaoMemberInfoDto kakaoMemberInfo) {
+        Member member = Member.builder()
+                .kakaoId(kakaoMemberInfo.getKakaoId())
+                .nickname(kakaoMemberInfo.getNickname())
+                .build();
+        em.persist(member);
+        return member;
+    }
+
 }

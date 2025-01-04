@@ -4,12 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.reviewing.review.member.domain.KakaoMemberToken;
-import com.reviewing.review.member.domain.KakaoTokenDto;
-import com.reviewing.review.member.domain.KakaoUserInfoDto;
+import com.reviewing.review.member.domain.kakao.KakaoMemberInfoDto;
+import com.reviewing.review.member.domain.kakao.KakaoTokenDto;
+import com.reviewing.review.member.domain.kakao.KakaoUserInfoDto;
 import com.reviewing.review.member.domain.Member;
 import com.reviewing.review.member.repository.MemberRepository;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -69,7 +68,7 @@ public class MemberService {
         return kakaoTokenDto;
     }
 
-    public Member getMemberInfo(String kakaoAccessToken) {
+    public KakaoMemberInfoDto getKakaoMemberInfo(String kakaoAccessToken) {
 
         RestTemplate rt = new RestTemplate();
 
@@ -97,49 +96,22 @@ public class MemberService {
             e.printStackTrace();
         }
 
-        Member member = new Member(kakaoUerInfoDto.getId()
+        KakaoMemberInfoDto kakaoMemberInfo = new KakaoMemberInfoDto(kakaoUerInfoDto.getId()
                 ,kakaoUerInfoDto.getKakao_account().getProfile().getNickname());
 
-        log.info("카카오에서 가져온 id={}",kakaoUerInfoDto.getId());
-        log.info("카카오에서 가져온 nickname={}",kakaoUerInfoDto.getKakao_account().getProfile().getNickname());
+        log.info("카카오에서 가져온 id={}",kakaoMemberInfo.getKakaoId());
+        log.info("카카오에서 가져온 nickname={}",kakaoMemberInfo.getNickname());
 
-        Optional<Member> existOwner = memberRepository.findMemberById(member.getMemberId());
+        return kakaoMemberInfo;
+    }
 
-        if (existOwner.isEmpty()) {
+    public Member signupOrLoginByKakaoId(KakaoMemberInfoDto kakaoMemberInfo) {
+        Member member = memberRepository.findMemberByKakaoId(kakaoMemberInfo.getKakaoId());
+        if (member == null) {
             // 회원가입
-            memberRepository.save(member);
+            return memberRepository.saveMemberByKakao(kakaoMemberInfo);
         }
         return member;
-
     }
-
-    public void saveKakaoToken(Member member, KakaoTokenDto kakaoTokenDto) {
-
-        KakaoMemberToken kakaoMemberToken = new KakaoMemberToken();
-        kakaoMemberToken.setMemberId(member.getMemberId());
-        kakaoMemberToken.setKakaoAccessToken(kakaoTokenDto.getAccess_token());
-        kakaoMemberToken.setKakaoRefreshToken(kakaoTokenDto.getRefresh_token());
-
-        KakaoMemberToken dbKakaoMemberToken = getDbKakaoMemberToken(member.getMemberId());
-
-        if (dbKakaoMemberToken != null) {
-            dbKakaoMemberToken.setKakaoAccessToken(kakaoTokenDto.getAccess_token());
-            dbKakaoMemberToken.setKakaoRefreshToken(kakaoTokenDto.getRefresh_token());
-        } else {
-            memberRepository.saveKakaoToken(kakaoMemberToken);
-
-        }
-    }
-
-    public KakaoMemberToken getDbKakaoMemberToken(Long memberId) {
-        Optional<KakaoMemberToken> kakaoMemberToken = memberRepository.findKakaoMemberTokenByMemberId(memberId);
-
-        if (kakaoMemberToken.isPresent()) {
-            return kakaoMemberToken.get();
-        } else {
-            return null;
-        }
-    }
-
 
 }

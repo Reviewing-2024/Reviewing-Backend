@@ -14,11 +14,12 @@ public class Member {
     @Id
     @Column(name = "id")
     private Long memberId;
-
+    private Long kakaoId;
     private String nickname;
 
     @Builder
-    public Member(String nickname) {
+    public Member(Long kakaoId, String nickname) {
+        this.kakaoId = kakaoId;
         this.nickname = nickname;
     }
 

@@ -1,4 +1,4 @@
-package com.reviewing.review.member.domain;
+package com.reviewing.review.member.domain.kakao;
 
 import lombok.Data;
 
