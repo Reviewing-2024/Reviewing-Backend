@@ -56,7 +56,7 @@ public class MyPageRepository {
         return em.createQuery(
                         "select new com.reviewing.review.course.domain.CourseResponseDto("
                                 + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, "
-                                + "c.wishes, true) "
+                                + "c.wishes, c.comments ,true) "
                                 + "from Course c "
                                 + "join CourseWish w on w.course.id = c.id "
                                 + "where w.member.id = :memberId ",
