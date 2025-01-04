@@ -5,6 +5,7 @@ import com.reviewing.review.member.domain.Member;
 import com.reviewing.review.member.domain.MyReviewResponseDto;
 import com.reviewing.review.review.domain.ReviewStateType;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -21,23 +22,17 @@ public class MyPageRepository {
 
         StringBuilder query = new StringBuilder(
                 "select new com.reviewing.review.member.domain.MyReviewResponseDto( "
-                        + "r.id, r.course.id, r.contents, r.reviewState.state, r.rating, "
-                        + "count(rl.id), "
+                        + "r.id, r.course.id, r.course.title, r.course.slug, r.contents, r.reviewState.state, r.rating, r.likes, r.dislikes, "
                         + "r.reviewState.rejectionReason, "
                         + "r.createdAt) "
                         + "from Review r "
-                        + "left join ReviewLike rl on rl.review.id = r.id "
                         + "where r.member.id = :memberId ");
 
         if (status != null) {
             query.append("and r.reviewState.state = :status ");
         }
 
-        query.append(
-                "group by r.id, r.reviewState.state, r.reviewState.rejectionReason");
-
-        // 쿼리 실행
-        var queryResult = em.createQuery(query.toString(), MyReviewResponseDto.class)
+        TypedQuery<MyReviewResponseDto> queryResult = em.createQuery(query.toString(), MyReviewResponseDto.class)
                 .setParameter("memberId", memberId);
 
         if (status != null) {
@@ -61,12 +56,10 @@ public class MyPageRepository {
         return em.createQuery(
                         "select new com.reviewing.review.course.domain.CourseResponseDto("
                                 + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, "
-                                + "count(w.id), true) "
+                                + "c.wishes, true) "
                                 + "from Course c "
                                 + "join CourseWish w on w.course.id = c.id "
-                                + "where w.member.id = :memberId "
-                                + "group by c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, "
-                                + "c.rating, c.slug, c.url",
+                                + "where w.member.id = :memberId ",
                         CourseResponseDto.class)
                 .setParameter("memberId", memberId)
                 .getResultList();

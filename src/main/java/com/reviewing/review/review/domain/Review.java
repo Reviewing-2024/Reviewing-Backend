@@ -44,6 +44,11 @@ public class Review {
     @Column(columnDefinition = "text")
     private String certification;
 
+    @Column(columnDefinition = "integer default 0")
+    private int likes;
+    @Column(columnDefinition = "integer default 0")
+    private int dislikes;
+
     @Builder
     public Review(String contents, float rating, LocalDateTime createdAt, String certification) {
         this.contents = contents;

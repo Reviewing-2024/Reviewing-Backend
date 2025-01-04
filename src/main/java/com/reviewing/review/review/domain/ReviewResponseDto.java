@@ -14,20 +14,22 @@ public class ReviewResponseDto {
     private String nickname;
     private String contents;
     private float rating;
-    private long likes;
-    private long dislikes;
+    private int likes;
+    private int dislikes;
     private boolean liked = false;
     private boolean disliked = false;
     private String createdAt;
 
     public ReviewResponseDto(Long id, String nickname, String contents, float rating,
-            long likes, LocalDateTime createdAt) {
+            int likes, int dislikes, LocalDateTime createdAt) {
         this.id = id;
         this.nickname = nickname;
         this.contents = contents;
         this.rating = rating;
         this.likes = likes;
-        this.createdAt = createdAt.format(DateTimeFormatter.ofPattern("yyyy.MM.dd hh.mm a", Locale.US));
+        this.dislikes = dislikes;
+        this.createdAt = createdAt.format(
+                DateTimeFormatter.ofPattern("yyyy.MM.dd hh.mm a", Locale.US));
     }
 
 }
