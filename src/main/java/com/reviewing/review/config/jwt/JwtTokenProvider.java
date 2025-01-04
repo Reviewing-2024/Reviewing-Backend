@@ -31,31 +31,26 @@ public class JwtTokenProvider {
                 .claim("id", member.getMemberId())
                 .claim("nickname", member.getNickname())
                 .setIssuedAt(now)
-                .setExpiration(new Date(System.currentTimeMillis() + (1000 * 60 * 30)))
-//                .setExpiration(new Date(System.currentTimeMillis() + (1000 * 60 * 2))) // 테스트용 2분
+                .setExpiration(new Date(System.currentTimeMillis() + (1000 * 60 * 60 * 24)))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
     }
 
-    // 모든 token에 대한 사용자 속성정보 조회
+    // token에 대한 사용자 속성정보 조회
     public Member getMemberByAccessToken(String token) {
         Claims claims = parserBuilder()
                 .setSigningKey(jwtSecretKey)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-
         Long memberId = (Long) claims.get("id");
         String nickname = (String) claims.get("nickname");
-
         return new Member(memberId, nickname);
-
     }
 
     // 토큰에서 memberId 조회
     public Long getMemberIdByRefreshToken(String token) {
-
         Claims claims =  parserBuilder()
                 .setSigningKey(jwtSecretKey)
                 .build()
@@ -66,12 +61,10 @@ public class JwtTokenProvider {
     }
 
     public boolean validateToken(String token) {
-
         if (token == null) {
             log.info("Token is null");
             return false;
         }
-
         try {
             Jwts.parserBuilder()
                     .setSigningKey(jwtSecretKey)
