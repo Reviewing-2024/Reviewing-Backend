@@ -32,6 +32,7 @@ public class JwtTokenProvider {
                 .claim("nickname", member.getNickname())
                 .setIssuedAt(now)
                 .setExpiration(new Date(System.currentTimeMillis() + (1000 * 60 * 60 * 24)))
+//                .setExpiration(new Date(System.currentTimeMillis() + (1000 * 60 * 2)))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
@@ -51,13 +52,17 @@ public class JwtTokenProvider {
 
     // 토큰에서 memberId 조회
     public Long getMemberIdByRefreshToken(String token) {
-        Claims claims =  parserBuilder()
-                .setSigningKey(jwtSecretKey)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        try {
+            Claims claims = parserBuilder()
+                    .setSigningKey(jwtSecretKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
 
-        return (Long) claims.get("id");
+            return (Long) claims.get("id");
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public boolean validateToken(String token) {
