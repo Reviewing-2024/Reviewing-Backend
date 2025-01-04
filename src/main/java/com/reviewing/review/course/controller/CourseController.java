@@ -57,12 +57,16 @@ public class CourseController {
 
     @GetMapping("/")
     public ResponseEntity<List<CourseResponseDto>> findAllCoursesBySorting(
-            @RequestBody CourseRequestDto courseRequestDto,
+            @RequestParam(value = "sort", required = false) String sortType,
+            @RequestParam(value = "lastCourseId", required = false) Long lastCourseId,
+            @RequestParam(value = "lastRating", required = false) Float lastRating,
+            @RequestParam(value = "lastComments", required = false) Integer lastComments,
             HttpServletRequest request) {
 
         String jwtHeader = request.getHeader("Authorization");
 
-        List<CourseResponseDto> courses = courseService.findAllCoursesBySorting(courseRequestDto);
+        List<CourseResponseDto> courses = courseService.findAllCoursesBySorting(sortType,
+                lastCourseId, lastRating, lastComments);
 
         if (jwtHeader == null) {
             return ResponseEntity.ok().body(courses);
@@ -77,12 +81,16 @@ public class CourseController {
     @GetMapping("/courses/{platform}")
     public ResponseEntity<List<CourseResponseDto>> findCoursesByPlatform(
             @PathVariable String platform,
-            @RequestBody CourseRequestDto courseRequestDto
-            , HttpServletRequest request) {
+            @RequestParam(value = "sort", required = false) String sortType,
+            @RequestParam(value = "lastCourseId", required = false) Long lastCourseId,
+            @RequestParam(value = "lastRating", required = false) Float lastRating,
+            @RequestParam(value = "lastComments", required = false) Integer lastComments,
+            HttpServletRequest request) {
 
         String jwtHeader = request.getHeader("Authorization");
 
-        List<CourseResponseDto> courses = courseService.findCoursesByPlatform(platform, courseRequestDto);
+        List<CourseResponseDto> courses = courseService.findCoursesByPlatform(platform, sortType,
+                lastCourseId, lastRating, lastComments);
 
         if (jwtHeader == null) {
             return ResponseEntity.ok().body(courses);
@@ -97,13 +105,16 @@ public class CourseController {
     @GetMapping("/courses/{platform}/{category}")
     public ResponseEntity<List<CourseResponseDto>> findCoursesByPlatformAndCategory(
             @PathVariable("platform") String platform, @PathVariable("category") String category,
-            @RequestBody CourseRequestDto courseRequestDto
-            , HttpServletRequest request) {
+            @RequestParam(value = "sort", required = false) String sortType,
+            @RequestParam(value = "lastCourseId", required = false) Long lastCourseId,
+            @RequestParam(value = "lastRating", required = false) Float lastRating,
+            @RequestParam(value = "lastComments", required = false) Integer lastComments,
+            HttpServletRequest request) {
 
         String jwtHeader = request.getHeader("Authorization");
 
         List<CourseResponseDto> courses = courseService.findCoursesByPlatformAndCategory(platform,
-                category, courseRequestDto);
+                category, sortType, lastCourseId, lastRating, lastComments);
 
         if (jwtHeader == null) {
             return ResponseEntity.ok().body(courses);
