@@ -37,6 +37,9 @@ public class MyPageController {
         String jwtHeader = request.getHeader("Authorization");
         String token = jwtHeader.replace("Bearer ", "");
         Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
+        if (memberId == null) {
+            return ResponseEntity.status(600).body(null);
+        }
 
         List<MyReviewResponseDto> myReviews = myPageService.findMyReviewsByStatus(status, memberId);
 
@@ -50,6 +53,9 @@ public class MyPageController {
         String jwtHeader = request.getHeader("Authorization");
         String token = jwtHeader.replace("Bearer ", "");
         Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
+        if (memberId == null) {
+            return ResponseEntity.status(600).body(null);
+        }
 
         List<CourseResponseDto> courses = myPageService.findWishCourseByMember(memberId);
 
@@ -63,6 +69,9 @@ public class MyPageController {
         String jwtHeader = request.getHeader("Authorization");
         String token = jwtHeader.replace("Bearer ", "");
         Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
+        if (memberId == null) {
+            return ResponseEntity.status(600).body(null);
+        }
 
         myPageService.updateUserNickname(memberId, memberNicknameDto.getNickName());
 
