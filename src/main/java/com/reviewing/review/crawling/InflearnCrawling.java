@@ -1,13 +1,11 @@
-package com.reviewing.review.crowling;
+package com.reviewing.review.crawling;
 
 import java.time.Duration;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -17,16 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class InflearnCrowling {
+public class InflearnCrawling {
 
-//    private WebDriver driver;
-//    private WebElement element;
-//
 //    public static String WEB_DRIVER_ID = "webdriver.chrome.driver";
 //    public static String WEB_DRIVER_PATH = "/Users/seoyeon/Downloads/chromedriver-mac-arm64";
 
-    @GetMapping("/crowling")
-    public void crowling() {
+    @GetMapping("/crawling/inflearn")
+    public void crawling() {
 
         ChromeOptions options = new ChromeOptions();
         // User-Agent 설정
@@ -54,35 +49,20 @@ public class InflearnCrowling {
                         ExpectedConditions.presenceOfElementLocated(By.cssSelector("main.mantine-1avyp1d"))
                 );
 
-                // 현재 페이지의 HTML 소스 가져오기
-                String req = driver.getPageSource();
-
-                // Jsoup으로 파싱
-                Document soup = Jsoup.parse(req);
-
-                // Python 코드에서 first, second 로 나눈 것과 동일한 부분
-                Element first = soup.selectFirst("ul.css-sdr7qd.mantine-1avyp1d");
-                Element second = soup.selectFirst("ul.css-2ldd65.mantine-1avyp1d");
-
-                // 각각 li 요소를 추출
-                Elements firstCourses = (first != null) ? first.select("li.css-8atqhb.mantine-1avyp1d") : new Elements();
-                Elements secondCourses = (second != null) ? second.select("li.mantine-1avyp1d") : new Elements();
-
+                WebElement firstUl = driver.findElement(By.cssSelector("ul.css-sdr7qd.mantine-1avyp1d"));
+                List<WebElement> firstCourses = firstUl.findElements(By.cssSelector("li.css-8atqhb.mantine-1avyp1d"));
                 System.out.println("first count: " + firstCourses.size());
+
+                WebElement secondUrl = driver.findElement(By.cssSelector("ul.css-2ldd65.mantine-1avyp1d"));
+                List<WebElement> secondCourses = secondUrl.findElements(By.cssSelector("li.mantine-1avyp1d"));
                 System.out.println("second count: " + secondCourses.size());
 
-                // 첫 번째 ul 처리
-                for (Element course : firstCourses) {
-                    // a 태그, 썸네일, title, teacher 추출
-                    Element urlTag = course.selectFirst("a");
-                    Element thumbnail = course.selectFirst("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd");
-                    Element titleTag = course.selectFirst("p.mantine-Text-root.css-10bh5qj.mantine-b3zn22");
-                    Element teacherTag = course.selectFirst("p.mantine-Text-root.css-1r49xhh.mantine-aiouth");
+                for (WebElement course : firstCourses) {
+                    WebElement urlTag = course.findElement(By.tagName("a"));
+                    String courseUrl = urlTag.getAttribute("href");
 
-                    String courseUrl = (urlTag != null) ? urlTag.attr("href") : "";
                     String courseSlug = "";
-                    if (!courseUrl.isEmpty()) {
-                        // Python의 split 로직
+                    if (courseUrl != null && !courseUrl.isEmpty()) {
                         String[] parts = courseUrl.split("/");
                         if (parts.length > 0) {
                             String lastPart = parts[parts.length - 1];
@@ -90,27 +70,27 @@ public class InflearnCrowling {
                         }
                     }
 
-                    // thumbnail 안에 img가 있는지 확인
+                    WebElement thumbnailDiv = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd"));
                     String thumbnailImage = null;
                     String thumbnailVideo = null;
-                    if (thumbnail != null) {
-                        Element imgOrVideo = thumbnail.selectFirst("img");
-                        if (imgOrVideo != null) {
-                            // img
-                            thumbnailImage = imgOrVideo.attr("src");
-                        } else {
-                            // source
-                            Element sourceTag = thumbnail.selectFirst("source");
-                            if (sourceTag != null) {
-                                thumbnailVideo = sourceTag.attr("src");
-                            }
+                    // img 태그 검색
+                    WebElement imgOrVideo = thumbnailDiv.findElement(By.tagName("img"));
+                    if (imgOrVideo != null) {
+                        // img 썸네일
+                        thumbnailImage = imgOrVideo.getAttribute("src");
+                    } else {
+                        // 비디오인 경우 source 태그 찾기
+                        WebElement sourceTag = thumbnailDiv.findElement(By.tagName("source"));
+                        if (sourceTag != null) {
+                            thumbnailVideo = sourceTag.getAttribute("src");
                         }
                     }
+                    WebElement titleTag = course.findElement(By.cssSelector("p.mantine-Text-root.css-10bh5qj.mantine-b3zn22"));
+                    String title = titleTag.getText();
 
-                    String title = (titleTag != null) ? titleTag.text() : "";
-                    String teacher = (teacherTag != null) ? teacherTag.text() : "";
+                    WebElement teacherTag = course.findElement(By.cssSelector("p.mantine-Text-root.css-1r49xhh.mantine-aiouth"));
+                    String teacher = teacherTag.getText();
 
-                    // 출력 (Python 코드와 유사한 로직)
                     System.out.println(title);
                     System.out.println(courseUrl);
                     System.out.println(courseSlug);
@@ -118,19 +98,15 @@ public class InflearnCrowling {
                     System.out.println(thumbnailVideo);
                     System.out.println(teacher);
                     System.out.println("----------------------");
+
                 }
 
-                // 두 번째 ul 처리
-                for (Element course : secondCourses) {
-                    // a 태그, 썸네일, title, teacher 추출
-                    Element urlTag = course.selectFirst("a");
-                    Element thumbnail = course.selectFirst("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd");
-                    Element titleTag = course.selectFirst("p.mantine-Text-root.css-10bh5qj.mantine-b3zn22");
-                    Element teacherTag = course.selectFirst("p.mantine-Text-root.css-1r49xhh.mantine-aiouth");
+                for (WebElement course : secondCourses) {
+                    WebElement urlTag = course.findElement(By.tagName("a"));
+                    String courseUrl = urlTag.getAttribute("href");
 
-                    String courseUrl = (urlTag != null) ? urlTag.attr("href") : "";
                     String courseSlug = "";
-                    if (!courseUrl.isEmpty()) {
+                    if (courseUrl != null && !courseUrl.isEmpty()) {
                         String[] parts = courseUrl.split("/");
                         if (parts.length > 0) {
                             String lastPart = parts[parts.length - 1];
@@ -138,23 +114,26 @@ public class InflearnCrowling {
                         }
                     }
 
-                    // thumbnail 안에 img가 있는지 확인
+                    WebElement thumbnailDiv = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd"));
                     String thumbnailImage = null;
                     String thumbnailVideo = null;
-                    if (thumbnail != null) {
-                        Element imgOrVideo = thumbnail.selectFirst("img");
-                        if (imgOrVideo != null) {
-                            thumbnailImage = imgOrVideo.attr("src");
-                        } else {
-                            Element sourceTag = thumbnail.selectFirst("source");
-                            if (sourceTag != null) {
-                                thumbnailVideo = sourceTag.attr("src");
-                            }
+                    // img 태그 검색
+                    WebElement imgOrVideo = thumbnailDiv.findElement(By.tagName("img"));
+                    if (imgOrVideo != null) {
+                        // img 썸네일
+                        thumbnailImage = imgOrVideo.getAttribute("src");
+                    } else {
+                        // 비디오인 경우 source 태그 찾기
+                        WebElement sourceTag = thumbnailDiv.findElement(By.tagName("source"));
+                        if (sourceTag != null) {
+                            thumbnailVideo = sourceTag.getAttribute("src");
                         }
                     }
+                    WebElement titleTag = course.findElement(By.cssSelector("p.mantine-Text-root.css-10bh5qj.mantine-b3zn22"));
+                    String title = titleTag.getText();
 
-                    String title = (titleTag != null) ? titleTag.text() : "";
-                    String teacher = (teacherTag != null) ? teacherTag.text() : "";
+                    WebElement teacherTag = course.findElement(By.cssSelector("p.mantine-Text-root.css-1r49xhh.mantine-aiouth"));
+                    String teacher = teacherTag.getText();
 
                     System.out.println(title);
                     System.out.println(courseUrl);
@@ -163,6 +142,7 @@ public class InflearnCrowling {
                     System.out.println(thumbnailVideo);
                     System.out.println(teacher);
                     System.out.println("----------------------");
+
                 }
             }
         } catch (Exception e) {
