@@ -7,6 +7,7 @@ import com.reviewing.review.review.repository.ReviewRepository;
 import com.reviewing.review.review.service.ReviewService;
 import com.reviewing.review.review.service.S3Service;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -36,7 +37,7 @@ public class ReviewController {
 
     @PostMapping(value = "/{courseId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> createReview(@PathVariable UUID courseId,
-            @RequestPart ReviewRequestDto reviewRequestDto,
+            @Valid @RequestPart ReviewRequestDto reviewRequestDto,
             @RequestPart MultipartFile certificationFile,
             HttpServletRequest request) throws IOException {
 
@@ -51,6 +52,19 @@ public class ReviewController {
 
         reviewService.createReview(courseId, memberId, reviewRequestDto, certification);
         return ResponseEntity.ok().body("리뷰 작성 성공");
+    }
+
+    @GetMapping("/check/{courseId}")
+    public ResponseEntity<String> checkBeforeReviewCreate(@PathVariable UUID courseId,
+            HttpServletRequest request) {
+        String jwtHeader = request.getHeader("Authorization");
+        String token = jwtHeader.replace("Bearer ", "");
+        Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
+        if (memberId == null) {
+            return ResponseEntity.status(600).body(null);
+        }
+
+        return ResponseEntity.status(reviewService.checkBeforeReviewCreate(courseId, memberId)).body(null);
     }
 
     // 테스트용
@@ -103,14 +117,20 @@ public class ReviewController {
         }
 
         if (liked) { // liked = true 일 때 -> 좋아요 취소
+            if (reviewService.checkReviewLikedByMember(reviewId, memberId)) {
+                return ResponseEntity.status(607).body(null);
+            }
             reviewService.removeReviewLike(reviewId, memberId);
-            ReviewResponseDto reviewResponseDto =  reviewService.findReviewById(reviewId, memberId);
+            ReviewResponseDto reviewResponseDto = reviewService.findReviewById(reviewId, memberId);
             return ResponseEntity.ok().body(reviewResponseDto);
         }
 
         // liked = false 일 때 -> 좋아요
+        if (!reviewService.checkReviewLikedByMember(reviewId, memberId)) {
+            return ResponseEntity.status(608).body(null);
+        }
         reviewService.createReviewLike(reviewId, memberId);
-        ReviewResponseDto reviewResponseDto =  reviewService.findReviewById(reviewId, memberId);
+        ReviewResponseDto reviewResponseDto = reviewService.findReviewById(reviewId, memberId);
         return ResponseEntity.ok().body(reviewResponseDto);
     }
 
@@ -127,11 +147,17 @@ public class ReviewController {
         }
 
         if (disliked) {
+            if (reviewService.checkReviewDislikedByMember(reviewId, memberId)) {
+                return ResponseEntity.status(609).body(null);
+            }
             reviewService.removeReviewDislike(reviewId, memberId);
             ReviewResponseDto reviewResponseDto =  reviewService.findReviewById(reviewId, memberId);
             return ResponseEntity.ok().body(reviewResponseDto);
         }
 
+        if (!reviewService.checkReviewDislikedByMember(reviewId, memberId)) {
+            return ResponseEntity.status(610).body(null);
+        }
         reviewService.createReviewDislike(reviewId, memberId);
         ReviewResponseDto reviewResponseDto =  reviewService.findReviewById(reviewId, memberId);
         return ResponseEntity.ok().body(reviewResponseDto);

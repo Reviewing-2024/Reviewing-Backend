@@ -7,6 +7,7 @@ import com.reviewing.review.review.domain.ReviewDislike;
 import com.reviewing.review.review.domain.ReviewLike;
 import com.reviewing.review.review.domain.ReviewResponseDto;
 import com.reviewing.review.review.domain.ReviewState;
+import com.reviewing.review.review.domain.ReviewStateByMemberDto;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import java.util.List;
@@ -155,16 +156,6 @@ public class ReviewRepository {
 
     }
 
-    public int findReviewDislikes(Long reviewId) {
-
-        return em.createQuery("select rd from ReviewDislike rd where rd.review.id = :reviewId",
-                        ReviewDislike.class)
-                .setParameter("reviewId", reviewId)
-                .getResultList()
-                .size();
-
-    }
-
     public void updateReviewLikeCount(Long reviewId, boolean liked) {
         Review findReview = em.find(Review.class, reviewId);
         int likes = findReview.getLikes();
@@ -187,4 +178,19 @@ public class ReviewRepository {
         findReview.setDislikes(dislikes - 1);
     }
 
+    public ReviewStateByMemberDto findReviewByCourseIdAndMemberId(UUID courseId, Long memberId) {
+        try {
+            return em.createQuery(
+                            "select new com.reviewing.review.review.domain.ReviewStateByMemberDto"
+                                    + "(r.course.id, r.id, r.member.id, r.reviewState.state) "
+                                    + "from Review r "
+                                    + "where r.course.id=:courseId and r.member.id=:memberId",
+                            ReviewStateByMemberDto.class)
+                    .setParameter("courseId", courseId)
+                    .setParameter("memberId", memberId)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
 }
