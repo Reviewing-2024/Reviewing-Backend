@@ -9,6 +9,7 @@ import com.reviewing.review.review.service.S3Service;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -34,7 +35,7 @@ public class ReviewController {
     private final S3Service s3Service;
 
     @PostMapping(value = "/{courseId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<?> createReview(@PathVariable Long courseId,
+    public ResponseEntity<?> createReview(@PathVariable UUID courseId,
             @RequestPart ReviewRequestDto reviewRequestDto,
             @RequestPart MultipartFile certificationFile,
             HttpServletRequest request) throws IOException {
@@ -67,7 +68,7 @@ public class ReviewController {
 
     @GetMapping("/{courseId}")
     public ResponseEntity<List<ReviewResponseDto>> findReviewsByCourse(
-            @PathVariable Long courseId, HttpServletRequest request) {
+            @PathVariable UUID courseId, HttpServletRequest request) {
 
         List<ReviewResponseDto> reviews;
 

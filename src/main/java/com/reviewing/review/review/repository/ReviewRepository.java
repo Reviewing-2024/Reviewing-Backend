@@ -10,6 +10,7 @@ import com.reviewing.review.review.domain.ReviewState;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -23,7 +24,7 @@ public class ReviewRepository {
 
     private final EntityManager em;
 
-    public void createReview(Long courseId, Long memberId, ReviewState reviewState, Review review) {
+    public void createReview(UUID courseId, Long memberId, ReviewState reviewState, Review review) {
 
         Member findMember = em.find(Member.class, memberId);
 
@@ -38,7 +39,7 @@ public class ReviewRepository {
         em.persist(review);
     }
 
-    public List<ReviewResponseDto> findReviewsByCourse(Long courseId) {
+    public List<ReviewResponseDto> findReviewsByCourse(UUID courseId) {
 
         return em.createQuery("select new com.reviewing.review.review.domain.ReviewResponseDto( "
                                 + "r.id, r.member.nickname, r.contents, r.rating, r.likes, r.dislikes, "
@@ -51,7 +52,7 @@ public class ReviewRepository {
                 .getResultList();
     }
 
-    public List<ReviewResponseDto> findReviewsWithLikedAndDislikedByCourse(Long courseId) {
+    public List<ReviewResponseDto> findReviewsWithLikedAndDislikedByCourse(UUID courseId) {
 
         return em.createQuery("select new com.reviewing.review.review.domain.ReviewResponseDto( "
                                 + "r.id, r.member.nickname, r.contents, r.rating, r.likes, r.dislikes, "

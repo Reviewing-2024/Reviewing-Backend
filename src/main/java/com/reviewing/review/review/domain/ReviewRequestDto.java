@@ -1,5 +1,6 @@
 package com.reviewing.review.review.domain;
 
+import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 @NoArgsConstructor
 public class ReviewRequestDto {
 
-    private float rating;
+    private BigDecimal rating;
     private String contents;
 
 }

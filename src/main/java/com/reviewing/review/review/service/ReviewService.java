@@ -10,6 +10,7 @@ import com.reviewing.review.review.domain.ReviewStateType;
 import com.reviewing.review.review.repository.ReviewRepository;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,7 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
 
-    public void createReview(Long courseId, Long memberId, ReviewRequestDto reviewRequestDto,
+    public void createReview(UUID courseId, Long memberId, ReviewRequestDto reviewRequestDto,
             String certification) {
 
         ReviewState reviewState = new ReviewState(ReviewStateType.PENDING);
@@ -36,11 +37,11 @@ public class ReviewService {
         reviewRepository.createReview(courseId, memberId, reviewState, review);
     }
 
-    public List<ReviewResponseDto> findReviewsByCourse(Long courseId) {
+    public List<ReviewResponseDto> findReviewsByCourse(UUID courseId) {
         return reviewRepository.findReviewsByCourse(courseId);
     }
 
-    public List<ReviewResponseDto> findReviewsWithLikedAndDislikedByCourse(Long courseId,
+    public List<ReviewResponseDto> findReviewsWithLikedAndDislikedByCourse(UUID courseId,
             Long memberId) {
 
         List<ReviewResponseDto> reviews = reviewRepository.findReviewsWithLikedAndDislikedByCourse(courseId);
