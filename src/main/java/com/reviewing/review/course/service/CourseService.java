@@ -88,4 +88,9 @@ public class CourseService {
         }
         return courses;
     }
+
+    public boolean checkCourseWishedByMember(UUID courseId, Long memberId) {
+        CourseWish findCourseWish = courseRepository.findCourseWish(courseId, memberId);
+        return findCourseWish != null;
+    }
 }
