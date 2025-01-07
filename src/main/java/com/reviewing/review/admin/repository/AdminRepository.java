@@ -1,11 +1,12 @@
 package com.reviewing.review.admin.repository;
 
 import com.reviewing.review.admin.domain.AdminReviewResponseDto;
-import com.reviewing.review.course.domain.Course;
 import com.reviewing.review.review.domain.Review;
 import com.reviewing.review.review.domain.ReviewStateType;
 import jakarta.persistence.EntityManager;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,7 +46,7 @@ public class AdminRepository {
         fineReview.getReviewState().setRejectionReason(rejectionReason);
     }
 
-    public void updateReviewRating(Review review, float newReviewRating) {
+    public void updateReviewRating(Review review, BigDecimal newReviewRating) {
         review.getCourse().setRating(newReviewRating);
     }
 
@@ -54,7 +55,7 @@ public class AdminRepository {
         findReview.getCourse().setUpdated(true);
     }
 
-    public int getTotalReviewCountByReviewId(Long courseId) {
+    public int getTotalReviewCountByReviewId(UUID courseId) {
 
         return em.createQuery("select r "
                         + "from Review r "

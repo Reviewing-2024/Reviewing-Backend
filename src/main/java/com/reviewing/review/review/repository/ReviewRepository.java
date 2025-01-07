@@ -1,6 +1,6 @@
 package com.reviewing.review.review.repository;
 
-import com.reviewing.review.course.domain.Course;
+import com.reviewing.review.course.entity.Course;
 import com.reviewing.review.member.domain.Member;
 import com.reviewing.review.review.domain.Review;
 import com.reviewing.review.review.domain.ReviewDislike;

@@ -1,6 +1,7 @@
 package com.reviewing.review.recommend.controller;
 
-import com.reviewing.review.course.domain.Course;
+import com.reviewing.review.course.entity.Category;
+import com.reviewing.review.course.entity.Course;
 import com.reviewing.review.recommend.repository.RecommendRepository;
 import com.reviewing.review.recommend.service.EmbeddingService;
 import java.util.HashMap;
@@ -29,26 +30,22 @@ public class EmbeddingController {
     @PostMapping("/embedding")
     public String createAndSaveEmbedding() {
 
-        for (int i = 3; i <= 130; i++) {
-            Course findCourse = recommendRepository.findCourseById((long) i);
 
-            if (findCourse == null) {
-                continue;
-            }
+//        Course findCourse = recommendRepository.findCourseById();
+//        List<Category> findCategory = recommendRepository.findCategoryByCourseId(findCourse.getId());
 
-            String text = String.format(
-                    "Title: %s, Platform: %s, Category: %s, Rating: %.1f",
-                    findCourse.getTitle(),
-                    findCourse.getPlatform(),
-                    findCourse.getCategory(),
-                    findCourse.getRating()
-            );
+//        String text = String.format(
+//                "Title: %s, Platform: %s, Category: %s, Rating: %.1f",
+//                findCourse.getTitle(),
+//                findCourse.getPlatform().getName(),
+//                findCourse.getCategory(),
+//                findCourse.getRating()
+//        );
 
-            List<Double> embedding = embeddingService.generateEmbedding(text);
+//        List<Double> embedding = embeddingService.generateEmbedding(text);
 
-            save("course", findCourse.getId(), embedding);
+//        save("course", findCourse.getId(), embedding);
 
-        }
 
         return "성공";
 
