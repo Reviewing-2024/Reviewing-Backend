@@ -7,6 +7,7 @@ import com.reviewing.review.review.repository.ReviewRepository;
 import com.reviewing.review.review.service.ReviewService;
 import com.reviewing.review.review.service.S3Service;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -36,7 +37,7 @@ public class ReviewController {
 
     @PostMapping(value = "/{courseId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> createReview(@PathVariable UUID courseId,
-            @RequestPart ReviewRequestDto reviewRequestDto,
+            @Valid @RequestPart ReviewRequestDto reviewRequestDto,
             @RequestPart MultipartFile certificationFile,
             HttpServletRequest request) throws IOException {
 
