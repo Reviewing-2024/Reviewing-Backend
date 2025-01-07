@@ -34,7 +34,7 @@ public class ReviewController {
     private final S3Service s3Service;
 
     @PostMapping(value = "/{courseId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public void createReview(@PathVariable Long courseId,
+    public ResponseEntity<?> createReview(@PathVariable Long courseId,
             @RequestPart ReviewRequestDto reviewRequestDto,
             @RequestPart MultipartFile certificationFile,
             HttpServletRequest request) throws IOException {
@@ -42,10 +42,14 @@ public class ReviewController {
         String jwtHeader = request.getHeader("Authorization");
         String token = jwtHeader.replace("Bearer ", "");
         Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
+        if (memberId == null) {
+            return ResponseEntity.status(600).body(null);
+        }
 
         String certification = s3Service.saveFile(certificationFile, memberId, courseId);
 
         reviewService.createReview(courseId, memberId, reviewRequestDto, certification);
+        return ResponseEntity.ok().body("리뷰 작성 성공");
     }
 
     // 테스트용
@@ -72,7 +76,9 @@ public class ReviewController {
         if (jwtHeader != null && jwtHeader.startsWith("Bearer ")) {
             String token = jwtHeader.replace("Bearer ", "");
             Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
-
+            if (memberId == null) {
+                return ResponseEntity.status(600).body(null);
+            }
             reviews = reviewService.findReviewsWithLikedAndDislikedByCourse(courseId, memberId);
 
             return ResponseEntity.ok().body(reviews);
@@ -91,6 +97,9 @@ public class ReviewController {
         String jwtHeader = request.getHeader("Authorization");
         String token = jwtHeader.replace("Bearer ", "");
         Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
+        if (memberId == null) {
+            return ResponseEntity.status(600).body(null);
+        }
 
         if (liked) { // liked = true 일 때 -> 좋아요 취소
             reviewService.removeReviewLike(reviewId, memberId);
@@ -112,6 +121,9 @@ public class ReviewController {
         String jwtHeader = request.getHeader("Authorization");
         String token = jwtHeader.replace("Bearer ", "");
         Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
+        if (memberId == null) {
+            return ResponseEntity.status(600).body(null);
+        }
 
         if (disliked) {
             reviewService.removeReviewDislike(reviewId, memberId);

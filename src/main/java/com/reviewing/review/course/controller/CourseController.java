@@ -49,6 +49,9 @@ public class CourseController {
         String jwtHeader = request.getHeader("Authorization");
         String token = jwtHeader.replace("Bearer ", "");
         Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
+        if (memberId == null) {
+            return ResponseEntity.status(600).body(null);
+        }
 
         CourseResponseDto courseResponseDto = courseService.findCourseById(courseId, memberId);
 
@@ -74,6 +77,9 @@ public class CourseController {
 
         String token = jwtHeader.replace("Bearer ", "");
         Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
+        if (memberId == null) {
+            return ResponseEntity.status(600).body(null);
+        }
 
         return ResponseEntity.ok().body(courseService.checkCourseWished(courses, memberId));
     }
@@ -98,6 +104,9 @@ public class CourseController {
 
         String token = jwtHeader.replace("Bearer ", "");
         Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
+        if (memberId == null) {
+            return ResponseEntity.status(600).body(null);
+        }
 
         return ResponseEntity.ok().body(courseService.checkCourseWished(courses, memberId));
     }
@@ -122,6 +131,9 @@ public class CourseController {
 
         String token = jwtHeader.replace("Bearer ", "");
         Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
+        if (memberId == null) {
+            return ResponseEntity.status(600).body(null);
+        }
 
         return ResponseEntity.ok().body(courseService.checkCourseWished(courses, memberId));
     }
@@ -134,6 +146,9 @@ public class CourseController {
         String jwtHeader = request.getHeader("Authorization");
         String token = jwtHeader.replace("Bearer ", "");
         Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
+        if (memberId == null) {
+            return ResponseEntity.status(600).body(null);
+        }
 
         if (wished) { // wished=true -> 강의 찜 취소
             courseService.removeCourseWish(courseId, memberId);

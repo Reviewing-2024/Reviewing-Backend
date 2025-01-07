@@ -50,6 +50,9 @@ dependencies {
 	implementation("org.opensearch.client:opensearch-java:2.7.0")
 	implementation("jakarta.json:jakarta.json-api")
 
+	// 크롤링
+	implementation 'org.seleniumhq.selenium:selenium-java:4.27.0'
+
 }
 
 tasks.named('test') {
