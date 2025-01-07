@@ -53,6 +53,19 @@ public class ReviewController {
         return ResponseEntity.ok().body("리뷰 작성 성공");
     }
 
+    @GetMapping("/check/{courseId}")
+    public ResponseEntity<String> checkBeforeReviewCreate(@PathVariable UUID courseId,
+            HttpServletRequest request) {
+        String jwtHeader = request.getHeader("Authorization");
+        String token = jwtHeader.replace("Bearer ", "");
+        Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
+        if (memberId == null) {
+            return ResponseEntity.status(600).body(null);
+        }
+
+        return ResponseEntity.status(reviewService.checkBeforeReviewCreate(courseId, memberId)).body(null);
+    }
+
     // 테스트용
 //    @PostMapping(value = "/{courseId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
 //    public void createReview(@PathVariable Long courseId,
@@ -107,7 +120,7 @@ public class ReviewController {
                 return ResponseEntity.status(607).body(null);
             }
             reviewService.removeReviewLike(reviewId, memberId);
-            ReviewResponseDto reviewResponseDto =  reviewService.findReviewById(reviewId, memberId);
+            ReviewResponseDto reviewResponseDto = reviewService.findReviewById(reviewId, memberId);
             return ResponseEntity.ok().body(reviewResponseDto);
         }
 
@@ -116,7 +129,7 @@ public class ReviewController {
             return ResponseEntity.status(608).body(null);
         }
         reviewService.createReviewLike(reviewId, memberId);
-        ReviewResponseDto reviewResponseDto =  reviewService.findReviewById(reviewId, memberId);
+        ReviewResponseDto reviewResponseDto = reviewService.findReviewById(reviewId, memberId);
         return ResponseEntity.ok().body(reviewResponseDto);
     }
 

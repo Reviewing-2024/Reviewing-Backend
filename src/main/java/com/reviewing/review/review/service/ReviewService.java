@@ -6,6 +6,7 @@ import com.reviewing.review.review.domain.ReviewLike;
 import com.reviewing.review.review.domain.ReviewRequestDto;
 import com.reviewing.review.review.domain.ReviewResponseDto;
 import com.reviewing.review.review.domain.ReviewState;
+import com.reviewing.review.review.domain.ReviewStateByMemberDto;
 import com.reviewing.review.review.domain.ReviewStateType;
 import com.reviewing.review.review.repository.ReviewRepository;
 import java.time.LocalDateTime;
@@ -106,5 +107,21 @@ public class ReviewService {
     public boolean checkReviewDislikedByMember(Long reviewId, Long memberId) {
         ReviewDislike findReviewDislike = reviewRepository.checkReviewDisliked(reviewId, memberId);
         return findReviewDislike != null;
+    }
+
+    public int checkBeforeReviewCreate(UUID courseId, Long memberId) {
+        ReviewStateByMemberDto findReview = reviewRepository.findReviewByCourseIdAndMemberId(courseId,
+                memberId);
+        if (findReview == null) {
+            return 200;
+        }
+        if (findReview.getReviewState() == ReviewStateType.REJECTED) {
+            return 200;
+        }
+        if (findReview.getReviewState() == ReviewStateType.PENDING) {
+            return 601;
+        }
+        // reviewState == ReviewStateType.APPROVED
+        return 602;
     }
 }
