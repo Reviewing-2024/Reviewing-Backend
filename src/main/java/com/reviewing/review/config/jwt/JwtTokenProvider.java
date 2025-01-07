@@ -21,6 +21,7 @@ public class JwtTokenProvider {
 
     public String createAccessToken(Member member) {
 
+        log.info(String.valueOf(member.getMemberId()));
         byte[] keyBytes = Decoders.BASE64.decode(jwtSecretKey);
         Key key = Keys.hmacShaKeyFor(keyBytes);
 
@@ -59,7 +60,7 @@ public class JwtTokenProvider {
                     .parseClaimsJws(token)
                     .getBody();
 
-            return (Long) claims.get("id");
+            return claims.get("id", Long.class);
         } catch (Exception e) {
             return null;
         }
