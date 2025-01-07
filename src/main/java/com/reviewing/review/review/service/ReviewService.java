@@ -98,4 +98,13 @@ public class ReviewService {
         return reviewResponseDto;
     }
 
+    public boolean checkReviewLikedByMember(Long reviewId, Long memberId) {
+        ReviewLike findReviewLike = reviewRepository.checkReviewLiked(reviewId, memberId);
+        return findReviewLike != null;
+    }
+
+    public boolean checkReviewDislikedByMember(Long reviewId, Long memberId) {
+        ReviewDislike findReviewDislike = reviewRepository.checkReviewDisliked(reviewId, memberId);
+        return findReviewDislike != null;
+    }
 }

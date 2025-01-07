@@ -103,12 +103,18 @@ public class ReviewController {
         }
 
         if (liked) { // liked = true 일 때 -> 좋아요 취소
+            if (reviewService.checkReviewLikedByMember(reviewId, memberId)) {
+                return ResponseEntity.status(607).body(null);
+            }
             reviewService.removeReviewLike(reviewId, memberId);
             ReviewResponseDto reviewResponseDto =  reviewService.findReviewById(reviewId, memberId);
             return ResponseEntity.ok().body(reviewResponseDto);
         }
 
         // liked = false 일 때 -> 좋아요
+        if (!reviewService.checkReviewLikedByMember(reviewId, memberId)) {
+            return ResponseEntity.status(608).body(null);
+        }
         reviewService.createReviewLike(reviewId, memberId);
         ReviewResponseDto reviewResponseDto =  reviewService.findReviewById(reviewId, memberId);
         return ResponseEntity.ok().body(reviewResponseDto);
@@ -127,11 +133,17 @@ public class ReviewController {
         }
 
         if (disliked) {
+            if (reviewService.checkReviewDislikedByMember(reviewId, memberId)) {
+                return ResponseEntity.status(609).body(null);
+            }
             reviewService.removeReviewDislike(reviewId, memberId);
             ReviewResponseDto reviewResponseDto =  reviewService.findReviewById(reviewId, memberId);
             return ResponseEntity.ok().body(reviewResponseDto);
         }
 
+        if (!reviewService.checkReviewDislikedByMember(reviewId, memberId)) {
+            return ResponseEntity.status(610).body(null);
+        }
         reviewService.createReviewDislike(reviewId, memberId);
         ReviewResponseDto reviewResponseDto =  reviewService.findReviewById(reviewId, memberId);
         return ResponseEntity.ok().body(reviewResponseDto);
