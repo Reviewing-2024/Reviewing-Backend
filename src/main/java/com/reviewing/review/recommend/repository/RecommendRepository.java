@@ -1,9 +1,11 @@
 package com.reviewing.review.recommend.repository;
 
-import com.reviewing.review.course.domain.Course;
-import com.reviewing.review.course.domain.CourseResponseDto;
+import com.reviewing.review.course.entity.Category;
+import com.reviewing.review.course.entity.Course;
 import com.reviewing.review.recommend.domain.RecommendResponseDto;
 import jakarta.persistence.EntityManager;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -17,9 +19,9 @@ public class RecommendRepository {
 
     private final EntityManager em;
 
-    public Course findCourseById(Long i) {
+    public Course findCourseById(UUID courseId) {
 
-        return em.find(Course.class, i);
+        return em.find(Course.class, courseId);
     }
 
     public RecommendResponseDto findCourseBySearchResponses(Long id) {
@@ -30,4 +32,13 @@ public class RecommendRepository {
                 .getSingleResult(); // 결과 반환
     }
 
+    public List<Category> findCategoryByCourseId(UUID courseId) {
+
+        return em.createQuery(
+                        "select category from Category category "
+                                + "join CategoryCourse cc on cc.category = category "
+                                + "where cc.course.id = :courseId ", Category.class)
+                .setParameter("courseId",courseId)
+                .getResultList();
+    }
 }

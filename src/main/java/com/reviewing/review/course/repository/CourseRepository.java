@@ -1,15 +1,17 @@
 package com.reviewing.review.course.repository;
 
-import com.reviewing.review.course.domain.Category;
+import com.reviewing.review.course.entity.Category;
 import com.reviewing.review.course.domain.CategoryResponseDto;
-import com.reviewing.review.course.domain.Course;
+import com.reviewing.review.course.entity.Course;
 import com.reviewing.review.course.domain.CourseResponseDto;
-import com.reviewing.review.course.domain.CourseWish;
-import com.reviewing.review.course.domain.Platform;
+import com.reviewing.review.course.entity.CourseWish;
+import com.reviewing.review.course.entity.Platform;
 import com.reviewing.review.member.domain.Member;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,8 +26,8 @@ public class CourseRepository {
     private final int PAGE_SIZE = 10;
 
     // 모든 강의 조회
-    public List<CourseResponseDto> findAllCoursesBySorting(String sortType, Long lastCourseId,
-            Float lastRating, Integer lastComments) {
+    public List<CourseResponseDto> findAllCoursesBySorting(String sortType, UUID lastCourseId,
+            BigDecimal lastRating, Integer lastComments) {
 
         // 평점순
         if (sortType != null && sortType.equals("rating")) {
@@ -69,8 +71,8 @@ public class CourseRepository {
     }
 
     // 플랫폼 기준 정렬
-    public List<CourseResponseDto> findCoursesByPlatform(String platform, String sortType, Long lastCourseId,
-            Float lastRating, Integer lastComments) {
+    public List<CourseResponseDto> findCoursesByPlatform(String platform, String sortType, UUID lastCourseId,
+            BigDecimal lastRating, Integer lastComments) {
 
         Platform finePlatform = em.createQuery("select p from Platform p where p.name = :name",
                         Platform.class)
@@ -122,8 +124,8 @@ public class CourseRepository {
 
     // 플랫폼,카테고리 기준 정렬 - 로그인 안함
     public List<CourseResponseDto> findCoursesByPlatformAndCategory(String platform,
-            String category, String sortType, Long lastCourseId,
-            Float lastRating, Integer lastComments) {
+            String category, String sortType, UUID lastCourseId,
+            BigDecimal lastRating, Integer lastComments) {
 
         Platform findPlatform = em.createQuery("select p from Platform p where p.name = :name",
                         Platform.class)
@@ -142,7 +144,8 @@ public class CourseRepository {
                             "select new com.reviewing.review.course.domain.CourseResponseDto("
                                     + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes, c.comments) "
                                     + "from Course c "
-                                    + "where c.platform = :platform and c.category = :category and (:lastRating is null or (c.rating < :lastRating or (c.rating = :lastRating and c.id < :lastCourseId))) "
+                                    + "join CategoryCourse cc on cc.course = c "
+                                    + "where c.platform = :platform and cc.category = :category and (:lastRating is null or (c.rating < :lastRating or (c.rating = :lastRating and c.id < :lastCourseId))) "
                                     + "order by c.rating desc, c.id desc ",
                             CourseResponseDto.class)
                     .setParameter("platform", findPlatform)
@@ -158,7 +161,8 @@ public class CourseRepository {
                             "select new com.reviewing.review.course.domain.CourseResponseDto("
                                     + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes, c.comments) "
                                     + "from Course c "
-                                    + "where c.platform = :platform and c.category = :category and (:lastComments is null or (c.comments < :lastComments or (c.comments = :lastComments and c.id < :lastCourseId))) "
+                                    + "join CategoryCourse cc on cc.course = c "
+                                    + "where c.platform = :platform and cc.category = :category and (:lastComments is null or (c.comments < :lastComments or (c.comments = :lastComments and c.id < :lastCourseId))) "
                                     + "order by c.comments desc, c.id desc ",
                             CourseResponseDto.class)
                     .setParameter("platform", findPlatform)
@@ -173,7 +177,8 @@ public class CourseRepository {
                         "select new com.reviewing.review.course.domain.CourseResponseDto("
                                 + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes, c.comments) "
                                 + "from Course c "
-                                + "where c.platform = :platform and c.category = :category and (:lastCourseId is null or c.id > :lastCourseId)",
+                                + "join CategoryCourse cc on cc.course = c "
+                                + "where c.platform = :platform and cc.category = :category and (:lastCourseId is null or c.id > :lastCourseId)",
                         CourseResponseDto.class)
                 .setParameter("platform", findPlatform)
                 .setParameter("category", findCategory)
@@ -182,7 +187,7 @@ public class CourseRepository {
                 .getResultList();
     }
 
-    public void createCourseWish(Long courseId, Long memberId) {
+    public void createCourseWish(UUID courseId, Long memberId) {
         Course course = em.find(Course.class, courseId);
         Member member = em.find(Member.class, memberId);
 
@@ -194,7 +199,7 @@ public class CourseRepository {
         em.persist(courseWish);
     }
 
-    public void removeCourseWish(Long courseId, Long memberId) {
+    public void removeCourseWish(UUID courseId, Long memberId) {
         CourseWish courseWish = em.createQuery(
                         "select cw from CourseWish cw where cw.course.id = :courseId and cw.member.id = :memberId",
                         CourseWish.class)
@@ -205,12 +210,12 @@ public class CourseRepository {
         em.remove(courseWish);
     }
 
-    public void changeCourseUpdated(Long courseId) {
+    public void changeCourseUpdated(UUID courseId) {
         Course findCourse = em.find(Course.class, courseId);
         findCourse.setUpdated(true);
     }
 
-    public CourseResponseDto findCourseById(Long courseId, Long memberId) {
+    public CourseResponseDto findCourseById(UUID courseId) {
         return em.createQuery(
                         "select new com.reviewing.review.course.domain.CourseResponseDto("
                                 + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes, c.comments) "
@@ -234,7 +239,7 @@ public class CourseRepository {
                 .getResultList();
     }
 
-    public CourseWish checkCourseWish(Long courseId, Long memberId) {
+    public CourseWish checkCourseWish(UUID courseId, Long memberId) {
         try {
             return em.createQuery(
                             "select cw from CourseWish cw where cw.course.id = :courseId and cw.member.id = :memberId",
@@ -247,7 +252,7 @@ public class CourseRepository {
         }
     }
 
-    public void updateCourseWishCount(Long courseId, boolean wished) {
+    public void updateCourseWishCount(UUID courseId, boolean wished) {
         Course findCourse = em.find(Course.class, courseId);
         int wishes = findCourse.getWishes();
 
@@ -258,7 +263,7 @@ public class CourseRepository {
         findCourse.setWishes(wishes - 1);
     }
 
-    public CourseWish findCourseWish(Long courseId, Long memberId) {
+    public CourseWish findCourseWish(UUID courseId, Long memberId) {
         try {
             return em.createQuery(
                             "select cw from CourseWish cw where cw.course.id = :courseId and cw.member.id = :memberId",

@@ -1,6 +1,7 @@
 package com.reviewing.review.admin.domain;
 
 import com.reviewing.review.review.domain.ReviewStateType;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -8,7 +9,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class AdminReviewResponseDto {
 
-    private Long courseId;
+    private UUID courseId;
     private String courseTitle;
     private String courseTeacher;
     private String courseThumbnailImage;
