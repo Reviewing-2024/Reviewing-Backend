@@ -1,9 +1,23 @@
 package com.reviewing.review.crawling;
 
+import com.reviewing.review.course.entity.Category;
+import com.reviewing.review.course.entity.CategoryCourse;
+import com.reviewing.review.course.entity.Course;
+import com.reviewing.review.course.entity.Platform;
+import com.reviewing.review.crawling.repository.CategoryCourseRepository;
+import com.reviewing.review.crawling.repository.CategoryRepository;
+import com.reviewing.review.crawling.repository.CourseCrawlingRepository;
+import com.reviewing.review.crawling.repository.PlatformRepository;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -15,13 +29,60 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class InflearnCrawling {
 
-//    public static String WEB_DRIVER_ID = "webdriver.chrome.driver";
-//    public static String WEB_DRIVER_PATH = "/Users/seoyeon/Downloads/chromedriver-mac-arm64";
+    private final PlatformRepository platformRepository;
+    private final CourseCrawlingRepository courseCrawlingRepository;
+    private final CategoryRepository categoryRepository;
+    private final CategoryCourseRepository categoryCourseRepository;
 
-    @GetMapping("/crawling/inflearn")
+    @GetMapping("/inflearn/platform")
+    public void createPlatform() {
+        Platform platform = new Platform("인프런");
+        platformRepository.save(platform);
+        Platform findPlatform = platformRepository.findByName("인프런");
+        System.out.println(findPlatform.getName());
+    }
+
+    @GetMapping("/inflearn/category")
+    public void createCategory() {
+        Platform findPlatform = platformRepository.findByName("인프런");
+
+        Map<String, String> map = new HashMap<>();
+
+        map.put("web-dev", "웹 개발");
+        map.put("front-end", "프론트엔드");
+        map.put("back-end", "백엔드");
+        map.put("full-stack", "풀스택");
+        map.put("mobile-app", "모바일 앱 개발");
+        map.put("programming-lang", "프로그래밍 언어");
+        map.put("algorithm", "알고리즘/자료구조");
+        map.put("database-dev", "데이터베이스");
+        map.put("devops-infra", "데브옵스/인프라");
+        map.put("sw-test", "소프트웨어 테스트");
+        map.put("programming-tool", "개발 도구");
+        map.put("web-publishing", "웹 퍼블리싱");
+        map.put("desktop-application", "데스크톱 앱 개발");
+        map.put("vr-ar", "VR/AR");
+
+        for (String slug : map.keySet()) {
+            Category category = new Category(map.get(slug), slug, findPlatform);
+            categoryRepository.save(category);
+        }
+
+        List<Category> categories = categoryRepository.findByPlatform(findPlatform);
+
+        for (Category category : categories) {
+            System.out.println(category.getName());
+        }
+
+    }
+
+    @GetMapping("/inflearn/crawling")
     public void crawling() {
+
+        Platform findPlatform = platformRepository.findByName("인프런");
 
         ChromeOptions options = new ChromeOptions();
         // User-Agent 설정
@@ -36,115 +97,257 @@ public class InflearnCrawling {
         WebDriver driver = new ChromeDriver(options);
 
         try {
-            String categorySlug = "back-end";
-            for (int page = 1; page <= 1; page++) {
-                String url = "https://www.inflearn.com/courses/it-programming/" + categorySlug
-                        + "?types=ONLINE&page_number=" + page;
 
-                // 페이지 접속
-                driver.get(url);
+            List<Category> categories = categoryRepository.findByPlatform(findPlatform);
 
-                // 특정 요소가 로드될 때까지 (최대 30초) 대기
-                new WebDriverWait(driver, Duration.ofSeconds(30)).until(
-                        ExpectedConditions.presenceOfElementLocated(By.cssSelector("main.mantine-1avyp1d"))
-                );
+            for (Category slugCategory : categories) {
+                String categorySlug = slugCategory.getSlug();
 
-                WebElement firstUl = driver.findElement(By.cssSelector("ul.css-sdr7qd.mantine-1avyp1d"));
-                List<WebElement> firstCourses = firstUl.findElements(By.cssSelector("li.css-8atqhb.mantine-1avyp1d"));
-                System.out.println("first count: " + firstCourses.size());
+                for (int page = 1; page <= 1; page++) {
+                    String url = "https://www.inflearn.com/courses/it-programming/" + categorySlug
+                            + "?types=ONLINE&page_number=" + page;
 
-                WebElement secondUrl = driver.findElement(By.cssSelector("ul.css-2ldd65.mantine-1avyp1d"));
-                List<WebElement> secondCourses = secondUrl.findElements(By.cssSelector("li.mantine-1avyp1d"));
-                System.out.println("second count: " + secondCourses.size());
+                    driver.get(url);
 
-                for (WebElement course : firstCourses) {
-                    WebElement urlTag = course.findElement(By.tagName("a"));
-                    String courseUrl = urlTag.getAttribute("href");
+                    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 
-                    String courseSlug = "";
-                    if (courseUrl != null && !courseUrl.isEmpty()) {
-                        String[] parts = courseUrl.split("/");
-                        if (parts.length > 0) {
-                            String lastPart = parts[parts.length - 1];
-                            courseSlug = lastPart.split("\\?")[0];
+                    // 전체 페이지 로드 완료 대기
+                    wait.until(webDriver -> ((JavascriptExecutor) webDriver)
+                            .executeScript("return document.readyState").equals("complete"));
+
+                    // 특정 요소가 표시될 때까지 대기
+                    wait.until(ExpectedConditions.visibilityOfElementLocated(
+                            By.cssSelector("ul.css-sdr7qd.mantine-1avyp1d")
+                    ));
+//                    wait.until(ExpectedConditions.presenceOfElementLocated(
+//                            By.cssSelector("ul.css-sdr7qd.mantine-1avyp1d")
+//                    ));
+
+//                    new WebDriverWait(driver, Duration.ofSeconds(30)).until(
+//                            ExpectedConditions.visibilityOfElementLocated(By.cssSelector("main.mantine-1avyp1d"))
+//                    );
+//                    new WebDriverWait(driver, Duration.ofSeconds(30)).until(
+//                            ExpectedConditions.presenceOfElementLocated(By.cssSelector("main.mantine-1avyp1d"))
+//                    );
+
+                    WebElement firstUl = driver.findElement(By.cssSelector("ul.css-sdr7qd.mantine-1avyp1d"));
+                    List<WebElement> firstCourses = firstUl.findElements(By.cssSelector("li.css-8atqhb.mantine-1avyp1d"));
+                    System.out.println("first count: " + firstCourses.size());
+
+                    WebElement secondUrl = driver.findElement(By.cssSelector("ul.css-2ldd65.mantine-1avyp1d"));
+                    List<WebElement> secondCourses = secondUrl.findElements(By.cssSelector("li.mantine-1avyp1d"));
+                    System.out.println("second count: " + secondCourses.size());
+
+                    for (WebElement course : firstCourses) {
+                        String courseUrl = course.findElement(By.tagName("a")).getAttribute("href");
+//                        String courseUrl = urlTag.getAttribute("href");
+
+                        String courseSlug = "";
+                        if (courseUrl != null && !courseUrl.isEmpty()) {
+                            String[] parts = courseUrl.split("/");
+                            if (parts.length > 0) {
+                                String lastPart = parts[parts.length - 1];
+                                courseSlug = lastPart.split("\\?")[0];
+                            }
                         }
+
+                        String thumbnailImage = null;
+                        String thumbnailVideo = null;
+                        try {
+                            WebElement thumbnailDiv = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd"));
+
+                            // img 태그 검색
+//                            WebElement imgOrVideo = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd")).findElement(By.tagName("img"));
+//                            if (imgOrVideo != null) {
+//                                // img 썸네일
+//                                thumbnailImage = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd")).findElement(By.tagName("img")).getAttribute("src");
+//                            } else {
+//                                // 비디오인 경우 source 태그 찾기
+//                                WebElement sourceTag = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd")).findElement(By.tagName("source"));
+//                                if (sourceTag != null) {
+//                                    thumbnailVideo = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd")).findElement(By.tagName("source")).getAttribute("src");
+//                                }
+//                            }
+                            WebElement imgOrVideo = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd")).findElement(By.tagName("img"));
+                            thumbnailImage = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd")).findElement(By.tagName("img")).getAttribute("src");
+                            if (imgOrVideo != null) {
+                                // img 썸네일
+                                thumbnailImage = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd")).findElement(By.tagName("img")).getAttribute("src");
+                            } else {
+                                // 비디오인 경우 source 태그 찾기
+                                WebElement sourceTag = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd")).findElement(By.tagName("source"));
+                                if (sourceTag != null) {
+                                    thumbnailVideo = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd")).findElement(By.tagName("source")).getAttribute("src");
+                                }
+                            }
+                        } catch (NoSuchElementException e) {
+                            log.info("에러 url: " + courseUrl);
+                        }
+
+                        String title = course.findElement(By.cssSelector("p.mantine-Text-root.css-10bh5qj.mantine-b3zn22")).getText();
+//                        String title = titleTag.getText();
+
+                        String teacher = course.findElement(By.cssSelector("p.mantine-Text-root.css-1r49xhh.mantine-aiouth")).getText();
+//                        String teacher = teacherTag.getText();
+
+                        Optional<Course> findCourse = courseCrawlingRepository.findBySlug(courseSlug);
+                        Optional<Category> findCategory = categoryRepository.findBySlug(categorySlug);
+
+                        if (findCategory.isEmpty()) {
+                            return;
+                        }
+                        Category category = findCategory.get();
+
+                        if (findCourse.isPresent()) { // 강의가 있을 때
+
+                            Optional<CategoryCourse> findCategoryCourse = categoryCourseRepository.findByCourseAndCategory(
+                                    findCourse.get(), category);
+
+                            if (findCategoryCourse.isEmpty()) { // 강의는 있는데 해당 카테고리에 없을 때
+                                log.info("카테고리 추가");
+                                CategoryCourse newCategoryCourse = CategoryCourse.builder()
+                                        .category(category)
+                                        .course(findCourse.get())
+                                        .build();
+
+                                categoryCourseRepository.save(newCategoryCourse);
+                            } else {
+                                log.info("이미 강의 존재");
+                            }
+
+                        } else {
+                            log.info("강의 생성");
+                            Course courseDto = Course.builder()
+                                    .platform(findPlatform)
+                                    .title(title)
+                                    .url(courseUrl)
+                                    .thumbnailImage(thumbnailImage)
+                                    .thumbnailVideo(thumbnailVideo)
+                                    .teacher(teacher)
+                                    .slug(courseSlug)
+                                    .build();
+
+                            Course savedCourse = courseCrawlingRepository.save(courseDto);
+
+                            CategoryCourse categoryCourse = CategoryCourse.builder()
+                                    .category(category)
+                                    .course(savedCourse)
+                                    .build();
+
+                            categoryCourseRepository.save(categoryCourse);
+                        }
+
+                        System.out.println(title);
+                        System.out.println(courseUrl);
+                        System.out.println(courseSlug);
+                        System.out.println(thumbnailImage);
+                        System.out.println(thumbnailVideo);
+                        System.out.println(teacher);
+                        System.out.println("----------------------");
+
                     }
 
-                    WebElement thumbnailDiv = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd"));
-                    String thumbnailImage = null;
-                    String thumbnailVideo = null;
-                    // img 태그 검색
-                    WebElement imgOrVideo = thumbnailDiv.findElement(By.tagName("img"));
-                    if (imgOrVideo != null) {
-                        // img 썸네일
-                        thumbnailImage = imgOrVideo.getAttribute("src");
-                    } else {
-                        // 비디오인 경우 source 태그 찾기
-                        WebElement sourceTag = thumbnailDiv.findElement(By.tagName("source"));
-                        if (sourceTag != null) {
-                            thumbnailVideo = sourceTag.getAttribute("src");
+                    for (WebElement course : secondCourses) {
+                        String courseUrl = course.findElement(By.tagName("a")).getAttribute("href");
+//                        String courseUrl = urlTag.getAttribute("href");
+
+                        String courseSlug = "";
+                        if (courseUrl != null && !courseUrl.isEmpty()) {
+                            String[] parts = courseUrl.split("/");
+                            if (parts.length > 0) {
+                                String lastPart = parts[parts.length - 1];
+                                courseSlug = lastPart.split("\\?")[0];
+                            }
                         }
+
+                        String thumbnailImage = null;
+                        String thumbnailVideo = null;
+                        try {
+                            WebElement thumbnailDiv = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd"));
+                            // img 태그 검색
+                            WebElement imgOrVideo = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd")).findElement(By.tagName("img"));
+                            if (imgOrVideo != null) {
+                                // img 썸네일
+                                thumbnailImage = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd")).findElement(By.tagName("img")).getAttribute("src");
+                            } else {
+                                // 비디오인 경우 source 태그 찾기
+                                WebElement sourceTag = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd")).findElement(By.tagName("source"));
+                                if (sourceTag != null) {
+                                    thumbnailVideo = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd")).findElement(By.tagName("source")).getAttribute("src");
+                                }
+                            }
+                        } catch (NoSuchElementException e) {
+                            log.info("에러 발생한 url: " + courseUrl);
+                        }
+
+
+                        String title = course.findElement(By.cssSelector("p.mantine-Text-root.css-10bh5qj.mantine-b3zn22")).getText();
+//                        String title = titleTag.getText();
+
+                        String teacher = course.findElement(By.cssSelector("p.mantine-Text-root.css-1r49xhh.mantine-aiouth")).getText();
+//                        String teacher = teacherTag.getText();
+
+                        Optional<Course> findCourse = courseCrawlingRepository.findBySlug(courseSlug);
+                        Optional<Category> findCategory = categoryRepository.findBySlug(categorySlug);
+
+                        if (findCategory.isEmpty()) {
+                            return;
+                        }
+                        Category category = findCategory.get();
+
+                        if (findCourse.isPresent()) { // 강의가 있을 때
+
+                            Optional<CategoryCourse> findCategoryCourse = categoryCourseRepository.findByCourseAndCategory(
+                                    findCourse.get(), category);
+
+                            if (findCategoryCourse.isEmpty()) { // 강의는 있는데 해당 카테고리에 없을 때
+                                log.info("카테고리 추가");
+                                CategoryCourse newCategoryCourse = CategoryCourse.builder()
+                                        .category(category)
+                                        .course(findCourse.get())
+                                        .build();
+
+                                categoryCourseRepository.save(newCategoryCourse);
+                            } else {
+                                log.info("이미 강의 존재");
+                            }
+
+                        } else {
+                            log.info("강의 생성");
+                            Course courseDto = Course.builder()
+                                    .platform(findPlatform)
+                                    .title(title)
+                                    .url(courseUrl)
+                                    .thumbnailImage(thumbnailImage)
+                                    .thumbnailVideo(thumbnailVideo)
+                                    .teacher(teacher)
+                                    .slug(courseSlug)
+                                    .build();
+
+                            Course savedCourse = courseCrawlingRepository.save(courseDto);
+
+                            CategoryCourse categoryCourse = CategoryCourse.builder()
+                                    .category(category)
+                                    .course(savedCourse)
+                                    .build();
+
+                            categoryCourseRepository.save(categoryCourse);
+                        }
+
+                        System.out.println(title);
+                        System.out.println(courseUrl);
+                        System.out.println(courseSlug);
+                        System.out.println(thumbnailImage);
+                        System.out.println(thumbnailVideo);
+                        System.out.println(teacher);
+                        System.out.println("----------------------");
+
                     }
-                    WebElement titleTag = course.findElement(By.cssSelector("p.mantine-Text-root.css-10bh5qj.mantine-b3zn22"));
-                    String title = titleTag.getText();
-
-                    WebElement teacherTag = course.findElement(By.cssSelector("p.mantine-Text-root.css-1r49xhh.mantine-aiouth"));
-                    String teacher = teacherTag.getText();
-
-                    System.out.println(title);
-                    System.out.println(courseUrl);
-                    System.out.println(courseSlug);
-                    System.out.println(thumbnailImage);
-                    System.out.println(thumbnailVideo);
-                    System.out.println(teacher);
-                    System.out.println("----------------------");
-
                 }
 
-                for (WebElement course : secondCourses) {
-                    WebElement urlTag = course.findElement(By.tagName("a"));
-                    String courseUrl = urlTag.getAttribute("href");
 
-                    String courseSlug = "";
-                    if (courseUrl != null && !courseUrl.isEmpty()) {
-                        String[] parts = courseUrl.split("/");
-                        if (parts.length > 0) {
-                            String lastPart = parts[parts.length - 1];
-                            courseSlug = lastPart.split("\\?")[0];
-                        }
-                    }
-
-                    WebElement thumbnailDiv = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd"));
-                    String thumbnailImage = null;
-                    String thumbnailVideo = null;
-                    // img 태그 검색
-                    WebElement imgOrVideo = thumbnailDiv.findElement(By.tagName("img"));
-                    if (imgOrVideo != null) {
-                        // img 썸네일
-                        thumbnailImage = imgOrVideo.getAttribute("src");
-                    } else {
-                        // 비디오인 경우 source 태그 찾기
-                        WebElement sourceTag = thumbnailDiv.findElement(By.tagName("source"));
-                        if (sourceTag != null) {
-                            thumbnailVideo = sourceTag.getAttribute("src");
-                        }
-                    }
-                    WebElement titleTag = course.findElement(By.cssSelector("p.mantine-Text-root.css-10bh5qj.mantine-b3zn22"));
-                    String title = titleTag.getText();
-
-                    WebElement teacherTag = course.findElement(By.cssSelector("p.mantine-Text-root.css-1r49xhh.mantine-aiouth"));
-                    String teacher = teacherTag.getText();
-
-                    System.out.println(title);
-                    System.out.println(courseUrl);
-                    System.out.println(courseSlug);
-                    System.out.println(thumbnailImage);
-                    System.out.println(thumbnailVideo);
-                    System.out.println(teacher);
-                    System.out.println("----------------------");
-
-                }
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

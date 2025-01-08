@@ -10,6 +10,7 @@ import jakarta.persistence.ManyToOne;
 import java.math.BigDecimal;
 import java.util.UUID;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -45,4 +46,15 @@ public class Course {
     @Column(nullable = false)
     private boolean updated = false;
 
+    @Builder
+    public Course(Platform platform, String title, String url, String thumbnailImage,
+            String thumbnailVideo, String teacher, String slug) {
+        this.platform = platform;
+        this.title = title;
+        this.url = url;
+        this.thumbnailImage = thumbnailImage;
+        this.thumbnailVideo = thumbnailVideo;
+        this.teacher = teacher;
+        this.slug = slug;
+    }
 }

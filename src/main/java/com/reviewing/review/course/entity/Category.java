@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -27,4 +28,10 @@ public class Category {
     @ManyToOne(fetch = FetchType.LAZY)
     private Platform platform;
 
+    @Builder
+    public Category(String name, String slug, Platform platform) {
+        this.name = name;
+        this.slug = slug;
+        this.platform = platform;
+    }
 }

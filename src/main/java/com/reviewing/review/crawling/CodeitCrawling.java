@@ -1,8 +1,20 @@
 package com.reviewing.review.crawling;
 
+import com.reviewing.review.course.entity.Category;
+import com.reviewing.review.course.entity.CategoryCourse;
+import com.reviewing.review.course.entity.Course;
+import com.reviewing.review.course.entity.Platform;
+import com.reviewing.review.crawling.repository.CategoryCourseRepository;
+import com.reviewing.review.crawling.repository.CategoryRepository;
+import com.reviewing.review.crawling.repository.CourseCrawlingRepository;
+import com.reviewing.review.crawling.repository.PlatformRepository;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -15,14 +27,57 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class CodeitCrawling {
+
+    private final PlatformRepository platformRepository;
+    private final CourseCrawlingRepository courseCrawlingRepository;
+    private final CategoryRepository categoryRepository;
+    private final CategoryCourseRepository categoryCourseRepository;
+
+    @GetMapping("/codeit/platform")
+    public void createPlatform() {
+        Platform platform = new Platform("코드잇");
+        platformRepository.save(platform);
+        Platform findPlatform = platformRepository.findByName("코드잇");
+        System.out.println(findPlatform.getName());
+    }
+
+    @GetMapping("/codeit/category")
+    public void createCategory() {
+        Platform findPlatform = platformRepository.findByName("코드잇");
+
+        Map<String, String> map = new HashMap<>();
+
+        map.put("FRONTEND", "프론트엔드");
+        map.put("BACKEND", "백엔드");
+        map.put("FULLSTACK", "풀스택");
+        map.put("DATA_ANALYSIS", "데이터 분석");
+        map.put("AI", "인공지능");
+        map.put("data-engineering", "데이터 엔지니어링");
+
+        for (String slug : map.keySet()) {
+            Category category = new Category(map.get(slug), slug, findPlatform);
+            categoryRepository.save(category);
+        }
+
+        List<Category> categories = categoryRepository.findByPlatform(findPlatform);
+
+        for (Category category : categories) {
+            System.out.println(category.getName());
+        }
+
+    }
 
     @GetMapping("/crawling/codeit")
     public void crawling() {
 
+        Platform findPlatform = platformRepository.findByName("코드잇");
+
         ChromeOptions options = new ChromeOptions();
         // User-Agent 설정
-        options.addArguments("user-agent=Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko");
+        options.addArguments(
+                "user-agent=Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko");
         // 헤드리스 모드
         options.addArguments("--headless");
         options.addArguments("--disable-popup-blocking");
@@ -33,46 +88,98 @@ public class CodeitCrawling {
         WebDriver driver = new ChromeDriver(options);
 
         try {
-            String categorySlug = "FRONTEND"; // FRONTEND, BACKEND, FULLSTACK
-            int count = 0;
-            for (int page = 1; page <= 1; page++) {
+            List<Category> categories = categoryRepository.findByPlatform(findPlatform);
 
-                String url = "https://www.codeit.kr/explore?page=" + page + "&category=" + categorySlug
-                        + "&difficulty=&types=";
+            for (Category slugCategory : categories) {
+                String categorySlug = slugCategory.getSlug();
 
-//                System.out.println(url);
+                int count = 0;
+                for (int page = 1; page <= 1; page++) {
 
-                driver.get(url);
+                    String url =
+                            "https://www.codeit.kr/explore?page=" + page + "&category=" + categorySlug
+                                    + "&difficulty=&types=";
 
-                // 특정 요소가 로드될 때까지 (최대 30초) 대기
-                new WebDriverWait(driver, Duration.ofSeconds(30)).until(
-                        ExpectedConditions.presenceOfElementLocated(
-                                By.cssSelector("div.TopicCommonCard_container__w89Rp")
-                        )
-                );
+                    driver.get(url);
 
-                WebElement topic = driver.findElement(By.cssSelector("div.TopicList_grid__7bZ8U"));
+                    new WebDriverWait(driver, Duration.ofSeconds(30)).
+                            until(ExpectedConditions.visibilityOfElementLocated(
+                                    By.cssSelector("div.TopicList_grid__7bZ8U")
+                            ));
 
-                List<WebElement> courses = topic.findElements(
-                        By.cssSelector("div.TopicCommonCard_container__w89Rp"));
+                    WebElement topic = driver.findElement(By.cssSelector("div.TopicList_grid__7bZ8U"));
 
-                for (WebElement course : courses) {
-                    count++;
-                    String title = course.findElement(By.cssSelector("p.TopicCommonCard_title__0KrCI")).getText();
-                    String courseUrl = course.findElement(
-                            By.cssSelector("a.TopicCommonCard_body__3_gHR")).getAttribute("href");
-                    String[] parts = courseUrl.split("/");
-                    String courseSlug = parts[parts.length - 1];
+                    List<WebElement> courses = topic.findElements(
+                            By.cssSelector("div.TopicCommonCard_container__w89Rp"));
 
-                    System.out.println(title);
-                    System.out.println(courseUrl);
-                    System.out.println(courseSlug);
-                    System.out.println("----------------------");
+                    for (WebElement course : courses) {
+                        count++;
+                        String title = course.findElement(
+                                By.cssSelector("p.TopicCommonCard_title__0KrCI")).getText();
+                        String courseUrl = course.findElement(
+                                By.cssSelector("a.TopicCommonCard_body__3_gHR")).getAttribute("href");
+                        String[] parts = courseUrl.split("/");
+                        String courseSlug = parts[parts.length - 1];
 
+                        Optional<Course> findCourse = courseCrawlingRepository.findBySlug(courseSlug);
+                        Optional<Category> findCategory = categoryRepository.findBySlug(categorySlug);
+
+                        if (findCategory.isEmpty()) {
+                            return;
+                        }
+                        Category category = findCategory.get();
+
+                        if (findCourse.isPresent()) { // 강의가 있을 때
+
+                            Optional<CategoryCourse> findCategoryCourse = categoryCourseRepository.findByCourseAndCategory(
+                                    findCourse.get(), category);
+
+                            if (findCategoryCourse.isEmpty()) { // 강의는 있는데 해당 카테고리에 없을 때
+                                log.info("카테고리 추가");
+                                CategoryCourse newCategoryCourse = CategoryCourse.builder()
+                                        .category(category)
+                                        .course(findCourse.get())
+                                        .build();
+
+                                categoryCourseRepository.save(newCategoryCourse);
+                            } else {
+                                log.info("이미 강의 존재");
+                            }
+
+                        } else {
+                            log.info("강의 생성");
+                            Course courseDto = Course.builder()
+                                    .platform(findPlatform)
+                                    .title(title)
+                                    .url(courseUrl)
+                                    .thumbnailImage("https://uni-reviewing.s3.ap-northeast-2.amazonaws.com/codeit.png")
+                                    .thumbnailVideo(null)
+                                    .teacher(null)
+                                    .slug(courseSlug)
+                                    .build();
+
+                            Course savedCourse = courseCrawlingRepository.save(courseDto);
+
+                            CategoryCourse categoryCourse = CategoryCourse.builder()
+                                    .category(category)
+                                    .course(savedCourse)
+                                    .build();
+
+                            categoryCourseRepository.save(categoryCourse);
+                        }
+
+                        System.out.println(title);
+                        System.out.println(courseUrl);
+                        System.out.println(courseSlug);
+                        System.out.println("----------------------");
+
+                    }
                 }
-            }
 
-            System.out.println(count);
+                System.out.println(slugCategory.getName());
+                System.out.println(count);
+
+            }
 
         } catch (Exception e) {
             e.printStackTrace();

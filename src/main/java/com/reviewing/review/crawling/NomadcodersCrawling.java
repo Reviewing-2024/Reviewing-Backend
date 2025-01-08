@@ -1,6 +1,9 @@
 package com.reviewing.review.crawling;
 
-import java.time.Duration;
+import com.reviewing.review.course.entity.Course;
+import com.reviewing.review.course.entity.Platform;
+import com.reviewing.review.crawling.repository.CourseCrawlingRepository;
+import com.reviewing.review.crawling.repository.PlatformRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.openqa.selenium.By;
@@ -9,8 +12,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,8 +19,28 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class NomadcodersCrawling {
 
+    private final PlatformRepository platformRepository;
+    private final CourseCrawlingRepository courseCrawlingRepository;
+
+    @GetMapping("/nomad")
+    public void createPlatform() {
+        Platform platform = new Platform("노마드코더");
+        platformRepository.save(platform);
+        Platform findPlatform = platformRepository.findByName("노마드코더");
+        System.out.println(findPlatform.getName());
+    }
+
+    @GetMapping("/nomad/remove")
+    public void remove() {
+        Platform findPlatform = platformRepository.findByName("노마드코더");
+        List<Course> courses = courseCrawlingRepository.findByPlatform(findPlatform);
+        courseCrawlingRepository.deleteAll(courses);
+    }
+
     @GetMapping("/crawling/nomad")
     public void crawling() {
+
+        Platform findPlatform = platformRepository.findByName("노마드코더");
 
         ChromeOptions options = new ChromeOptions();
         // User-Agent 설정
@@ -89,6 +110,18 @@ public class NomadcodersCrawling {
                 String thumbnail = course.findElement(By.cssSelector("img.rounded-lg"))
                         .getAttribute("src");
 
+                Course courseDto = Course.builder()
+                        .platform(findPlatform)
+                        .title(title)
+                        .url(courseUrl)
+                        .thumbnailImage(thumbnail)
+                        .thumbnailVideo(null)
+                        .teacher(null)
+                        .slug(courseSlug)
+                        .build();
+
+                courseCrawlingRepository.save(courseDto);
+
                 System.out.println(title);
                 System.out.println(courseUrl);
                 System.out.println(courseSlug);
@@ -96,6 +129,7 @@ public class NomadcodersCrawling {
                 System.out.println("----------------------");
             }
             System.out.println(count);
+            System.out.println(courseCrawlingRepository.count());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -104,5 +138,6 @@ public class NomadcodersCrawling {
         }
 
     }
+
 
 }
