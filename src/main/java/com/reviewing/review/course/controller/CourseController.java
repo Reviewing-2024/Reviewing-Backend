@@ -151,7 +151,7 @@ public class CourseController {
         }
 
         if (wished) { // wished=true -> 강의 찜 취소
-            if (courseService.checkCourseWishedByMember(courseId, memberId)) {
+            if (!courseService.checkCourseWishedByMember(courseId, memberId)) {
                 return ResponseEntity.status(605).body(null);
             }
             courseService.removeCourseWish(courseId, memberId);
@@ -160,7 +160,7 @@ public class CourseController {
         }
 
         // wished=false -> 강의 찜
-        if (!courseService.checkCourseWishedByMember(courseId, memberId)) {
+        if (courseService.checkCourseWishedByMember(courseId, memberId)) {
             return ResponseEntity.status(606).body(null);
         }
         courseService.createCourseWish(courseId, memberId);
