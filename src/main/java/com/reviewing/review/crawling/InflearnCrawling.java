@@ -87,7 +87,7 @@ public class InflearnCrawling {
         Platform findPlatform = platformRepository.findByName("인프런");
 
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("user-agent=Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko");
+        options.addArguments("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36");
         options.addArguments("--headless");
         options.addArguments("--disable-popup-blocking");
         options.addArguments("--disable-default-apps");
