@@ -66,4 +66,9 @@ public class AdminRepository {
                 .size();
 
     }
+
+    public void updateReviewCount(Long reviewId, int newTotalReviewCount) {
+        Review findReview = em.find(Review.class, reviewId);
+        findReview.getCourse().setComments(newTotalReviewCount);
+    }
 }
