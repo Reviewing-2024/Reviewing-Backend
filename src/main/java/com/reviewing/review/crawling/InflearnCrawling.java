@@ -8,6 +8,8 @@ import com.reviewing.review.crawling.repository.CategoryCourseRepository;
 import com.reviewing.review.crawling.repository.CategoryRepository;
 import com.reviewing.review.crawling.repository.CourseCrawlingRepository;
 import com.reviewing.review.crawling.repository.PlatformRepository;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
@@ -85,9 +87,7 @@ public class InflearnCrawling {
         Platform findPlatform = platformRepository.findByName("인프런");
 
         ChromeOptions options = new ChromeOptions();
-        // User-Agent 설정
         options.addArguments("user-agent=Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko");
-        // 헤드리스 모드
         options.addArguments("--headless");
         options.addArguments("--disable-popup-blocking");
         options.addArguments("--disable-default-apps");
@@ -119,16 +119,6 @@ public class InflearnCrawling {
                     wait.until(ExpectedConditions.visibilityOfElementLocated(
                             By.cssSelector("ul.css-sdr7qd.mantine-1avyp1d")
                     ));
-//                    wait.until(ExpectedConditions.presenceOfElementLocated(
-//                            By.cssSelector("ul.css-sdr7qd.mantine-1avyp1d")
-//                    ));
-
-//                    new WebDriverWait(driver, Duration.ofSeconds(30)).until(
-//                            ExpectedConditions.visibilityOfElementLocated(By.cssSelector("main.mantine-1avyp1d"))
-//                    );
-//                    new WebDriverWait(driver, Duration.ofSeconds(30)).until(
-//                            ExpectedConditions.presenceOfElementLocated(By.cssSelector("main.mantine-1avyp1d"))
-//                    );
 
                     WebElement firstUl = driver.findElement(By.cssSelector("ul.css-sdr7qd.mantine-1avyp1d"));
                     List<WebElement> firstCourses = firstUl.findElements(By.cssSelector("li.css-8atqhb.mantine-1avyp1d"));
@@ -139,56 +129,25 @@ public class InflearnCrawling {
                     System.out.println("second count: " + secondCourses.size());
 
                     for (WebElement course : firstCourses) {
-                        String courseUrl = course.findElement(By.tagName("a")).getAttribute("href");
-//                        String courseUrl = urlTag.getAttribute("href");
-
-                        String courseSlug = "";
-                        if (courseUrl != null && !courseUrl.isEmpty()) {
-                            String[] parts = courseUrl.split("/");
-                            if (parts.length > 0) {
-                                String lastPart = parts[parts.length - 1];
-                                courseSlug = lastPart.split("\\?")[0];
-                            }
-                        }
+                        String baseCourseUrl = course.findElement(By.tagName("a")).getAttribute("href");
+                        int keywordIndex = baseCourseUrl.indexOf("attributionToken");
+                        String encodedUrl = (keywordIndex != -1) ? baseCourseUrl.substring(0, baseCourseUrl.lastIndexOf("?", keywordIndex)) : baseCourseUrl;
+                        String courseUrl = URLDecoder.decode(encodedUrl, StandardCharsets.UTF_8);
+                        String[] parts = courseUrl.split("/");
+                        String courseSlug = parts[parts.length - 1];
 
                         String thumbnailImage = null;
                         String thumbnailVideo = null;
                         try {
-                            WebElement thumbnailDiv = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd"));
-
-                            // img 태그 검색
-//                            WebElement imgOrVideo = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd")).findElement(By.tagName("img"));
-//                            if (imgOrVideo != null) {
-//                                // img 썸네일
-//                                thumbnailImage = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd")).findElement(By.tagName("img")).getAttribute("src");
-//                            } else {
-//                                // 비디오인 경우 source 태그 찾기
-//                                WebElement sourceTag = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd")).findElement(By.tagName("source"));
-//                                if (sourceTag != null) {
-//                                    thumbnailVideo = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd")).findElement(By.tagName("source")).getAttribute("src");
-//                                }
-//                            }
-                            WebElement imgOrVideo = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd")).findElement(By.tagName("img"));
                             thumbnailImage = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd")).findElement(By.tagName("img")).getAttribute("src");
-                            if (imgOrVideo != null) {
-                                // img 썸네일
-                                thumbnailImage = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd")).findElement(By.tagName("img")).getAttribute("src");
-                            } else {
-                                // 비디오인 경우 source 태그 찾기
-                                WebElement sourceTag = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd")).findElement(By.tagName("source"));
-                                if (sourceTag != null) {
-                                    thumbnailVideo = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd")).findElement(By.tagName("source")).getAttribute("src");
-                                }
-                            }
                         } catch (NoSuchElementException e) {
-                            log.info("에러 url: " + courseUrl);
+                            log.info("비디오 썸네일");
+                            thumbnailVideo = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd")).findElement(By.tagName("source")).getAttribute("src");
                         }
 
                         String title = course.findElement(By.cssSelector("p.mantine-Text-root.css-10bh5qj.mantine-b3zn22")).getText();
-//                        String title = titleTag.getText();
 
                         String teacher = course.findElement(By.cssSelector("p.mantine-Text-root.css-1r49xhh.mantine-aiouth")).getText();
-//                        String teacher = teacherTag.getText();
 
                         Optional<Course> findCourse = courseCrawlingRepository.findBySlug(courseSlug);
                         Optional<Category> findCategory = categoryRepository.findBySlug(categorySlug);
@@ -248,44 +207,27 @@ public class InflearnCrawling {
                     }
 
                     for (WebElement course : secondCourses) {
-                        String courseUrl = course.findElement(By.tagName("a")).getAttribute("href");
-//                        String courseUrl = urlTag.getAttribute("href");
-
-                        String courseSlug = "";
-                        if (courseUrl != null && !courseUrl.isEmpty()) {
-                            String[] parts = courseUrl.split("/");
-                            if (parts.length > 0) {
-                                String lastPart = parts[parts.length - 1];
-                                courseSlug = lastPart.split("\\?")[0];
-                            }
-                        }
+                        String baseCourseUrl = course.findElement(By.tagName("a")).getAttribute("href");
+                        int keywordIndex = baseCourseUrl.indexOf("attributionToken");
+                        String encodedUrl = (keywordIndex != -1) ? baseCourseUrl.substring(0, baseCourseUrl.lastIndexOf("?", keywordIndex)) : baseCourseUrl;
+                        String courseUrl = URLDecoder.decode(encodedUrl, StandardCharsets.UTF_8);
+                        String[] parts = courseUrl.split("/");
+                        String courseSlug = parts[parts.length - 1];
 
                         String thumbnailImage = null;
                         String thumbnailVideo = null;
                         try {
-                            WebElement thumbnailDiv = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd"));
-                            // img 태그 검색
-                            WebElement imgOrVideo = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd")).findElement(By.tagName("img"));
-                            if (imgOrVideo != null) {
-                                // img 썸네일
-                                thumbnailImage = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd")).findElement(By.tagName("img")).getAttribute("src");
-                            } else {
-                                // 비디오인 경우 source 태그 찾기
-                                WebElement sourceTag = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd")).findElement(By.tagName("source"));
-                                if (sourceTag != null) {
-                                    thumbnailVideo = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd")).findElement(By.tagName("source")).getAttribute("src");
-                                }
-                            }
+                            thumbnailImage = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd"))
+                                    .findElement(By.tagName("img")).getAttribute("src");
                         } catch (NoSuchElementException e) {
-                            log.info("에러 발생한 url: " + courseUrl);
+                            log.info("비디오 썸네일");
+                            thumbnailVideo = course.findElement(By.cssSelector("div.mantine-AspectRatio-root.css-10tf8cw.mantine-1w8yksd"))
+                                    .findElement(By.tagName("source")).getAttribute("src");
                         }
 
-
                         String title = course.findElement(By.cssSelector("p.mantine-Text-root.css-10bh5qj.mantine-b3zn22")).getText();
-//                        String title = titleTag.getText();
 
                         String teacher = course.findElement(By.cssSelector("p.mantine-Text-root.css-1r49xhh.mantine-aiouth")).getText();
-//                        String teacher = teacherTag.getText();
 
                         Optional<Course> findCourse = courseCrawlingRepository.findBySlug(courseSlug);
                         Optional<Category> findCategory = categoryRepository.findBySlug(categorySlug);
