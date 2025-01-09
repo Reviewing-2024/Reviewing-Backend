@@ -90,8 +90,13 @@ public class CodeitCrawling {
             for (Category slugCategory : categories) {
                 String categorySlug = slugCategory.getSlug();
 
+                int lastPage = findLastPage(driver, categorySlug);
+                if (lastPage == 0) {
+                    continue;
+                }
+                log.info("마지막 페이지: {}", lastPage);
                 int count = 0;
-                for (int page = 1; page <= 1; page++) {
+                for (int page = 1; page <= lastPage; page++) {
 
                     String url =
                             "https://www.codeit.kr/explore?page=" + page + "&category=" + categorySlug
@@ -184,6 +189,28 @@ public class CodeitCrawling {
             driver.quit();
         }
 
+    }
+
+    private int findLastPage(WebDriver driver, String categorySlug) {
+
+        String url = "https://www.codeit.kr/explore?page=1&category=" + categorySlug
+                + "&difficulty=&types=";
+
+        driver.get(url);
+
+        new WebDriverWait(driver, Duration.ofSeconds(30)).
+                until(ExpectedConditions.visibilityOfElementLocated(
+                        By.cssSelector("div.TopicList_grid__7bZ8U")
+                ));
+
+        WebElement paginationDiv = driver.findElement(By.cssSelector("div.Pagination_container__jFl63"));
+        List<WebElement> pages = paginationDiv.findElements(
+                By.cssSelector("button.Pagination_page__nB9XK"));
+
+        if (!pages.isEmpty()) {
+            return Integer.parseInt(pages.getLast().getText());
+        }
+        return 0;
     }
 
 }
