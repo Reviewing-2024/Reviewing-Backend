@@ -187,6 +187,19 @@ public class CourseRepository {
                 .getResultList();
     }
 
+    public List<CourseResponseDto> searchCoursesByKeyword(String keyword, UUID lastCourseId) {
+        return em.createQuery("select new com.reviewing.review.course.domain.CourseResponseDto"
+                                + "(c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes, c.comments) "
+                                + "from Course c "
+                                + "where c.title like :keyword and (:lastCourseId is null or c.id > :lastCourseId)"
+                                + "order by c.id asc ",
+                        CourseResponseDto.class)
+                .setParameter("lastCourseId", lastCourseId)
+                .setParameter("keyword", "%" + keyword + "%")
+                .setMaxResults(PAGE_SIZE)
+                .getResultList();
+    }
+
     public void createCourseWish(UUID courseId, Long memberId) {
         Course course = em.find(Course.class, courseId);
         Member member = em.find(Member.class, memberId);

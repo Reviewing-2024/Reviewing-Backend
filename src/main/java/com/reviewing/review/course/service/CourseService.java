@@ -93,4 +93,8 @@ public class CourseService {
         CourseWish findCourseWish = courseRepository.findCourseWish(courseId, memberId);
         return findCourseWish != null;
     }
+
+    public List<CourseResponseDto> searchCoursesByKeyword(String keyword, UUID lastCourseId) {
+        return courseRepository.searchCoursesByKeyword(keyword, lastCourseId);
+    }
 }

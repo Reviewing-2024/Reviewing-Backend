@@ -58,6 +58,30 @@ public class CourseController {
         return ResponseEntity.ok().body(courseResponseDto);
     }
 
+    @GetMapping("/courses/search")
+    public ResponseEntity<List<CourseResponseDto>> searchCourses(
+            @RequestParam(value = "keyword") String keyword,
+            @RequestParam(value = "lastCourseId", required = false) UUID lastCourseId,
+            HttpServletRequest request) {
+
+        String jwtHeader = request.getHeader("Authorization");
+
+        List<CourseResponseDto> courses = courseService.searchCoursesByKeyword(keyword,
+                lastCourseId);
+
+        if (jwtHeader == null) {
+            return ResponseEntity.ok().body(courses);
+        }
+
+        String token = jwtHeader.replace("Bearer ", "");
+        Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
+        if (memberId == null) {
+            return ResponseEntity.status(600).body(null);
+        }
+
+        return ResponseEntity.ok().body(courseService.checkCourseWished(courses, memberId));
+    }
+
     @GetMapping("/")
     public ResponseEntity<List<CourseResponseDto>> findAllCoursesBySorting(
             @RequestParam(value = "sort", required = false) String sortType,
