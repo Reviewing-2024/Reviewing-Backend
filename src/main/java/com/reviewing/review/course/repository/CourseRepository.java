@@ -23,7 +23,7 @@ public class CourseRepository {
 
     private final EntityManager em;
 
-    private final int PAGE_SIZE = 10;
+    private final int PAGE_SIZE = 20;
 
     // 모든 강의 조회
     public List<CourseResponseDto> findAllCoursesBySorting(String sortType, UUID lastCourseId,
