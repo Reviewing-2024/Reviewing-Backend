@@ -20,10 +20,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -81,7 +83,7 @@ public class InflearnCrawling {
 
     }
 
-    @GetMapping("/inflearn/crawling")
+    @GetMapping("/crawling/inflearn")
     public void crawling() {
 
         Platform findPlatform = platformRepository.findByName("인프런");
@@ -93,23 +95,29 @@ public class InflearnCrawling {
         options.addArguments("--disable-default-apps");
         options.addArguments("--disable-notifications");
         options.addArguments("--disable-blink-features=AutomationControlled");
+        options.addArguments("--disable-gpu");
+        options.addArguments("--disable-extensions");
+        options.addArguments("--auto-open-devtools-for-tabs");
 
         WebDriver driver = new ChromeDriver(options);
 
         try {
-
             List<Category> categories = categoryRepository.findByPlatform(findPlatform);
 
             for (Category slugCategory : categories) {
                 String categorySlug = slugCategory.getSlug();
+                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 
-                for (int page = 1; page <= 1; page++) {
+                int lastPage = findLastPage(driver, categorySlug, wait);
+                if (lastPage == 0) {
+                    continue;
+                }
+                log.info("마지막 페이지: {}", lastPage);
+                for (int page = 1; page <= lastPage; page++) {
                     String url = "https://www.inflearn.com/courses/it-programming/" + categorySlug
                             + "?types=ONLINE&page_number=" + page;
 
                     driver.get(url);
-
-                    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 
                     // 전체 페이지 로드 완료 대기
                     wait.until(webDriver -> ((JavascriptExecutor) webDriver)
@@ -297,5 +305,53 @@ public class InflearnCrawling {
         }
 
     }
+
+    private int findLastPage(WebDriver driver, String categorySlug, WebDriverWait wait) {
+        String url = "https://www.inflearn.com/courses/it-programming/" + categorySlug
+                + "?types=ONLINE&page_number=1";
+
+        driver.get(url);
+
+        scrollToElement(driver,wait);
+
+        WebElement paginationDiv = driver.findElement(
+                By.cssSelector("div.mantine-Group-root.mantine-13v5ff3"));
+        List<WebElement> pages = paginationDiv.findElements(
+                By.cssSelector("button.mantine-UnstyledButton-root.mantine-Pagination-control.mantine-1gh1g76"));
+
+        if (!pages.isEmpty()) {
+            return Integer.parseInt(pages.getLast().getText());
+        }
+        return 0;
+    }
+
+    private void scrollToElement(WebDriver driver, WebDriverWait wait) {
+        boolean isElementVisible = false;
+
+        while (!isElementVisible) {
+            try {
+                wait.until(webDriver -> ((JavascriptExecutor) webDriver)
+                        .executeScript("return document.readyState").equals("complete"));
+                wait.until(webDriver -> ((JavascriptExecutor) webDriver)
+                        .executeScript("return document.querySelector('div.mantine-Group-root.mantine-13v5ff3') !== null"));
+
+                // 요소가 화면에 보이는지 확인
+                WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div.mantine-Group-root.mantine-13v5ff3")));
+
+                // 요소가 보인다면 스크롤 완료
+                isElementVisible = true;
+
+                // 요소가 보이도록 스크롤
+                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
+                System.out.println("Element is visible: " + "div.mantine-Group-root.mantine-13v5ff3");
+
+            } catch (TimeoutException e) {
+                // 현재 화면에서 요소가 보이지 않는 경우 스크롤
+                ((JavascriptExecutor) driver).executeScript("window.scrollBy(0, 10000);");
+                System.out.println("Scrolling down...");
+            }
+        }
+    }
+
 
 }
