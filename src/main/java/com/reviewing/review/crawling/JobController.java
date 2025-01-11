@@ -18,14 +18,21 @@ public class JobController {
 
     @GetMapping("/first")
     public String firstApi(@RequestParam("value") String value) throws Exception {
+        JobParameters jobParameters = new JobParametersBuilder()
+                .addString("date", value)
+                .toJobParameters();
+        jobLauncher.run(jobRegistry.getJob("nomadcodersCrawlingJob"), jobParameters);
+        return "ok";
+    }
+
+    @GetMapping("/second")
+    public String secondApi(@RequestParam("value") String value) throws Exception {
 
         JobParameters jobParameters = new JobParametersBuilder()
                 .addString("date", value)
                 .toJobParameters();
 
-        jobLauncher.run(jobRegistry.getJob("nomadcodersCrawlingJob"), jobParameters);
-
-
+        jobLauncher.run(jobRegistry.getJob("codeitCrawlingJob"), jobParameters);
         return "ok";
     }
 

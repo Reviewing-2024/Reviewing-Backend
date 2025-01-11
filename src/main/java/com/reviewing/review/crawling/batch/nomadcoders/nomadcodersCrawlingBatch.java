@@ -31,20 +31,20 @@ public class nomadcodersCrawlingBatch {
     private final PlatformRepository platformRepository;
 
     @Bean
-    public Job job() {
+    public Job nomadcodsersJob() {
         return new JobBuilder("nomadcodersCrawlingJob",jobRepository)
-                .start(step())
+                .start(nomadcodersStep())
                 .build();
     }
 
     @Bean
-    public Step step() {
+    public Step nomadcodersStep() {
 
         return new StepBuilder("nomadcodersCrawlingStep",jobRepository)
                 .<Course,Course> chunk(5,platformTransactionManager)
-                .reader(beforeReader())
-                .processor(processor())
-                .writer(afterWriter())
+                .reader(nomadcodersReader())
+                .processor(nomadcodersProcessor())
+                .writer(nomadcodersWriter())
                 .faultTolerant()
                 .retryLimit(5)
                 .retry(NoSuchElementException.class)
@@ -54,12 +54,12 @@ public class nomadcodersCrawlingBatch {
     }
 
     @Bean
-    public ItemStreamReader<Course> beforeReader() {
+    public ItemStreamReader<Course> nomadcodersReader() {
         return new NomadcodersReader(platformRepository);
     }
 
     @Bean
-    public ItemProcessor<Course, Course> processor() {
+    public ItemProcessor<Course, Course> nomadcodersProcessor() {
         return course -> {
             Optional<Course> findCourse = courseCrawlingRepository.findBySlug(course.getSlug());
             if (findCourse.isPresent()) {
@@ -70,7 +70,7 @@ public class nomadcodersCrawlingBatch {
     }
 
     @Bean
-    public ItemWriter<Course> afterWriter() {
+    public ItemWriter<Course> nomadcodersWriter() {
         return courses -> {
             for (Course course : courses) {
                 courseCrawlingRepository.save(course);
