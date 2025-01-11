@@ -203,7 +203,7 @@ public class FastcampusCrawling {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("크롤링 에러: {}", e.getMessage());
         } finally {
             driver.quit();
         }
