@@ -1,4 +1,4 @@
-package com.reviewing.review.crawling;
+package com.reviewing.review.crawling.batch.codeit;
 
 import com.reviewing.review.course.entity.Category;
 import com.reviewing.review.course.entity.CategoryCourse;

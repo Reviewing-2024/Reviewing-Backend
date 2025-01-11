@@ -1,4 +1,4 @@
-package com.reviewing.review.crawling;
+package com.reviewing.review.crawling.batch.nomadcoders;
 
 import com.reviewing.review.course.entity.Course;
 import com.reviewing.review.course.entity.Platform;
@@ -6,6 +6,7 @@ import com.reviewing.review.crawling.repository.CourseCrawlingRepository;
 import com.reviewing.review.crawling.repository.PlatformRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class NomadcodersCrawling {
 
     private final PlatformRepository platformRepository;
@@ -89,7 +91,7 @@ public class NomadcodersCrawling {
                 Thread.sleep(4000);
 
                 scrollCount++;
-                if (scrollCount > 50) { // 최대 20번 스크롤
+                if (scrollCount > 50) { // 최대 50번 스크롤
                     break;
                 }
             }
@@ -127,10 +129,9 @@ public class NomadcodersCrawling {
                 System.out.println("----------------------");
             }
             System.out.println(count);
-            System.out.println(courseCrawlingRepository.count());
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("크롤링 에러: {}", e.getMessage());
         } finally {
             driver.quit();
         }
