@@ -18,15 +18,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class RecommendRepository {
 
     private final EntityManager em;
-
     public Course findCourseById(UUID courseId) {
-
         return em.find(Course.class, courseId);
     }
 
-    public RecommendResponseDto findCourseBySearchResponses(Long id) {
+    public RecommendResponseDto findCourseBySearchResponses(UUID id) {
         return em.createQuery(
-                        "select new com.reviewing.review.recommend.domain.RecommendResponseDto(c.title, c.teacher, c.url) " +
+                        "select new com.reviewing.review.recommend.domain.RecommendResponseDto(c.title, c.teacher, c.url, c.slug) " +
                                 "from Course c where c.id = :id", RecommendResponseDto.class)
                 .setParameter("id", id) // 파라미터 바인딩
                 .getSingleResult(); // 결과 반환
