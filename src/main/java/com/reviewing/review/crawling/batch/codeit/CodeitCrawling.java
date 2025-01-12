@@ -1,4 +1,4 @@
-package com.reviewing.review.crawling;
+package com.reviewing.review.crawling.batch.codeit;
 
 import com.reviewing.review.course.entity.Category;
 import com.reviewing.review.course.entity.CategoryCourse;
@@ -88,6 +88,7 @@ public class CodeitCrawling {
             List<Category> categories = categoryRepository.findByPlatform(findPlatform);
 
             for (Category slugCategory : categories) {
+                System.out.println(slugCategory.getName());
                 String categorySlug = slugCategory.getSlug();
 
                 int lastPage = findLastPage(driver, categorySlug);
@@ -177,14 +178,12 @@ public class CodeitCrawling {
 
                     }
                 }
-
-                System.out.println(slugCategory.getName());
                 System.out.println(count);
 
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("크롤링 에러: {}", e.getMessage());
         } finally {
             driver.quit();
         }

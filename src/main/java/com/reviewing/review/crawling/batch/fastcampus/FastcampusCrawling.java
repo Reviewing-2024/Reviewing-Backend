@@ -1,4 +1,4 @@
-package com.reviewing.review.crawling;
+package com.reviewing.review.crawling.batch.fastcampus;
 
 import com.reviewing.review.course.entity.Category;
 import com.reviewing.review.course.entity.CategoryCourse;
@@ -203,7 +203,7 @@ public class FastcampusCrawling {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("크롤링 에러: {}", e.getMessage());
         } finally {
             driver.quit();
         }

@@ -1,4 +1,4 @@
-package com.reviewing.review.crawling;
+package com.reviewing.review.crawling.batch.udemy;
 
 import com.reviewing.review.course.entity.Category;
 import com.reviewing.review.course.entity.CategoryCourse;
@@ -16,7 +16,6 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
