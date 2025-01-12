@@ -32,8 +32,8 @@ public class JwtTokenProvider {
                 .claim("id", member.getMemberId())
                 .claim("nickname", member.getNickname())
                 .setIssuedAt(now)
-//                .setExpiration(new Date(System.currentTimeMillis() + (1000 * 60 * 60 * 24)))
-                .setExpiration(new Date(System.currentTimeMillis() + (1000 * 60 * 3)))
+                .setExpiration(new Date(System.currentTimeMillis() + (1000 * 60 * 60 * 24)))
+//                .setExpiration(new Date(System.currentTimeMillis() + (1000 * 60 * 3)))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
