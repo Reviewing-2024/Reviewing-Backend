@@ -48,7 +48,6 @@ public class AdminService {
         adminRepository.updateReviewRating(findReview,
                 calculateReviewRating(newTotalRating, newTotalReviewCount));
         adminRepository.changeReviewApprove(findReview);
-        adminRepository.changeCourseUpdated(reviewId);
         adminRepository.updateReviewCount(reviewId, newTotalReviewCount);
     }
 
