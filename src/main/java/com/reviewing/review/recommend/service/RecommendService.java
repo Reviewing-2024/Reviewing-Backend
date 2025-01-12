@@ -92,7 +92,7 @@ public class RecommendService {
 //                    .toList();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("강의 추천 에러 발생");
             return Collections.emptyList();
         }
     }
@@ -106,7 +106,7 @@ public class RecommendService {
                     searchResponse.getId());
 
             recommendResponseDto.setReviewingUrl(
-                    "http://localhost:3000/reviews/" + searchResponse.getId());
+                    "https://reviewing.my/reviews/" + recommendResponseDto.getCourseSlug());
 
             result.add(recommendResponseDto);
         }

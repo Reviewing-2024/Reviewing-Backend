@@ -19,14 +19,14 @@ public class OpenSearchService {
     private final OpenSearchClient openSearchClient;
 
     // OpenSearch 인덱스 생성
-    public void createIndexWithMapping() {
+    public void createIndex() {
         try {
 
             String mappingJson = """
             {
               "mappings": {
                 "properties": {
-                  "id": { "type": "long" },
+                  "id": { "type": "keyword" },
                   "embedding": { "type": "object" }  // 벡터를 일반 JSON 배열로 저장
                 }
               }
@@ -39,7 +39,7 @@ public class OpenSearchService {
 
             System.out.println("Index created: " + response.getStatusLine().getStatusCode());
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("인덱스 생성 실패");
         }
     }
 
@@ -53,7 +53,7 @@ public class OpenSearchService {
                     .index(indexName).build();
             deleteIndexResponse = openSearchClient.indices().delete(deleteIndexRequest);
         } catch (Exception e) {
-            log.error("deleteIndex indexName : [{}]", indexName, e);
+            log.error("인덱스 삭제 실패 : [{}]", indexName, e);
         }
 
         return deleteIndexResponse;
