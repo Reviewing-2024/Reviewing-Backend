@@ -6,7 +6,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.Builder;
+import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -22,8 +22,8 @@ public class ReviewState {
     @Enumerated(EnumType.STRING)
     private ReviewStateType state;
     private String rejectionReason;
+    private LocalDateTime updatedAt;
 
-    @Builder
     public ReviewState( ReviewStateType state) {
         this.state = state;
     }

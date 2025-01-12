@@ -5,7 +5,10 @@ import com.reviewing.review.review.domain.Review;
 import com.reviewing.review.review.domain.ReviewStateType;
 import jakarta.persistence.EntityManager;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -36,6 +39,7 @@ public class AdminRepository {
 
     public void changeReviewApprove(Review review) {
         review.getReviewState().setState(ReviewStateType.APPROVED);
+        review.getReviewState().setUpdatedAt(LocalDateTime.now());
     }
 
     public void changeReviewReject(Long reviewId, String rejectionReason) {
@@ -44,15 +48,11 @@ public class AdminRepository {
 
         fineReview.getReviewState().setState(ReviewStateType.REJECTED);
         fineReview.getReviewState().setRejectionReason(rejectionReason);
+        fineReview.getReviewState().setUpdatedAt(LocalDateTime.now());
     }
 
     public void updateReviewRating(Review review, BigDecimal newReviewRating) {
         review.getCourse().setRating(newReviewRating);
-    }
-
-    public void changeCourseUpdated(Long reviewId) {
-        Review findReview = em.find(Review.class, reviewId);
-        findReview.getCourse().setUpdated(true);
     }
 
     public int getTotalReviewCountByReviewId(UUID courseId) {
