@@ -40,6 +40,8 @@ public class NomadcodersReader implements ItemStreamReader<Course> {
         options.addArguments("--disable-default-apps");
         options.addArguments("--disable-notifications");
         options.addArguments("--disable-blink-features=AutomationControlled");
+        options.addArguments("--disable-gpu");
+        options.addArguments("--disable-extensions");
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-gpu");
 
@@ -66,7 +68,7 @@ public class NomadcodersReader implements ItemStreamReader<Course> {
                 break;
             }
             oldCount = newCount;
-            actions.scrollByAmount(0, 20000).perform();
+            actions.scrollByAmount(0, 2000).perform();
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException e) {
