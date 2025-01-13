@@ -68,7 +68,7 @@ public class NomadcodersReader implements ItemStreamReader<Course> {
             oldCount = newCount;
             actions.scrollByAmount(0, 1000).perform();
             try {
-                Thread.sleep(4000);
+                Thread.sleep(8000);
             } catch (InterruptedException e) {
                 log.info("노마드코더 sleep 에러");
                 throw new RuntimeException(e);
