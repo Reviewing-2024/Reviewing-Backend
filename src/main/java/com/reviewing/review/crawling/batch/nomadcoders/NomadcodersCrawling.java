@@ -51,6 +51,9 @@ public class NomadcodersCrawling {
         options.addArguments("--disable-default-apps");
         options.addArguments("--disable-notifications");
         options.addArguments("--disable-blink-features=AutomationControlled");
+        options.addArguments("--disable-gpu");
+        options.addArguments("--disable-extensions");
+        options.addArguments("--no-sandbox");
 
         WebDriver driver = new ChromeDriver(options);
 

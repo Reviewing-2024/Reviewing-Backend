@@ -50,6 +50,11 @@ public class NomadcodersReader implements ItemStreamReader<Course> {
         Platform findPlatform = platformRepository.findByName("노마드코더");
         String url = "https://nomadcoders.co/courses";
         driver.get(url);
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         Actions actions = new Actions(driver);
         int oldCount = 0;
         int scrollCount = 0;
@@ -69,7 +74,7 @@ public class NomadcodersReader implements ItemStreamReader<Course> {
                 break;
             }
             oldCount = newCount;
-            actions.scrollByAmount(0, 2000).perform();
+            actions.scrollByAmount(0, 1000).perform();
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException e) {
