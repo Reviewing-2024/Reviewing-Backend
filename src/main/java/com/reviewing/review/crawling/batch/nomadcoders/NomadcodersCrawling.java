@@ -88,7 +88,7 @@ public class NomadcodersCrawling {
                 actions.scrollByAmount(0, 1000).perform();
 
                 // 로딩 대기
-                Thread.sleep(4000);
+                Thread.sleep(8000);
 
                 scrollCount++;
                 if (scrollCount > 50) { // 최대 50번 스크롤
