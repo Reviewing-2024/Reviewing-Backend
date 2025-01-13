@@ -80,6 +80,7 @@ public class CourseSaveToOpenSearchBatch {
             String categoriesText = categories.stream()
                     .map(category -> category.getCategory().getName())
                     .collect(Collectors.joining(", "));
+            log.info("카테고리: {}", categories);
 
             String inputCourseText = String.format(
                     "Title: %s, Platform: %s, Category: %s, Rating: %.1f, Wishes: %d",
@@ -89,6 +90,7 @@ public class CourseSaveToOpenSearchBatch {
                     rating,
                     wishes
             );
+            log.info(inputCourseText);
             List<Double> embedding = embeddingService.generateEmbedding(inputCourseText);
 
             Map<String, Object> embeddingMap = new HashMap<>();
