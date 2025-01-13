@@ -11,6 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -25,7 +26,7 @@ public class MemberController {
      * 카카오 로그인
      * 로컬 테스트일 때만 Get 요청으로 변경해둠
      */
-    @GetMapping("/kakao/kakaoLogin/{code}")
+    @PostMapping("/kakao/kakaoLogin/{code}")
     public ResponseEntity<Member> kakaoLogin(@PathVariable("code") String code) {
         // 토큰 받기 성공 -> 카카오에 계정 존재
         KakaoTokenDto kakaoTokenDto = memberService.getKakaoAccessToken(code);
