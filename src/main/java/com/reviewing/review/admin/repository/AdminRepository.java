@@ -23,7 +23,7 @@ public class AdminRepository {
 
         return em.createQuery("select new com.reviewing.review.admin.domain.AdminReviewResponseDto "
                         + "(r.course.id, r.course.title, r.course.teacher, r.course.thumbnailImage, r.course.thumbnailVideo,r.course.url, "
-                        + "r.id,r.contents,r.reviewState.state,r.certification) "
+                        + "r.id,r.contents,r.reviewState.state,r.certification,r.reviewState.updatedAt) "
                         + "from Review r "
                         + "where r.reviewState.state = :status", AdminReviewResponseDto.class)
                 .setParameter("status", status)
