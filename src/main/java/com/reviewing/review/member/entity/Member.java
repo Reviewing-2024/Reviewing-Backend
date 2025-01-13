@@ -1,4 +1,4 @@
-package com.reviewing.review.member.domain;
+package com.reviewing.review.member.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

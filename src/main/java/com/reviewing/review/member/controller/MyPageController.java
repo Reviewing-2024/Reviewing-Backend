@@ -2,10 +2,9 @@ package com.reviewing.review.member.controller;
 
 import com.reviewing.review.config.jwt.JwtTokenProvider;
 import com.reviewing.review.course.domain.CourseResponseDto;
-import com.reviewing.review.member.domain.Member;
+import com.reviewing.review.member.entity.Member;
 import com.reviewing.review.member.domain.MemberNicknameDto;
 import com.reviewing.review.member.domain.MyReviewResponseDto;
-import com.reviewing.review.member.service.MemberService;
 import com.reviewing.review.member.service.MyPageService;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;

@@ -1,9 +1,8 @@
 package com.reviewing.review.admin.service;
 
 import com.reviewing.review.admin.domain.AdminReviewResponseDto;
-import com.reviewing.review.admin.domain.RejectionDto;
 import com.reviewing.review.admin.repository.AdminRepository;
-import com.reviewing.review.review.domain.Review;
+import com.reviewing.review.review.entity.Review;
 import com.reviewing.review.review.domain.ReviewStateType;
 import java.math.BigDecimal;
 import java.math.RoundingMode;

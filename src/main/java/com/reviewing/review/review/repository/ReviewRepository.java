@@ -1,12 +1,12 @@
 package com.reviewing.review.review.repository;
 
 import com.reviewing.review.course.entity.Course;
-import com.reviewing.review.member.domain.Member;
-import com.reviewing.review.review.domain.Review;
-import com.reviewing.review.review.domain.ReviewDislike;
-import com.reviewing.review.review.domain.ReviewLike;
+import com.reviewing.review.member.entity.Member;
+import com.reviewing.review.review.entity.Review;
+import com.reviewing.review.review.entity.ReviewDislike;
+import com.reviewing.review.review.entity.ReviewLike;
 import com.reviewing.review.review.domain.ReviewResponseDto;
-import com.reviewing.review.review.domain.ReviewState;
+import com.reviewing.review.review.entity.ReviewState;
 import com.reviewing.review.review.domain.ReviewStateByMemberDto;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;

@@ -1,6 +1,6 @@
 package com.reviewing.review.member.repository;
 
-import com.reviewing.review.member.domain.Member;
+import com.reviewing.review.member.entity.Member;
 import com.reviewing.review.member.domain.kakao.KakaoMemberInfoDto;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;

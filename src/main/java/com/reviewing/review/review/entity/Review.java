@@ -1,7 +1,7 @@
-package com.reviewing.review.review.domain;
+package com.reviewing.review.review.entity;
 
 import com.reviewing.review.course.entity.Course;
-import com.reviewing.review.member.domain.Member;
+import com.reviewing.review.member.entity.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

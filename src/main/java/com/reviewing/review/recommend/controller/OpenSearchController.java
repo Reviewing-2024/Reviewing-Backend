@@ -23,7 +23,7 @@ public class OpenSearchController {
 
     @PostMapping("/opensearch/index")
     public String createOpenSearchIndex() {
-//        openSearchService.deleteIndex("course");
+        openSearchService.deleteIndex("course");
         openSearchService.createIndex();
         openSearchService.updateFieldLimit();
         return "인덱스 생성 성공";

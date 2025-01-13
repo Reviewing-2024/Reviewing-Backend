@@ -1,14 +1,12 @@
 package com.reviewing.review.admin.repository;
 
 import com.reviewing.review.admin.domain.AdminReviewResponseDto;
-import com.reviewing.review.review.domain.Review;
+import com.reviewing.review.review.entity.Review;
 import com.reviewing.review.review.domain.ReviewStateType;
 import jakarta.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

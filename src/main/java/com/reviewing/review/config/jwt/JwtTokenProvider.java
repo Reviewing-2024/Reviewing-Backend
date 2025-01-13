@@ -2,7 +2,7 @@ package com.reviewing.review.config.jwt;
 
 import static io.jsonwebtoken.Jwts.parserBuilder;
 
-import com.reviewing.review.member.domain.Member;
+import com.reviewing.review.member.entity.Member;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;

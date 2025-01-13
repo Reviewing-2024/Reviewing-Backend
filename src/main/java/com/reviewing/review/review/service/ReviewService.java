@@ -1,11 +1,11 @@
 package com.reviewing.review.review.service;
 
-import com.reviewing.review.review.domain.Review;
-import com.reviewing.review.review.domain.ReviewDislike;
-import com.reviewing.review.review.domain.ReviewLike;
+import com.reviewing.review.review.entity.Review;
+import com.reviewing.review.review.entity.ReviewDislike;
+import com.reviewing.review.review.entity.ReviewLike;
 import com.reviewing.review.review.domain.ReviewRequestDto;
 import com.reviewing.review.review.domain.ReviewResponseDto;
-import com.reviewing.review.review.domain.ReviewState;
+import com.reviewing.review.review.entity.ReviewState;
 import com.reviewing.review.review.domain.ReviewStateByMemberDto;
 import com.reviewing.review.review.domain.ReviewStateType;
 import com.reviewing.review.review.repository.ReviewRepository;

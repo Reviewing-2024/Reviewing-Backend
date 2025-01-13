@@ -6,7 +6,7 @@ import com.reviewing.review.course.entity.Course;
 import com.reviewing.review.course.domain.CourseResponseDto;
 import com.reviewing.review.course.entity.CourseWish;
 import com.reviewing.review.course.entity.Platform;
-import com.reviewing.review.member.domain.Member;
+import com.reviewing.review.member.entity.Member;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import java.math.BigDecimal;

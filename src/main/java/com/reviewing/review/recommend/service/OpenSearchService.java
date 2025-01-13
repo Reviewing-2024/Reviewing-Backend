@@ -44,19 +44,14 @@ public class OpenSearchService {
     }
 
     // OpenSearch 인덱스 삭제
-    public DeleteIndexResponse deleteIndex(String indexName) {
-
-        DeleteIndexResponse deleteIndexResponse = null;
-
+    public void deleteIndex(String indexName) {
         try {
             DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest.Builder()
                     .index(indexName).build();
-            deleteIndexResponse = openSearchClient.indices().delete(deleteIndexRequest);
+            openSearchClient.indices().delete(deleteIndexRequest);
         } catch (Exception e) {
-            log.error("인덱스 삭제 실패 : [{}]", indexName, e);
+            log.info("인덱스 존재x");
         }
-
-        return deleteIndexResponse;
     }
 
     // OpenSearch field 제한 변경

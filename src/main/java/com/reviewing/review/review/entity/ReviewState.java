@@ -1,5 +1,6 @@
-package com.reviewing.review.review.domain;
+package com.reviewing.review.review.entity;
 
+import com.reviewing.review.review.domain.ReviewStateType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

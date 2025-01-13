@@ -3,7 +3,7 @@ package com.reviewing.review.member.controller;
 import com.reviewing.review.config.jwt.JwtTokenProvider;
 import com.reviewing.review.member.domain.kakao.KakaoMemberInfoDto;
 import com.reviewing.review.member.domain.kakao.KakaoTokenDto;
-import com.reviewing.review.member.domain.Member;
+import com.reviewing.review.member.entity.Member;
 import com.reviewing.review.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
