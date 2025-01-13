@@ -64,6 +64,7 @@ public class NomadcodersReader implements ItemStreamReader<Course> {
                     newCount++;
                 }
             }
+            log.info("newCount: {}",newCount);
             if (newCount == oldCount) {
                 break;
             }
