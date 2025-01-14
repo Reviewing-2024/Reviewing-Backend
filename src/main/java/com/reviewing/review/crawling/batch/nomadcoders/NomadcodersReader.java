@@ -88,7 +88,7 @@ public class NomadcodersReader implements ItemStreamReader<Course> {
         }
         log.info("무한 스크롤 나옴");
         List<WebElement> courses = driver.findElements(By.cssSelector(
-                "div.sc-4a1d66b0-0.cZeVxA.flex.flex-col.relative.rounded-lg.items-center"));
+                "div.sc-4a1d66b0-0.jiwdzH.flex.flex-col.relative.rounded-lg.items-center"));
 
 
         for (WebElement course : courses) {
