@@ -80,7 +80,7 @@ public class CourseSaveToOpenSearchBatch {
             String categoriesText = categories.stream()
                     .map(category -> category.getCategory().getName())
                     .collect(Collectors.joining(", "));
-            log.info("카테고리: {}", categories);
+            log.info("카테고리: {}", categoriesText);
 
             String inputCourseText = String.format(
                     "Title: %s, Platform: %s, Category: %s, Rating: %.1f, Wishes: %d",

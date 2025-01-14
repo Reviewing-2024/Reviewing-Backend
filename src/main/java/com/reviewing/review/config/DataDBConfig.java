@@ -50,7 +50,7 @@ public class DataDBConfig {
         em. setJpaVendorAdapter(new HibernateJpaVendorAdapter());
 
         HashMap<String, Object> properties = new HashMap<>();
-        properties.put("hibernate.hbm2ddl.auto", "validate");
+        properties.put("hibernate.hbm2ddl.auto", "create");
         properties.put("hibernate.show_sql", "false");
         properties.put("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
         em.setJpaPropertyMap(properties);
