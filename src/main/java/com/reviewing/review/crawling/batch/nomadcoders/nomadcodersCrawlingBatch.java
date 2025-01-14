@@ -63,8 +63,10 @@ public class nomadcodersCrawlingBatch {
         return course -> {
             Optional<Course> findCourse = courseCrawlingRepository.findBySlug(course.getSlug());
             if (findCourse.isPresent()) {
+                log.info("존재하는 강의");
                 return null;
             }
+            log.info("processor");
             return course;
         };
     }
@@ -72,7 +74,9 @@ public class nomadcodersCrawlingBatch {
     @Bean
     public ItemWriter<Course> nomadcodersWriter() {
         return courses -> {
+            log.info("writer");
             for (Course course : courses) {
+                log.info("강의 저장");
                 courseCrawlingRepository.save(course);
             }
         };
