@@ -99,6 +99,9 @@ public class NomadcodersReader implements ItemStreamReader<Course> {
             String thumbnail = course.findElement(By.cssSelector("img.rounded-lg"))
                     .getAttribute("src");
 
+            log.info(thumbnail);
+            log.info(thumbnail);
+
             Course courseDto = Course.builder()
                     .platform(findPlatform)
                     .title(title)
