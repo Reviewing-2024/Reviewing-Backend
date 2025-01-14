@@ -1,5 +1,7 @@
 package com.reviewing.review.recommend.batch;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.reviewing.review.course.entity.CategoryCourse;
 import com.reviewing.review.course.entity.Course;
 import com.reviewing.review.crawling.repository.CategoryCourseRepository;
@@ -91,7 +93,7 @@ public class CourseSaveToOpenSearchBatch {
                     wishes
             );
             log.info(inputCourseText);
-            List<Double> embedding = embeddingService.generateEmbedding(inputCourseText);
+            List<Double> embedding = embeddingService.generateEmbedding(escapeJson(inputCourseText));
 
             Map<String, Object> embeddingMap = new HashMap<>();
             for (int i = 0; i < embedding.size(); i++) {
@@ -106,6 +108,15 @@ public class CourseSaveToOpenSearchBatch {
             return new CourseOpenSearchRequestDto(
                     String.valueOf(course.getId()), document);
         };
+    }
+
+    public String escapeJson(String input) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return objectMapper.writeValueAsString(input).replaceAll("^\"|\"$", "");
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("JSON Escape 실패", e);
+        }
     }
 
     @Bean
