@@ -54,19 +54,19 @@ public class InflearnCrawling {
 
         Map<String, String> map = new HashMap<>();
 
-        map.put("web-dev", "웹 개발");
-        map.put("front-end", "프론트엔드");
-        map.put("back-end", "백엔드");
-        map.put("full-stack", "풀스택");
-        map.put("mobile-app", "모바일 앱 개발");
-        map.put("programming-lang", "프로그래밍 언어");
-        map.put("algorithm", "알고리즘/자료구조");
-        map.put("database-dev", "데이터베이스");
-        map.put("devops-infra", "데브옵스/인프라");
+//        map.put("web-dev", "웹 개발");
+//        map.put("front-end", "프론트엔드");
+//        map.put("back-end", "백엔드");
+//        map.put("full-stack", "풀스택");
+//        map.put("mobile-app", "모바일 앱 개발");
+//        map.put("programming-lang", "프로그래밍 언어");
+//        map.put("algorithm", "알고리즘/자료구조");
+//        map.put("database-dev", "데이터베이스");
+//        map.put("devops-infra", "데브옵스/인프라");
         map.put("sw-test", "소프트웨어 테스트");
-        map.put("programming-tool", "개발 도구");
-        map.put("web-publishing", "웹 퍼블리싱");
-        map.put("desktop-application", "데스크톱 앱 개발");
+//        map.put("programming-tool", "개발 도구");
+//        map.put("web-publishing", "웹 퍼블리싱");
+//        map.put("desktop-application", "데스크톱 앱 개발");
         map.put("vr-ar", "VR/AR");
 
         for (String slug : map.keySet()) {
