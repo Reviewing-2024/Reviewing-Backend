@@ -50,10 +50,10 @@ public class CodeitCrawling {
         Map<String, String> map = new HashMap<>();
 
         map.put("FRONTEND", "프론트엔드");
-        map.put("BACKEND", "백엔드");
-        map.put("FULLSTACK", "풀스택");
-        map.put("DATA_ANALYSIS", "데이터 분석");
-        map.put("AI", "인공지능");
+//        map.put("BACKEND", "백엔드");
+//        map.put("FULLSTACK", "풀스택");
+//        map.put("DATA_ANALYSIS", "데이터 분석");
+//        map.put("AI", "인공지능");
         map.put("data-engineering", "데이터 엔지니어링");
 
         for (String slug : map.keySet()) {

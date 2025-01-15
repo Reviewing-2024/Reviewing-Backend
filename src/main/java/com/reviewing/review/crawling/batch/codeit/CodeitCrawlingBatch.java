@@ -3,6 +3,7 @@ package com.reviewing.review.crawling.batch.codeit;
 import com.reviewing.review.course.entity.Category;
 import com.reviewing.review.course.entity.CategoryCourse;
 import com.reviewing.review.course.entity.Course;
+import com.reviewing.review.crawling.domain.CategoryCourseDto;
 import com.reviewing.review.crawling.domain.CrawlingCourseDto;
 import com.reviewing.review.crawling.repository.CategoryCourseRepository;
 import com.reviewing.review.crawling.repository.CategoryRepository;
@@ -47,7 +48,7 @@ public class CodeitCrawlingBatch {
     @Bean
     public Step codeitStep() {
         return new StepBuilder("codeitCrawlingStep", jobRepository)
-                .<CrawlingCourseDto,Course> chunk(10,platformTransactionManager)
+                .<CrawlingCourseDto,CategoryCourseDto> chunk(10,platformTransactionManager)
                 .reader(codeitReader())
                 .processor(codeitProcessor())
                 .writer(codeitWriter())
@@ -65,7 +66,7 @@ public class CodeitCrawlingBatch {
     }
 
     @Bean
-    public ItemProcessor<CrawlingCourseDto, Course> codeitProcessor() {
+    public ItemProcessor<CrawlingCourseDto, CategoryCourseDto> codeitProcessor() {
         return crawlingCourseDto -> {
             Optional<Course> findCourse = courseCrawlingRepository.findBySlug(crawlingCourseDto.getCourseSlug());
             Optional<Category> findCategory = categoryRepository.findBySlug(crawlingCourseDto.getCategorySlug());
@@ -102,16 +103,21 @@ public class CodeitCrawlingBatch {
                         .slug(crawlingCourseDto.getCourseSlug())
                         .build();
 
-                return courseDto;
+                return new CategoryCourseDto(category, courseDto);
             }
         };
     }
 
     @Bean
-    public ItemWriter<Course> codeitWriter() {
-        return courses -> {
-            for (Course course : courses) {
-                courseCrawlingRepository.save(course);
+    public ItemWriter<CategoryCourseDto> codeitWriter() {
+        return categoryCourseDtos -> {
+            for (CategoryCourseDto categoryCourseDto : categoryCourseDtos) {
+                Course newCourse = courseCrawlingRepository.save(categoryCourseDto.getCourse());
+                CategoryCourse newCategoryCourse = CategoryCourse.builder()
+                        .category(categoryCourseDto.getCategory())
+                        .course(newCourse)
+                        .build();
+                categoryCourseRepository.save(newCategoryCourse);
             }
         };
     }
