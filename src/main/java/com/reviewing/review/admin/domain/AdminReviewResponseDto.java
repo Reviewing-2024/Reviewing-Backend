@@ -40,7 +40,11 @@ public class AdminReviewResponseDto {
         this.reviewContents = reviewContents;
         this.reviewStatus = reviewStatus;
         this.reviewCertification = reviewCertification;
-        this.updatedAt = updatedAt.format(
-                DateTimeFormatter.ofPattern("yyyy.MM.dd hh.mm a", Locale.US));
+        if (updatedAt != null) {
+            this.updatedAt = updatedAt.format(
+                    DateTimeFormatter.ofPattern("yyyy.MM.dd hh.mm a", Locale.US));
+        } else {
+            this.updatedAt = null; // 기본값
+        }
     }
 }
