@@ -71,7 +71,7 @@ public class NomadcodersReader implements ItemStreamReader<Course> {
             }
         }
         List<WebElement> courses = driver.findElements(By.cssSelector(
-                "div.sc-4a1d66b0-0.cZeVxA.flex.flex-col.relative.rounded-lg.items-center"));
+                "div.sc-4a1d66b0-0.jiwdzH.flex.flex-col.relative.rounded-lg.items-center"));
 
 
         for (WebElement course : courses) {
