@@ -1,11 +1,13 @@
 package com.reviewing.review.admin.repository;
 
 import com.reviewing.review.admin.domain.AdminReviewResponseDto;
-import com.reviewing.review.course.domain.Course;
-import com.reviewing.review.review.domain.Review;
+import com.reviewing.review.review.entity.Review;
 import com.reviewing.review.review.domain.ReviewStateType;
 import jakarta.persistence.EntityManager;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +23,7 @@ public class AdminRepository {
 
         return em.createQuery("select new com.reviewing.review.admin.domain.AdminReviewResponseDto "
                         + "(r.course.id, r.course.title, r.course.teacher, r.course.thumbnailImage, r.course.thumbnailVideo,r.course.url, "
-                        + "r.id,r.contents,r.reviewState.state,r.certification) "
+                        + "r.id,r.contents,r.reviewState.state,r.certification,r.reviewState.updatedAt) "
                         + "from Review r "
                         + "where r.reviewState.state = :status", AdminReviewResponseDto.class)
                 .setParameter("status", status)
@@ -35,6 +37,7 @@ public class AdminRepository {
 
     public void changeReviewApprove(Review review) {
         review.getReviewState().setState(ReviewStateType.APPROVED);
+        review.getReviewState().setUpdatedAt(LocalDateTime.now());
     }
 
     public void changeReviewReject(Long reviewId, String rejectionReason) {
@@ -43,18 +46,14 @@ public class AdminRepository {
 
         fineReview.getReviewState().setState(ReviewStateType.REJECTED);
         fineReview.getReviewState().setRejectionReason(rejectionReason);
+        fineReview.getReviewState().setUpdatedAt(LocalDateTime.now());
     }
 
-    public void updateReviewRating(Review review, float newReviewRating) {
+    public void updateReviewRating(Review review, BigDecimal newReviewRating) {
         review.getCourse().setRating(newReviewRating);
     }
 
-    public void changeCourseUpdated(Long reviewId) {
-        Review findReview = em.find(Review.class, reviewId);
-        findReview.getCourse().setUpdated(true);
-    }
-
-    public int getTotalReviewCountByReviewId(Long courseId) {
+    public int getTotalReviewCountByReviewId(UUID courseId) {
 
         return em.createQuery("select r "
                         + "from Review r "
@@ -64,5 +63,10 @@ public class AdminRepository {
                 .getResultList()
                 .size();
 
+    }
+
+    public void updateReviewCount(Long reviewId, int newTotalReviewCount) {
+        Review findReview = em.find(Review.class, reviewId);
+        findReview.getCourse().setComments(newTotalReviewCount);
     }
 }

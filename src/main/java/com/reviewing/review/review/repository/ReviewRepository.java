@@ -1,15 +1,17 @@
 package com.reviewing.review.review.repository;
 
-import com.reviewing.review.course.domain.Course;
-import com.reviewing.review.member.domain.Member;
-import com.reviewing.review.review.domain.Review;
-import com.reviewing.review.review.domain.ReviewDislike;
-import com.reviewing.review.review.domain.ReviewLike;
+import com.reviewing.review.course.entity.Course;
+import com.reviewing.review.member.entity.Member;
+import com.reviewing.review.review.entity.Review;
+import com.reviewing.review.review.entity.ReviewDislike;
+import com.reviewing.review.review.entity.ReviewLike;
 import com.reviewing.review.review.domain.ReviewResponseDto;
-import com.reviewing.review.review.domain.ReviewState;
+import com.reviewing.review.review.entity.ReviewState;
+import com.reviewing.review.review.domain.ReviewStateByMemberDto;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -23,7 +25,7 @@ public class ReviewRepository {
 
     private final EntityManager em;
 
-    public void createReview(Long courseId, Long memberId, ReviewState reviewState, Review review) {
+    public void createReview(UUID courseId, Long memberId, ReviewState reviewState, Review review) {
 
         Member findMember = em.find(Member.class, memberId);
 
@@ -38,7 +40,7 @@ public class ReviewRepository {
         em.persist(review);
     }
 
-    public List<ReviewResponseDto> findReviewsByCourse(Long courseId) {
+    public List<ReviewResponseDto> findReviewsByCourse(UUID courseId) {
 
         return em.createQuery("select new com.reviewing.review.review.domain.ReviewResponseDto( "
                                 + "r.id, r.member.nickname, r.contents, r.rating, r.likes, r.dislikes, "
@@ -51,7 +53,7 @@ public class ReviewRepository {
                 .getResultList();
     }
 
-    public List<ReviewResponseDto> findReviewsWithLikedAndDislikedByCourse(Long courseId) {
+    public List<ReviewResponseDto> findReviewsWithLikedAndDislikedByCourse(UUID courseId) {
 
         return em.createQuery("select new com.reviewing.review.review.domain.ReviewResponseDto( "
                                 + "r.id, r.member.nickname, r.contents, r.rating, r.likes, r.dislikes, "
@@ -154,16 +156,6 @@ public class ReviewRepository {
 
     }
 
-    public int findReviewDislikes(Long reviewId) {
-
-        return em.createQuery("select rd from ReviewDislike rd where rd.review.id = :reviewId",
-                        ReviewDislike.class)
-                .setParameter("reviewId", reviewId)
-                .getResultList()
-                .size();
-
-    }
-
     public void updateReviewLikeCount(Long reviewId, boolean liked) {
         Review findReview = em.find(Review.class, reviewId);
         int likes = findReview.getLikes();
@@ -186,4 +178,19 @@ public class ReviewRepository {
         findReview.setDislikes(dislikes - 1);
     }
 
+    public ReviewStateByMemberDto findReviewByCourseIdAndMemberId(UUID courseId, Long memberId) {
+        try {
+            return em.createQuery(
+                            "select new com.reviewing.review.review.domain.ReviewStateByMemberDto"
+                                    + "(r.course.id, r.id, r.member.id, r.reviewState.state) "
+                                    + "from Review r "
+                                    + "where r.course.id=:courseId and r.member.id=:memberId",
+                            ReviewStateByMemberDto.class)
+                    .setParameter("courseId", courseId)
+                    .setParameter("memberId", memberId)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
 }

@@ -3,12 +3,13 @@ package com.reviewing.review.course.controller;
 import com.reviewing.review.config.jwt.JwtTokenProvider;
 import com.reviewing.review.course.domain.CategoryRequestDto;
 import com.reviewing.review.course.domain.CategoryResponseDto;
-import com.reviewing.review.course.domain.CourseRequestDto;
 import com.reviewing.review.course.domain.CourseResponseDto;
-import com.reviewing.review.course.domain.Platform;
+import com.reviewing.review.course.entity.Platform;
 import com.reviewing.review.course.service.CourseService;
 import jakarta.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -35,15 +36,14 @@ public class CourseController {
 
     @GetMapping("/platform/category")
     public ResponseEntity<List<CategoryResponseDto>> findCategoriesByPlatform(
-            @RequestBody CategoryRequestDto categoryRequestDto) {
-        List<CategoryResponseDto> categories = courseService.findCategories(
-                categoryRequestDto.getPlatform());
+            @RequestParam String platform) {
+        List<CategoryResponseDto> categories = courseService.findCategories(platform);
 
         return ResponseEntity.ok().body(categories);
     }
 
     @GetMapping("/course/{courseId}")
-    public ResponseEntity<CourseResponseDto> findCourseById(@PathVariable Long courseId,
+    public ResponseEntity<CourseResponseDto> findCourseById(@PathVariable UUID courseId,
             HttpServletRequest request) {
 
         String jwtHeader = request.getHeader("Authorization");
@@ -58,11 +58,35 @@ public class CourseController {
         return ResponseEntity.ok().body(courseResponseDto);
     }
 
+    @GetMapping("/courses/search")
+    public ResponseEntity<List<CourseResponseDto>> searchCourses(
+            @RequestParam(value = "keyword") String keyword,
+            @RequestParam(value = "lastCourseId", required = false) UUID lastCourseId,
+            HttpServletRequest request) {
+
+        String jwtHeader = request.getHeader("Authorization");
+
+        List<CourseResponseDto> courses = courseService.searchCoursesByKeyword(keyword,
+                lastCourseId);
+
+        if (jwtHeader == null) {
+            return ResponseEntity.ok().body(courses);
+        }
+
+        String token = jwtHeader.replace("Bearer ", "");
+        Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
+        if (memberId == null) {
+            return ResponseEntity.status(600).body(null);
+        }
+
+        return ResponseEntity.ok().body(courseService.checkCourseWished(courses, memberId));
+    }
+
     @GetMapping("/")
     public ResponseEntity<List<CourseResponseDto>> findAllCoursesBySorting(
             @RequestParam(value = "sort", required = false) String sortType,
-            @RequestParam(value = "lastCourseId", required = false) Long lastCourseId,
-            @RequestParam(value = "lastRating", required = false) Float lastRating,
+            @RequestParam(value = "lastCourseId", required = false) UUID lastCourseId,
+            @RequestParam(value = "lastRating", required = false) BigDecimal lastRating,
             @RequestParam(value = "lastComments", required = false) Integer lastComments,
             HttpServletRequest request) {
 
@@ -88,8 +112,8 @@ public class CourseController {
     public ResponseEntity<List<CourseResponseDto>> findCoursesByPlatform(
             @PathVariable String platform,
             @RequestParam(value = "sort", required = false) String sortType,
-            @RequestParam(value = "lastCourseId", required = false) Long lastCourseId,
-            @RequestParam(value = "lastRating", required = false) Float lastRating,
+            @RequestParam(value = "lastCourseId", required = false) UUID lastCourseId,
+            @RequestParam(value = "lastRating", required = false) BigDecimal lastRating,
             @RequestParam(value = "lastComments", required = false) Integer lastComments,
             HttpServletRequest request) {
 
@@ -115,8 +139,8 @@ public class CourseController {
     public ResponseEntity<List<CourseResponseDto>> findCoursesByPlatformAndCategory(
             @PathVariable("platform") String platform, @PathVariable("category") String category,
             @RequestParam(value = "sort", required = false) String sortType,
-            @RequestParam(value = "lastCourseId", required = false) Long lastCourseId,
-            @RequestParam(value = "lastRating", required = false) Float lastRating,
+            @RequestParam(value = "lastCourseId", required = false) UUID lastCourseId,
+            @RequestParam(value = "lastRating", required = false) BigDecimal lastRating,
             @RequestParam(value = "lastComments", required = false) Integer lastComments,
             HttpServletRequest request) {
 
@@ -139,7 +163,7 @@ public class CourseController {
     }
 
     @PostMapping("/courses/{courseId}/wish")
-    public ResponseEntity<CourseResponseDto> createCourseWish(@PathVariable Long courseId,
+    public ResponseEntity<CourseResponseDto> createCourseWish(@PathVariable UUID courseId,
             @RequestParam(value = "wished") boolean wished,
             HttpServletRequest request) {
 
@@ -151,12 +175,18 @@ public class CourseController {
         }
 
         if (wished) { // wished=true -> 강의 찜 취소
+            if (!courseService.checkCourseWishedByMember(courseId, memberId)) {
+                return ResponseEntity.status(605).body(null);
+            }
             courseService.removeCourseWish(courseId, memberId);
             CourseResponseDto courseResponseDto = courseService.findCourseById(courseId,memberId);
             return ResponseEntity.ok().body(courseResponseDto);
         }
 
         // wished=false -> 강의 찜
+        if (courseService.checkCourseWishedByMember(courseId, memberId)) {
+            return ResponseEntity.status(606).body(null);
+        }
         courseService.createCourseWish(courseId, memberId);
         CourseResponseDto courseResponseDto = courseService.findCourseById(courseId,memberId);
         return ResponseEntity.ok().body(courseResponseDto);

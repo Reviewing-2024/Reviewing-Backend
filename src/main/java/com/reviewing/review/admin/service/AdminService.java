@@ -1,10 +1,11 @@
 package com.reviewing.review.admin.service;
 
 import com.reviewing.review.admin.domain.AdminReviewResponseDto;
-import com.reviewing.review.admin.domain.RejectionDto;
 import com.reviewing.review.admin.repository.AdminRepository;
-import com.reviewing.review.review.domain.Review;
+import com.reviewing.review.review.entity.Review;
 import com.reviewing.review.review.domain.ReviewStateType;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,24 +36,24 @@ public class AdminService {
 
         Review findReview = adminRepository.findReviewById(reviewId);
 
-        float thisReviewRating = findReview.getRating();
-        float courseRating = findReview.getCourse().getRating();
+        BigDecimal thisReviewRating = findReview.getRating();
+        BigDecimal courseRating = findReview.getCourse().getRating();
 
         int totalReviewCount = adminRepository.getTotalReviewCountByReviewId(findReview.getCourse().getId());
 
-        float newTotalRating = thisReviewRating + courseRating;
+        BigDecimal newTotalRating = thisReviewRating.add(courseRating);
         int newTotalReviewCount = totalReviewCount + 1;
 
         adminRepository.updateReviewRating(findReview,
                 calculateReviewRating(newTotalRating, newTotalReviewCount));
-
         adminRepository.changeReviewApprove(findReview);
-
-        adminRepository.changeCourseUpdated(reviewId);
+        adminRepository.updateReviewCount(reviewId, newTotalReviewCount);
     }
 
-    public float calculateReviewRating(float newTotalRating, int newTotalReviewCount) {
-        return Math.round(newTotalRating / newTotalReviewCount * 10) / 10.0f;
+    public BigDecimal calculateReviewRating(BigDecimal newTotalRating, int newTotalReviewCount) {
+        return newTotalRating.divide(
+                BigDecimal.valueOf(newTotalReviewCount), 1, RoundingMode.HALF_UP
+        );
     }
 
     public void changeReviewReject(Long reviewId, String rejectionReason) {

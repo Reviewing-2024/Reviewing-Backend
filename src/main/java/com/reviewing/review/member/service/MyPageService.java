@@ -1,7 +1,7 @@
 package com.reviewing.review.member.service;
 
 import com.reviewing.review.course.domain.CourseResponseDto;
-import com.reviewing.review.member.domain.Member;
+import com.reviewing.review.member.entity.Member;
 import com.reviewing.review.member.domain.MyReviewResponseDto;
 import com.reviewing.review.member.repository.MyPageRepository;
 import com.reviewing.review.review.domain.ReviewStateType;

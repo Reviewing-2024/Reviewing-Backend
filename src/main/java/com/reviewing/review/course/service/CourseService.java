@@ -1,13 +1,13 @@
 package com.reviewing.review.course.service;
 
 import com.reviewing.review.course.domain.CategoryResponseDto;
-import com.reviewing.review.course.domain.Course;
-import com.reviewing.review.course.domain.CourseRequestDto;
 import com.reviewing.review.course.domain.CourseResponseDto;
-import com.reviewing.review.course.domain.CourseWish;
-import com.reviewing.review.course.domain.Platform;
+import com.reviewing.review.course.entity.CourseWish;
+import com.reviewing.review.course.entity.Platform;
 import com.reviewing.review.course.repository.CourseRepository;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,44 +20,44 @@ public class CourseService {
     private final CourseRepository courseRepository;
 
     // 전체 강의 조회
-    public List<CourseResponseDto> findAllCoursesBySorting(String sortType, Long lastCourseId,
-            Float lastRating, Integer lastComments) {
+    public List<CourseResponseDto> findAllCoursesBySorting(String sortType, UUID lastCourseId,
+            BigDecimal lastRating, Integer lastComments) {
 
         return courseRepository.findAllCoursesBySorting(sortType,
                 lastCourseId, lastRating, lastComments);
     }
     // 플랫폼 기준 조회
-    public List<CourseResponseDto> findCoursesByPlatform(String platform, String sortType, Long lastCourseId,
-            Float lastRating, Integer lastComments) {
+    public List<CourseResponseDto> findCoursesByPlatform(String platform, String sortType, UUID lastCourseId,
+            BigDecimal lastRating, Integer lastComments) {
         return courseRepository.findCoursesByPlatform(platform, sortType,
                 lastCourseId, lastRating, lastComments);
     }
 
     public List<CourseResponseDto> findCoursesByPlatformAndCategory(String platform,
-            String category, String sortType, Long lastCourseId, Float lastRating,
+            String category, String sortType, UUID lastCourseId, BigDecimal lastRating,
             Integer lastComments) {
 
         return courseRepository.findCoursesByPlatformAndCategory(platform, category, sortType,
                 lastCourseId, lastRating, lastComments);
     }
 
-    public void createCourseWish(Long courseId, Long memberId) {
+    public void createCourseWish(UUID courseId, Long memberId) {
         courseRepository.createCourseWish(courseId, memberId);
 
         courseRepository.changeCourseUpdated(courseId);
         courseRepository.updateCourseWishCount(courseId, true);
     }
 
-    public void removeCourseWish(Long courseId, Long memberId) {
+    public void removeCourseWish(UUID courseId, Long memberId) {
         courseRepository.removeCourseWish(courseId, memberId);
 
         courseRepository.changeCourseUpdated(courseId);
         courseRepository.updateCourseWishCount(courseId, false);
     }
 
-    public CourseResponseDto findCourseById(Long courseId, Long memberId) {
+    public CourseResponseDto findCourseById(UUID courseId, Long memberId) {
 
-        CourseResponseDto courseResponseDto = courseRepository.findCourseById(courseId, memberId);
+        CourseResponseDto courseResponseDto = courseRepository.findCourseById(courseId);
 
         CourseWish findCourseWish = courseRepository.checkCourseWish(courseId, memberId);
 
@@ -87,5 +87,14 @@ public class CourseService {
             }
         }
         return courses;
+    }
+
+    public boolean checkCourseWishedByMember(UUID courseId, Long memberId) {
+        CourseWish findCourseWish = courseRepository.findCourseWish(courseId, memberId);
+        return findCourseWish != null;
+    }
+
+    public List<CourseResponseDto> searchCoursesByKeyword(String keyword, UUID lastCourseId) {
+        return courseRepository.searchCoursesByKeyword(keyword, lastCourseId);
     }
 }

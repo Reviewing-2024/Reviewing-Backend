@@ -25,7 +25,7 @@ public class AdminController {
 
     @GetMapping("/reviews")
     public ResponseEntity<List<AdminReviewResponseDto>> findReviewByStatus(
-            @RequestParam(value = "status", required = true) String status) {
+            @RequestParam(value = "status") String status) {
 
         List<AdminReviewResponseDto> reviews = adminService.findReviewByStatus(status);
 

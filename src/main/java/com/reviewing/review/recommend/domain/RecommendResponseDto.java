@@ -11,11 +11,14 @@ public class RecommendResponseDto {
     private String courseTeacher;
     private String courseUrl;
     private String reviewingUrl;
+    private String courseSlug;
 
-    public RecommendResponseDto(String courseTitle, String courseTeacher, String courseUrl) {
+    public RecommendResponseDto(String courseTitle, String courseTeacher, String courseUrl,
+            String courseSlug) {
         this.courseTitle = courseTitle;
         this.courseTeacher = courseTeacher;
         this.courseUrl = courseUrl;
+        this.courseSlug = courseSlug;
     }
 
 }

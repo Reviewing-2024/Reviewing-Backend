@@ -7,7 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.reviewing.review.member.domain.kakao.KakaoMemberInfoDto;
 import com.reviewing.review.member.domain.kakao.KakaoTokenDto;
 import com.reviewing.review.member.domain.kakao.KakaoUserInfoDto;
-import com.reviewing.review.member.domain.Member;
+import com.reviewing.review.member.entity.Member;
 import com.reviewing.review.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +31,8 @@ public class MemberService {
 
     @Value("${Kakao.clientId}")
     private String clientId;
+    @Value("${Kakao.redirect_url}")
+    private String redirect_url;
 
     public KakaoTokenDto getKakaoAccessToken(String code) {
 
@@ -40,7 +42,7 @@ public class MemberService {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
         params.add("client_id", clientId);
-        params.add("redirect_uri", "http://localhost:3000/login/callback/kakao");
+        params.add("redirect_uri", redirect_url + "/login/callback/kakao");
         params.add("code", code);
 //        params.add("client_secret", KAKAO_CLIENT_SECRET); 선택 사항
 

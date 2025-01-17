@@ -19,14 +19,14 @@ public class OpenSearchService {
     private final OpenSearchClient openSearchClient;
 
     // OpenSearch 인덱스 생성
-    public void createIndexWithMapping() {
+    public void createIndex() {
         try {
 
             String mappingJson = """
             {
               "mappings": {
                 "properties": {
-                  "id": { "type": "long" },
+                  "id": { "type": "keyword" },
                   "embedding": { "type": "object" }  // 벡터를 일반 JSON 배열로 저장
                 }
               }
@@ -39,24 +39,19 @@ public class OpenSearchService {
 
             System.out.println("Index created: " + response.getStatusLine().getStatusCode());
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("인덱스 생성 실패");
         }
     }
 
     // OpenSearch 인덱스 삭제
-    public DeleteIndexResponse deleteIndex(String indexName) {
-
-        DeleteIndexResponse deleteIndexResponse = null;
-
+    public void deleteIndex(String indexName) {
         try {
             DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest.Builder()
                     .index(indexName).build();
-            deleteIndexResponse = openSearchClient.indices().delete(deleteIndexRequest);
+            openSearchClient.indices().delete(deleteIndexRequest);
         } catch (Exception e) {
-            log.error("deleteIndex indexName : [{}]", indexName, e);
+            log.info("인덱스 존재x");
         }
-
-        return deleteIndexResponse;
     }
 
     // OpenSearch field 제한 변경

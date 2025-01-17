@@ -1,11 +1,11 @@
-package com.reviewing.review.review.domain;
+package com.reviewing.review.review.entity;
 
+import com.reviewing.review.member.entity.Member;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,20 +13,22 @@ import lombok.NoArgsConstructor;
 @Entity
 @Data
 @NoArgsConstructor
-public class ReviewState {
+public class ReviewDislike {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    private ReviewStateType state;
-    private String rejectionReason;
+    @ManyToOne
+    private Member member;
+
+    @ManyToOne
+    private Review review;
 
     @Builder
-    public ReviewState( ReviewStateType state) {
-        this.state = state;
+    public ReviewDislike(Member member, Review review) {
+        this.member = member;
+        this.review = review;
     }
 
 }
-

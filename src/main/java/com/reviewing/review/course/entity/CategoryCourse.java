@@ -1,34 +1,35 @@
-package com.reviewing.review.course.domain;
+package com.reviewing.review.course.entity;
 
-import com.reviewing.review.member.domain.Member;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Data
-@NoArgsConstructor
-public class CourseWish {
+public class CategoryCourse {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    private Member member;
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Course course;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Category category;
+
     @Builder
-    public CourseWish(Member member, Course course) {
-        this.member = member;
+    public CategoryCourse(Course course, Category category) {
         this.course = course;
+        this.category = category;
     }
 
 }

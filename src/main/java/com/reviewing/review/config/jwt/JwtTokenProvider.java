@@ -2,7 +2,7 @@ package com.reviewing.review.config.jwt;
 
 import static io.jsonwebtoken.Jwts.parserBuilder;
 
-import com.reviewing.review.member.domain.Member;
+import com.reviewing.review.member.entity.Member;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -21,6 +21,7 @@ public class JwtTokenProvider {
 
     public String createAccessToken(Member member) {
 
+        log.info(String.valueOf(member.getMemberId()));
         byte[] keyBytes = Decoders.BASE64.decode(jwtSecretKey);
         Key key = Keys.hmacShaKeyFor(keyBytes);
 
@@ -32,7 +33,7 @@ public class JwtTokenProvider {
                 .claim("nickname", member.getNickname())
                 .setIssuedAt(now)
                 .setExpiration(new Date(System.currentTimeMillis() + (1000 * 60 * 60 * 24)))
-//                .setExpiration(new Date(System.currentTimeMillis() + (1000 * 60 * 2)))
+//                .setExpiration(new Date(System.currentTimeMillis() + (1000 * 60 * 3)))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
@@ -59,7 +60,7 @@ public class JwtTokenProvider {
                     .parseClaimsJws(token)
                     .getBody();
 
-            return (Long) claims.get("id");
+            return claims.get("id", Long.class);
         } catch (Exception e) {
             return null;
         }
