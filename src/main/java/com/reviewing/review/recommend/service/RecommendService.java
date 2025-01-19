@@ -105,9 +105,6 @@ public class RecommendService {
             RecommendResponseDto recommendResponseDto = recommendRepository.findCourseBySearchResponses(
                     searchResponse.getId());
 
-            recommendResponseDto.setReviewingUrl(
-                    "https://reviewing.my/reviews/" + recommendResponseDto.getCourseSlug());
-
             result.add(recommendResponseDto);
         }
 
