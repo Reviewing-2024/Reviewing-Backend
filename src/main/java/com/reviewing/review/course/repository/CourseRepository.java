@@ -239,6 +239,17 @@ public class CourseRepository {
                 .getSingleResult();
     }
 
+    public CourseResponseDto findCourseBySlug(String courseSlug) {
+        return em.createQuery(
+                        "select new com.reviewing.review.course.domain.CourseResponseDto("
+                                + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes, c.comments) "
+                                + "from Course c "
+                                + "where c.slug = :courseSlug ",
+                        CourseResponseDto.class)
+                .setParameter("courseSlug", courseSlug)
+                .getSingleResult();
+    }
+
     public List<Platform> findPlatforms() {
         return em.createQuery("select p from Platform p",Platform.class)
                 .getResultList();

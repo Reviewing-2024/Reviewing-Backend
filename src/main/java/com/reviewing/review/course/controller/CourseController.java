@@ -46,16 +46,40 @@ public class CourseController {
     public ResponseEntity<CourseResponseDto> findCourseById(@PathVariable UUID courseId,
             HttpServletRequest request) {
 
+        CourseResponseDto courseResponseDto = courseService.findCourseById(courseId);
+
         String jwtHeader = request.getHeader("Authorization");
+        if (jwtHeader == null) {
+            return ResponseEntity.ok().body(courseResponseDto);
+        }
         String token = jwtHeader.replace("Bearer ", "");
         Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
         if (memberId == null) {
             return ResponseEntity.status(600).body(null);
         }
 
-        CourseResponseDto courseResponseDto = courseService.findCourseById(courseId, memberId);
+        return ResponseEntity.ok()
+                .body(courseService.checkCourseWished(courseResponseDto, memberId));
+    }
 
-        return ResponseEntity.ok().body(courseResponseDto);
+    @GetMapping("/course")
+    public ResponseEntity<CourseResponseDto> findCourseBySlug(@RequestParam("courseSlug") String courseSlug,
+            HttpServletRequest request) {
+
+        CourseResponseDto courseResponseDto = courseService.findCourseBySlug(courseSlug);
+
+        String jwtHeader = request.getHeader("Authorization");
+        if (jwtHeader == null) {
+            return ResponseEntity.ok().body(courseResponseDto);
+        }
+        String token = jwtHeader.replace("Bearer ", "");
+        Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
+        if (memberId == null) {
+            return ResponseEntity.status(600).body(null);
+        }
+
+        return ResponseEntity.ok()
+                .body(courseService.checkCourseWished(courseResponseDto, memberId));
     }
 
     @GetMapping("/courses/search")
@@ -79,7 +103,7 @@ public class CourseController {
             return ResponseEntity.status(600).body(null);
         }
 
-        return ResponseEntity.ok().body(courseService.checkCourseWished(courses, memberId));
+        return ResponseEntity.ok().body(courseService.checkCoursesWished(courses, memberId));
     }
 
     @GetMapping("/")
@@ -105,7 +129,7 @@ public class CourseController {
             return ResponseEntity.status(600).body(null);
         }
 
-        return ResponseEntity.ok().body(courseService.checkCourseWished(courses, memberId));
+        return ResponseEntity.ok().body(courseService.checkCoursesWished(courses, memberId));
     }
 
     @GetMapping("/courses/{platform}")
@@ -132,7 +156,7 @@ public class CourseController {
             return ResponseEntity.status(600).body(null);
         }
 
-        return ResponseEntity.ok().body(courseService.checkCourseWished(courses, memberId));
+        return ResponseEntity.ok().body(courseService.checkCoursesWished(courses, memberId));
     }
 
     @GetMapping("/courses/{platform}/{category}")
@@ -159,7 +183,7 @@ public class CourseController {
             return ResponseEntity.status(600).body(null);
         }
 
-        return ResponseEntity.ok().body(courseService.checkCourseWished(courses, memberId));
+        return ResponseEntity.ok().body(courseService.checkCoursesWished(courses, memberId));
     }
 
     @PostMapping("/courses/{courseId}/wish")
@@ -179,8 +203,10 @@ public class CourseController {
                 return ResponseEntity.status(605).body(null);
             }
             courseService.removeCourseWish(courseId, memberId);
-            CourseResponseDto courseResponseDto = courseService.findCourseById(courseId,memberId);
-            return ResponseEntity.ok().body(courseResponseDto);
+            // 수정
+            CourseResponseDto courseResponseDto = courseService.findCourseById(courseId);
+            return ResponseEntity.ok()
+                    .body(courseService.checkCourseWished(courseResponseDto, memberId));
         }
 
         // wished=false -> 강의 찜
@@ -188,8 +214,10 @@ public class CourseController {
             return ResponseEntity.status(606).body(null);
         }
         courseService.createCourseWish(courseId, memberId);
-        CourseResponseDto courseResponseDto = courseService.findCourseById(courseId,memberId);
-        return ResponseEntity.ok().body(courseResponseDto);
+        // 수정
+        CourseResponseDto courseResponseDto = courseService.findCourseById(courseId);
+        return ResponseEntity.ok()
+                .body(courseService.checkCourseWished(courseResponseDto, memberId));
     }
 
 }

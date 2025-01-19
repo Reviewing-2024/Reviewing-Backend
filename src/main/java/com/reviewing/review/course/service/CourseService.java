@@ -55,17 +55,13 @@ public class CourseService {
         courseRepository.updateCourseWishCount(courseId, false);
     }
 
-    public CourseResponseDto findCourseById(UUID courseId, Long memberId) {
+    public CourseResponseDto findCourseById(UUID courseId) {
 
-        CourseResponseDto courseResponseDto = courseRepository.findCourseById(courseId);
+        return courseRepository.findCourseById(courseId);
+    }
 
-        CourseWish findCourseWish = courseRepository.checkCourseWish(courseId, memberId);
-
-        if (findCourseWish != null) {
-            courseResponseDto.setWished(true);
-        }
-
-        return courseResponseDto;
+    public CourseResponseDto findCourseBySlug(String courseSlug) {
+        return courseRepository.findCourseBySlug(courseSlug);
     }
 
     public List<Platform> findPlatforms() {
@@ -76,7 +72,7 @@ public class CourseService {
         return courseRepository.findCategories(platform);
     }
 
-    public List<CourseResponseDto> checkCourseWished(List<CourseResponseDto> courses,
+    public List<CourseResponseDto> checkCoursesWished(List<CourseResponseDto> courses,
             Long memberId) {
 
         for (CourseResponseDto course : courses) {
@@ -97,4 +93,13 @@ public class CourseService {
     public List<CourseResponseDto> searchCoursesByKeyword(String keyword, UUID lastCourseId) {
         return courseRepository.searchCoursesByKeyword(keyword, lastCourseId);
     }
+
+    public CourseResponseDto checkCourseWished(CourseResponseDto courseResponseDto, Long memberId) {
+        CourseWish findCourseWish = courseRepository.findCourseWish(courseResponseDto.getId(), memberId);
+        if (findCourseWish != null) {
+            courseResponseDto.setWished(true);
+        }
+        return courseResponseDto;
+    }
+
 }
