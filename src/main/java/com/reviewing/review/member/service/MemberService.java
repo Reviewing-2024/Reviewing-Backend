@@ -101,9 +101,6 @@ public class MemberService {
         KakaoMemberInfoDto kakaoMemberInfo = new KakaoMemberInfoDto(kakaoUerInfoDto.getId()
                 ,kakaoUerInfoDto.getKakao_account().getProfile().getNickname());
 
-        log.info("카카오에서 가져온 id={}",kakaoMemberInfo.getKakaoId());
-        log.info("카카오에서 가져온 nickname={}",kakaoMemberInfo.getNickname());
-
         return kakaoMemberInfo;
     }
 

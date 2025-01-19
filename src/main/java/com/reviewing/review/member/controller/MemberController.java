@@ -34,7 +34,6 @@ public class MemberController {
         // 회원가입 or 로그인
         Member member = memberService.signupOrLoginByKakaoId(kakaoMemberInfo);
         String accessToken = jwtTokenProvider.createAccessToken(member);
-        log.info("자체 access token={}",accessToken);
 
         // 헤더에 jwt 토큰 담기
         HttpHeaders headers = new HttpHeaders();
