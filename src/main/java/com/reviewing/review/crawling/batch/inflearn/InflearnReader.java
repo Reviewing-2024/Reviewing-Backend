@@ -177,12 +177,12 @@ public class InflearnReader implements ItemStreamReader<CrawlingCourseDto> {
         WebElement firstUl = driverForCourseData.findElement(By.cssSelector("ul.css-sdr7qd.mantine-1avyp1d"));
         List<WebElement> firstCourses = firstUl.findElements(
                 By.cssSelector("li.css-8atqhb.mantine-1avyp1d"));
-        System.out.println("first count: " + firstCourses.size());
+        log.info("first count: {}", firstCourses.size());
 
         WebElement secondUrl = driverForCourseData.findElement(By.cssSelector("ul.css-2ldd65.mantine-1avyp1d"));
         List<WebElement> secondCourses = secondUrl.findElements(
                 By.cssSelector("li.mantine-1avyp1d"));
-        System.out.println("second count: " + secondCourses.size());
+        log.info("second count: {}", secondCourses.size());
 
         for (WebElement course : firstCourses) {
             String baseCourseUrl = course.findElement(By.tagName("a")).getAttribute("href");
