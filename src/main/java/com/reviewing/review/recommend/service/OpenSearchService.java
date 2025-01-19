@@ -19,7 +19,7 @@ public class OpenSearchService {
     private final OpenSearchClient openSearchClient;
 
     // OpenSearch 인덱스 생성
-    public void createIndex() {
+    public void createIndex(String indexName) {
         try {
 
             String mappingJson = """
@@ -33,7 +33,7 @@ public class OpenSearchService {
             }
             """;
 
-            Request request = new Request("PUT", "/course");
+            Request request = new Request("PUT", "/" + indexName);
             request.setJsonEntity(mappingJson);
             Response response = restClient.performRequest(request);
 
@@ -55,7 +55,7 @@ public class OpenSearchService {
     }
 
     // OpenSearch field 제한 변경
-    public void updateFieldLimit() {
+    public void updateFieldLimit(String indexName) {
         try {
             String settingsJson = """
         {
@@ -63,7 +63,7 @@ public class OpenSearchService {
         }
         """;
 
-            Request request = new Request("PUT", "/course/_settings");
+            Request request = new Request("PUT", "/" + indexName + "/_settings");
             request.setJsonEntity(settingsJson);
 
             Response response = restClient.performRequest(request);

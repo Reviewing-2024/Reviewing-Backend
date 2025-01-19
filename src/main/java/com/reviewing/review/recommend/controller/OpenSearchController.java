@@ -22,16 +22,19 @@ public class OpenSearchController {
     private final JobRegistry jobRegistry;
 
     @PostMapping("/opensearch/index")
-    public String createOpenSearchIndex() {
-        openSearchService.deleteIndex("course");
-        openSearchService.createIndex();
-        openSearchService.updateFieldLimit();
+    public String createOpenSearchIndex(@RequestParam("indexName") String indexName) {
+        openSearchService.deleteIndex(indexName);
+        openSearchService.createIndex(indexName);
+        openSearchService.updateFieldLimit(indexName);
         return "인덱스 생성 성공";
     }
 
     @PostMapping("/opensearch/courses")
-    public String createEmbeddingsAndSaveOpenSearch(@RequestParam("value") String value) {
+    public String createEmbeddingsAndSaveOpenSearch(@RequestParam("indexName") String indexName,
+            @RequestParam("value") String value) {
+
         JobParameters jobParameters = new JobParametersBuilder()
+                .addString("indexName", indexName)
                 .addString("date", value)
                 .toJobParameters();
         try {
