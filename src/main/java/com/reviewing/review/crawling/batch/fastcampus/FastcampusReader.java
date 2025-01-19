@@ -86,10 +86,17 @@ public class FastcampusReader implements ItemStreamReader<CrawlingCourseDto> {
                 }
                 oldCount = newCount;
 
-                // 스크롤 7000px씩
-                actions.scrollByAmount(0, 7000).perform();
+                // 스크롤 5000px씩
+                actions.scrollByAmount(0, 5000).perform();
 
-                wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(
+                try {
+                    Thread.sleep(4000);
+                } catch (InterruptedException e) {
+                    log.info("패스트캠퍼스 sleep 에러");
+                    throw new RuntimeException(e);
+                }
+
+                wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(
                         By.cssSelector("div.CourseCard_basicType__XWiBm.CourseCard_courseCardContainer__sx20K.InfinityCourse_infinityCourseCard__YxLps")
                 ));
 
