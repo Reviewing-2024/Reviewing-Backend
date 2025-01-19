@@ -55,6 +55,8 @@ public class InflearnReader implements ItemStreamReader<CrawlingCourseDto> {
         optionsForCourseData.addArguments("--disable-default-apps");
         optionsForCourseData.addArguments("--disable-notifications");
         optionsForCourseData.addArguments("--disable-blink-features=AutomationControlled");
+        optionsForCourseData.addArguments("--no-sandbox");
+        optionsForCourseData.addArguments("--disable-gpu");
 
         this.driverForCourseData = new ChromeDriver(optionsForCourseData);
 
@@ -68,6 +70,7 @@ public class InflearnReader implements ItemStreamReader<CrawlingCourseDto> {
         optionsForLastPage.addArguments("--disable-gpu");
         optionsForLastPage.addArguments("--disable-extensions");
         optionsForLastPage.addArguments("--auto-open-devtools-for-tabs");
+        optionsForLastPage.addArguments("--no-sandbox");
 
         this.driverForLastPage = new ChromeDriver(optionsForLastPage);
 

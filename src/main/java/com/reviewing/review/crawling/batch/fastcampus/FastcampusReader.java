@@ -48,6 +48,9 @@ public class FastcampusReader implements ItemStreamReader<CrawlingCourseDto> {
         options.addArguments("--disable-default-apps");
         options.addArguments("--disable-notifications");
         options.addArguments("--disable-blink-features=AutomationControlled");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-gpu");
+        options.addArguments("--window-size=1920,1080");
 
         this.driver = new ChromeDriver(options);
 
