@@ -38,6 +38,7 @@ public class MemberController {
         // 헤더에 jwt 토큰 담기
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + accessToken);
+        //testest
 
         return ResponseEntity.ok().headers(headers).body(member);
     }

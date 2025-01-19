@@ -39,6 +39,7 @@ public class InflearnCrawling {
     private final CourseCrawlingRepository courseCrawlingRepository;
     private final CategoryRepository categoryRepository;
     private final CategoryCourseRepository categoryCourseRepository;
+    //test
 
     @GetMapping("/inflearn/platform")
     public void createPlatform() {
