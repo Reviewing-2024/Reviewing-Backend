@@ -24,7 +24,7 @@ public class RecommendRepository {
 
     public RecommendResponseDto findCourseBySearchResponses(UUID id) {
         return em.createQuery(
-                        "select new com.reviewing.review.recommend.domain.RecommendResponseDto(c.title, c.teacher, c.url, c.slug) " +
+                        "select new com.reviewing.review.recommend.domain.RecommendResponseDto(c.id ,c.title, c.teacher, c.url, c.slug) " +
                                 "from Course c where c.id = :id", RecommendResponseDto.class)
                 .setParameter("id", id) // 파라미터 바인딩
                 .getSingleResult(); // 결과 반환

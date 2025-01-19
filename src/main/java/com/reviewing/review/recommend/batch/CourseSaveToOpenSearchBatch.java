@@ -19,6 +19,7 @@ import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch.core.IndexRequest;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
@@ -26,6 +27,7 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.data.RepositoryItemReader;
 import org.springframework.batch.item.data.builder.RepositoryItemReaderBuilder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Sort;
@@ -56,7 +58,7 @@ public class CourseSaveToOpenSearchBatch {
                 .<Course, CourseOpenSearchRequestDto> chunk(10,platformTransactionManager)
                 .reader(CourseSaveToOpenSearchReader())
                 .processor(CourseSaveToOpenSearchProcessor())
-                .writer(CourseSaveToOpenSearchwriter())
+                .writer(CourseSaveToOpenSearchwriter(null))
                 .build();
     }
 
@@ -119,11 +121,13 @@ public class CourseSaveToOpenSearchBatch {
 
 
     @Bean
-    public ItemWriter<CourseOpenSearchRequestDto> CourseSaveToOpenSearchwriter() {
+    @StepScope
+    public ItemWriter<CourseOpenSearchRequestDto> CourseSaveToOpenSearchwriter(@Value("#{jobParameters['indexName']}") String indexName) {
         return courseOpenSearchRequestDtos -> {
+            log.info("indexName: {}", indexName);
             for (CourseOpenSearchRequestDto courseOpenSearchRequestDto : courseOpenSearchRequestDtos) {
                 IndexRequest<Map<String, Object>> indexRequest = IndexRequest.of(builder -> builder
-                        .index("course")   // 인덱스 이름
+                        .index(indexName)   // 인덱스 이름
                         .id(String.valueOf(courseOpenSearchRequestDto.getCourseId())) // 문서 ID
                         .document(courseOpenSearchRequestDto.getDocument()) // 변환된 문서 데이터
                 );
