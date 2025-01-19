@@ -69,6 +69,7 @@ public class FastcampusReader implements ItemStreamReader<CrawlingCourseDto> {
             Platform findPlatform = platformRepository.findByName("패스트캠퍼스");
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 
+            System.out.println("test");
             int oldCount = 0;
             int scrollCount = 0;
             while (true) {
