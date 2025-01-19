@@ -48,18 +48,18 @@ public class FastcampusCrawling {
         Map<String, String> map = new HashMap<>();
 
         map.put("category_online_programmingfront", "프론트엔드");
-//        map.put("category_online_programmingback", "백엔드");
-//        map.put("category_online_programmingapp", "모바일 앱 개발");
-//        map.put("category_online_programmingdevops", "DevOps/Infra");
-//        map.put("category_online_programmingblockchain", "블록체인 개발");
+        map.put("category_online_programmingback", "백엔드");
+        map.put("category_online_programmingapp", "모바일 앱 개발");
+        map.put("category_online_programmingdevops", "DevOps/Infra");
+        map.put("category_online_programmingblockchain", "블록체인 개발");
         map.put("category_online_programminggame", "게임 개발");
-//        map.put("category_online_programmingcareer", "컴퓨터 공학/SW 엔지니어링");
-//        map.put("category_online_datasciencedeep", "딥러닝");
-//        map.put("category_online_datasciencecv", "컴퓨터비전");
-//        map.put("category_online_datasciencenlp", "자연어처리");
-//        map.put("category_online_datascienceanal", "데이터분석");
-//        map.put("category_online_datasciencemr", "머신러닝");
-//        map.put("category_online_datascienceeng", "데이터엔지니어링");
+        map.put("category_online_programmingcareer", "컴퓨터 공학/SW 엔지니어링");
+        map.put("category_online_datasciencedeep", "딥러닝");
+        map.put("category_online_datasciencecv", "컴퓨터비전");
+        map.put("category_online_datasciencenlp", "자연어처리");
+        map.put("category_online_datascienceanal", "데이터분석");
+        map.put("category_online_datasciencemr", "머신러닝");
+        map.put("category_online_datascienceeng", "데이터엔지니어링");
 
         for (String slug : map.keySet()) {
             Category category = new Category(map.get(slug), slug, findPlatform);
