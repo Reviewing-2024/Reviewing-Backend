@@ -34,10 +34,10 @@ public class CourseService {
     }
 
     public List<CourseResponseDto> findCoursesByPlatformAndCategory(String platform,
-            String category, String sortType, UUID lastCourseId, BigDecimal lastRating,
+            String categorySlug, String sortType, UUID lastCourseId, BigDecimal lastRating,
             Integer lastComments) {
 
-        return courseRepository.findCoursesByPlatformAndCategory(platform, category, sortType,
+        return courseRepository.findCoursesByPlatformAndCategory(platform, categorySlug, sortType,
                 lastCourseId, lastRating, lastComments);
     }
 

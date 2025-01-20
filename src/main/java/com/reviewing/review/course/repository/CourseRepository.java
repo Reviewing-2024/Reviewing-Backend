@@ -124,7 +124,7 @@ public class CourseRepository {
 
     // 플랫폼,카테고리 기준 정렬 - 로그인 안함
     public List<CourseResponseDto> findCoursesByPlatformAndCategory(String platform,
-            String category, String sortType, UUID lastCourseId,
+            String categorySlug, String sortType, UUID lastCourseId,
             BigDecimal lastRating, Integer lastComments) {
 
         Platform findPlatform = em.createQuery("select p from Platform p where p.name = :name",
@@ -133,9 +133,9 @@ public class CourseRepository {
                 .getSingleResult();
 
         Category findCategory = em.createQuery(
-                        "select c from Category c where c.name = :name and c.platform.id = :platformId",
+                        "select c from Category c where c.slug = :slug and c.platform.id = :platformId",
                         Category.class)
-                .setParameter("name", category)
+                .setParameter("slug", categorySlug)
                 .setParameter("platformId", findPlatform.getId()) // 플랫폼 조건 추가
                 .getSingleResult();
 
@@ -257,7 +257,7 @@ public class CourseRepository {
 
     public List<CategoryResponseDto> findCategories(String platform) {
         return em.createQuery(
-                        "select new com.reviewing.review.course.domain.CategoryResponseDto (c.name) from Category c "
+                        "select new com.reviewing.review.course.domain.CategoryResponseDto (c.name, c.slug) from Category c "
                                 + "where c.platform.name = :platform", CategoryResponseDto.class)
                 .setParameter("platform", platform)
                 .getResultList();
