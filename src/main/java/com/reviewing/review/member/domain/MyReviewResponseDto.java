@@ -41,7 +41,7 @@ public class MyReviewResponseDto {
         this.dislikes = dislikes;
         this.rejectionReason = rejectionReason;
         this.createdAt = createdAt.format(
-                DateTimeFormatter.ofPattern("yyyy.MM.dd hh.mm a", Locale.US));
+                DateTimeFormatter.ofPattern("yyyy.MM.dd hh:mm a", Locale.US));
     }
 
 }

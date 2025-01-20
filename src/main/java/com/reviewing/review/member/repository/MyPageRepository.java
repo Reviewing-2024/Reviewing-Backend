@@ -26,7 +26,8 @@ public class MyPageRepository {
                         + "r.reviewState.rejectionReason, "
                         + "r.createdAt) "
                         + "from Review r "
-                        + "where r.member.id = :memberId ");
+                        + "where r.member.id = :memberId "
+                        + "order by r.createdAt desc");
 
         if (status != null) {
             query.append("and r.reviewState.state = :status ");

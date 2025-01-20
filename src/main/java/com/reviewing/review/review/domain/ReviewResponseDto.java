@@ -31,7 +31,7 @@ public class ReviewResponseDto {
         this.likes = likes;
         this.dislikes = dislikes;
         this.createdAt = createdAt.format(
-                DateTimeFormatter.ofPattern("yyyy.MM.dd hh.mm a", Locale.US));
+                DateTimeFormatter.ofPattern("yyyy.MM.dd hh:mm a", Locale.US));
     }
 
 }
