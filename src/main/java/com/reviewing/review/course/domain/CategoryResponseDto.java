@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 public class CategoryResponseDto {
 
     private String category;
+    private String slug;
 
 }

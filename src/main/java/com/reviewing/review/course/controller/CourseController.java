@@ -161,7 +161,7 @@ public class CourseController {
 
     @GetMapping("/courses/{platform}/{category}")
     public ResponseEntity<List<CourseResponseDto>> findCoursesByPlatformAndCategory(
-            @PathVariable("platform") String platform, @PathVariable("category") String category,
+            @PathVariable("platform") String platform, @PathVariable("category") String categorySlug,
             @RequestParam(value = "sort", required = false) String sortType,
             @RequestParam(value = "lastCourseId", required = false) UUID lastCourseId,
             @RequestParam(value = "lastRating", required = false) BigDecimal lastRating,
@@ -171,7 +171,7 @@ public class CourseController {
         String jwtHeader = request.getHeader("Authorization");
 
         List<CourseResponseDto> courses = courseService.findCoursesByPlatformAndCategory(platform,
-                category, sortType, lastCourseId, lastRating, lastComments);
+                categorySlug, sortType, lastCourseId, lastRating, lastComments);
 
         if (jwtHeader == null) {
             return ResponseEntity.ok().body(courses);
