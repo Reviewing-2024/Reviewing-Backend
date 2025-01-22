@@ -4,7 +4,6 @@
 [리뷰잉 보러가기](https://reviewing.my)
 
 ## 프로젝트 소개
-***
 인프런, 유데미, 코드잇, 노마드코더, 패스트캠퍼스 등등 <br/>
 여러 플랫폼의 수많은 강의들 중 `어떤 강의를 선택할지` 또는 `어떤 강의가 나와 맞을지` <br/>
 일일이 강의 후기를 찾아보기 힘들다고 생각한 적 없으셨나요?🤔 <br/>
@@ -15,7 +14,6 @@
 또 관심 있는 주제에 대해 적절한 강의를 추천하는 강의 추천 기능도 제공하고 있어요!
 
 ## 주요 기능
-***
 ### 강의 리뷰 작성
 1. 수강한 강의들 중 작성하고 싶은 강의의 리뷰를 작성해 주세요!
 ![Image](https://github.com/user-attachments/assets/0e8424f7-5e78-4dbb-a5e2-1b75d0a39191)
@@ -28,11 +26,9 @@
 (결과에는 입력한 텍스트, 인기도 (평점, 찜 개수 등)가 반영되어 있습니다.)
 ![Image](https://github.com/user-attachments/assets/6706d180-65c3-45b5-841c-e1ba9258f51f)
 ## 인프라 구조
-***
 <img width="1535" alt="Image" src="https://github.com/user-attachments/assets/40a34c55-7f40-49d9-abff-f43b2561cce0" />
 
 ## 개발자
-***
 | BE 박서연 | FE 성준현 |
 |:------:|:------:|
 |  [@seoyeoning](https://github.com/seoyeoning)  |  [@sungjunhyeon](https://github.com/sungjunhyeon)  |
