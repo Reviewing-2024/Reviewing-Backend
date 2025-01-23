@@ -48,7 +48,7 @@ public class InflearnCrawlingBatch {
     @Bean
     public Step inflearnStep() {
         return new StepBuilder("inflearnCrawlingStep", jobRepository)
-                .<CrawlingCourseDto, CategoryCourseDto> chunk(20,platformTransactionManager)
+                .<CrawlingCourseDto, CategoryCourseDto> chunk(8,platformTransactionManager)
                 .reader(inflearnReader())
                 .processor(inflearnProcessor())
                 .writer(inflearnWriter())
