@@ -13,6 +13,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -55,8 +56,7 @@ public class InflearnCrawlingBatch {
                 .faultTolerant()
                 .retryLimit(5)
                 .retry(NoSuchElementException.class)
-                .skip(NoSuchElementException.class)
-                .skipLimit(5)
+                .retry(TimeoutException.class)
                 .build();
     }
 
