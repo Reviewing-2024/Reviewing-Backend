@@ -66,7 +66,7 @@ public class CourseSaveToOpenSearchBatch {
     public RepositoryItemReader<Course> CourseSaveToOpenSearchReader() {
         return new RepositoryItemReaderBuilder<Course>()
                 .name("CourseSaveToOpenSearchReader")
-                .pageSize(20)
+                .pageSize(10)
                 .methodName("findAll")
                 .repository(courseCrawlingRepository)
                 .sorts(Map.of("id", Sort.Direction.ASC))
@@ -124,7 +124,6 @@ public class CourseSaveToOpenSearchBatch {
     @StepScope
     public ItemWriter<CourseOpenSearchRequestDto> CourseSaveToOpenSearchwriter(@Value("#{jobParameters['indexName']}") String indexName) {
         return courseOpenSearchRequestDtos -> {
-            log.info("indexName: {}", indexName);
             for (CourseOpenSearchRequestDto courseOpenSearchRequestDto : courseOpenSearchRequestDtos) {
                 IndexRequest<Map<String, Object>> indexRequest = IndexRequest.of(builder -> builder
                         .index(indexName)   // 인덱스 이름
@@ -133,6 +132,7 @@ public class CourseSaveToOpenSearchBatch {
                 );
                 openSearchClient.index(indexRequest);
             }
+            log.info("등록중");
         };
     }
 
