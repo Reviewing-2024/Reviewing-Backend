@@ -83,4 +83,15 @@ public class JobController {
         return "ok";
     }
 
+    @GetMapping("/inflearnCrawling/category")
+    public String inflearnCrawlingByCategory(@RequestParam("categorySlug") String categorySlug,
+            @RequestParam("value") String value) throws Exception {
+        JobParameters jobParameters = new JobParametersBuilder()
+                .addString("categorySlug", categorySlug)
+                .addString("date", value)
+                .toJobParameters();
+        jobLauncher.run(jobRegistry.getJob("inflearnCrawlingByCategoryJob"), jobParameters);
+        return "ok";
+    }
+
 }
