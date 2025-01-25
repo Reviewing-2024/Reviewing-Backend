@@ -8,7 +8,6 @@ import com.reviewing.review.crawling.repository.CategoryCourseRepository;
 import com.reviewing.review.crawling.repository.CourseCrawlingRepository;
 import com.reviewing.review.recommend.domain.CourseOpenSearchRequestDto;
 import com.reviewing.review.recommend.service.EmbeddingService;
-import com.reviewing.review.recommend.service.OpenSearchService;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
@@ -37,39 +36,39 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Configuration
 @RequiredArgsConstructor
 @Slf4j
-public class CourseSaveToOpenSearchBatch {
+public class UpdateCourseToOpenSearchBatch {
 
     private final JobRepository jobRepository;
     private final PlatformTransactionManager platformTransactionManager;
-    private final CourseCrawlingRepository courseCrawlingRepository;
+    private final CourseCrawlingRepository courseCrawlingRepository; //
     private final CategoryCourseRepository categoryCourseRepository;
     private final EmbeddingService embeddingService;
     private final OpenSearchClient openSearchClient;
-    private final OpenSearchService openSearchService;
 
     @Bean
-    public Job CourseSaveToOpenSearchJob() {
-        return new JobBuilder("CourseSaveToOpenSearchJob",jobRepository)
-                .start(CourseSaveToOpenSearchStep())
+    public Job UpdateCourseToOpenSearchJob() {
+        return new JobBuilder("UpdateCourseToOpenSearchJob",jobRepository)
+                .start(UpdateCourseToOpenSearchStep())
                 .build();
     }
 
     @Bean
-    public Step CourseSaveToOpenSearchStep() {
-        return new StepBuilder("CourseSaveToOpenSearchStep", jobRepository)
+    public Step UpdateCourseToOpenSearchStep() {
+        return new StepBuilder("UpdateCourseToOpenSearchStep", jobRepository)
                 .<Course, CourseOpenSearchRequestDto> chunk(10,platformTransactionManager)
-                .reader(CourseSaveToOpenSearchReader())
-                .processor(CourseSaveToOpenSearchProcessor(null))
-                .writer(CourseSaveToOpenSearchWriter(null))
+                .reader(UpdateCourseToOpenSearchReader())
+                .processor(UpdateCourseToOpenSearchProcessor(null))
+                .writer(UpdateCourseToOpenSearchWriter(null))
                 .build();
     }
 
     @Bean
-    public RepositoryItemReader<Course> CourseSaveToOpenSearchReader() {
+    public RepositoryItemReader<Course> UpdateCourseToOpenSearchReader() {
         return new RepositoryItemReaderBuilder<Course>()
                 .name("CourseSaveToOpenSearchReader")
                 .pageSize(10)
-                .methodName("findAll")
+                .arguments(List.of())
+                .methodName("findByUpdatedTrue")
                 .repository(courseCrawlingRepository)
                 .sorts(Map.of("id", Sort.Direction.ASC))
                 .build();
@@ -77,12 +76,10 @@ public class CourseSaveToOpenSearchBatch {
 
     @Bean
     @StepScope
-    public ItemProcessor<Course, CourseOpenSearchRequestDto> CourseSaveToOpenSearchProcessor(@Value("#{jobParameters['indexName']}") String indexName) {
+    public ItemProcessor<Course, CourseOpenSearchRequestDto> UpdateCourseToOpenSearchProcessor(@Value("#{jobParameters['indexName']}") String indexName) {
         return course -> {
-            // 중복 검사
-            if (openSearchService.searchCourse(course.getId(), indexName)) {
-                return null;
-            }
+            course.setUpdated(false);
+
             String title = course.getTitle();
             String platform = course.getPlatform().getName();
             BigDecimal rating = course.getRating();
@@ -126,14 +123,14 @@ public class CourseSaveToOpenSearchBatch {
         }
     }
 
-
     @Bean
     @StepScope
-    public ItemWriter<CourseOpenSearchRequestDto> CourseSaveToOpenSearchWriter(@Value("#{jobParameters['indexName']}") String indexName) {
+    public ItemWriter<CourseOpenSearchRequestDto> UpdateCourseToOpenSearchWriter(@Value("#{jobParameters['indexName']}") String indexName) {
         return courseOpenSearchRequestDtos -> {
             for (CourseOpenSearchRequestDto courseOpenSearchRequestDto : courseOpenSearchRequestDtos) {
                 IndexRequest<Map<String, Object>> indexRequest = IndexRequest.of(builder -> builder
                         .index(indexName)   // 인덱스 이름
+
                         .id(String.valueOf(courseOpenSearchRequestDto.getCourseId())) // 문서 ID
                         .document(courseOpenSearchRequestDto.getDocument()) // 변환된 문서 데이터
                 );

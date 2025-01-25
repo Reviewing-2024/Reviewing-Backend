@@ -7,7 +7,10 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.boot.autoconfigure.batch.BatchProperties.Job;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -45,4 +48,20 @@ public class OpenSearchController {
             return "실패";
         }
     }
+
+    @PutMapping("/opensearch/courses")
+    public String updateCourseEmbeddingsToOpenSearch(@RequestParam("indexName") String indexName,
+            @RequestParam("value") String value) {
+        JobParameters jobParameters = new JobParametersBuilder()
+                .addString("indexName", indexName)
+                .addString("date",value)
+                .toJobParameters();
+        try {
+            jobLauncher.run(jobRegistry.getJob("UpdateCourseToOpenSearchJob"), jobParameters);
+            return "성공";
+        } catch (Exception e) {
+            return "실패";
+        }
+    }
+
 }

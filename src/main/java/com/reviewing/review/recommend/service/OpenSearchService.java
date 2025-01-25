@@ -1,11 +1,15 @@
 package com.reviewing.review.recommend.service;
 
+import java.io.IOException;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.opensearch.client.Request;
 import org.opensearch.client.Response;
 import org.opensearch.client.RestClient;
 import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch.core.GetResponse;
+import org.opensearch.client.opensearch.core.SearchRequest;
 import org.opensearch.client.opensearch.indices.DeleteIndexRequest;
 import org.opensearch.client.opensearch.indices.DeleteIndexResponse;
 import org.springframework.stereotype.Service;
@@ -70,6 +74,19 @@ public class OpenSearchService {
             System.out.println("Field limit updated: " + response.getStatusLine().getStatusCode());
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    // openSearch 강의 존재 검색
+    public boolean searchCourse(UUID courseId, String indexName) {
+        try {
+            GetResponse<Object> response = openSearchClient.get(g -> g
+                    .index(indexName)
+                    .id(courseId.toString()), Object.class);
+
+            return response.found();
+        } catch (IOException e) {
+            throw new RuntimeException("OpenSearch 조회 실패", e);
         }
     }
 

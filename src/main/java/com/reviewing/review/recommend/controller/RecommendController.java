@@ -24,7 +24,7 @@ public class RecommendController {
     public List<RecommendResponseDto> recommendCourse(
             @RequestBody RecommendRequestDto recommendRequestDto) {
 
-        List<SearchResponseDto> searchResponses =  recommendService.search("course", embeddingService.generateEmbedding(recommendRequestDto.getQuestion()), 5);
+        List<SearchResponseDto> searchResponses =  recommendService.search("course-seoyeon", embeddingService.generateEmbedding(recommendRequestDto.getQuestion()), 5);
 
         return recommendService.findCourseBySearchResponses(searchResponses);
 
