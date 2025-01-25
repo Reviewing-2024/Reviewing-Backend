@@ -26,13 +26,12 @@ public class MyPageRepository {
                         + "r.reviewState.rejectionReason, "
                         + "r.createdAt) "
                         + "from Review r "
-                        + "where r.member.id = :memberId "
-                        + "order by r.createdAt desc");
+                        + "where r.member.id = :memberId ");
 
         if (status != null) {
             query.append("and r.reviewState.state = :status ");
         }
-
+        query.append("order by r.createdAt desc");
         TypedQuery<MyReviewResponseDto> queryResult = em.createQuery(query.toString(), MyReviewResponseDto.class)
                 .setParameter("memberId", memberId);
 
