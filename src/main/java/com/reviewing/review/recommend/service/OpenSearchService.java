@@ -82,11 +82,12 @@ public class OpenSearchService {
         try {
             GetResponse<Object> response = openSearchClient.get(g -> g
                     .index(indexName)
-                    .id(courseId.toString()), Object.class);
+                    .id(String.valueOf(courseId)), Object.class);
 
             return response.found();
         } catch (IOException e) {
-            throw new RuntimeException("OpenSearch 조회 실패", e);
+            log.info("실패: {}", courseId);
+            throw new RuntimeException("OpenSearch 조회 실패 ", e);
         }
     }
 
