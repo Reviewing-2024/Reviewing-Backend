@@ -46,6 +46,10 @@ public class SearchConfig {
                 .setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder
                         .setDefaultCredentialsProvider(credentialsProvider)
                 )
+                .setRequestConfigCallback(requestConfigBuilder -> requestConfigBuilder
+                        .setConnectTimeout(10000)
+                        .setSocketTimeout(60000)
+                )
                 .build();
     }
 
