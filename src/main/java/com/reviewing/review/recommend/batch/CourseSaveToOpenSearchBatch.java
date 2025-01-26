@@ -61,6 +61,10 @@ public class CourseSaveToOpenSearchBatch {
                 .reader(CourseSaveToOpenSearchReader())
                 .processor(CourseSaveToOpenSearchProcessor(null))
                 .writer(CourseSaveToOpenSearchWriter(null))
+                .faultTolerant()
+                .retryLimit(5)
+                .retry(RuntimeException.class)
+                .skip(RuntimeException.class)
                 .build();
     }
 
