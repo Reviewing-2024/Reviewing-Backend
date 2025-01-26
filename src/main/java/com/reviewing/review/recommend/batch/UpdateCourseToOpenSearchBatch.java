@@ -55,7 +55,7 @@ public class UpdateCourseToOpenSearchBatch {
     @Bean
     public Step UpdateCourseToOpenSearchStep() {
         return new StepBuilder("UpdateCourseToOpenSearchStep", jobRepository)
-                .<Course, CourseOpenSearchRequestDto> chunk(10,platformTransactionManager)
+                .<Course, CourseOpenSearchRequestDto> chunk(5,platformTransactionManager)
                 .reader(UpdateCourseToOpenSearchReader())
                 .processor(UpdateCourseToOpenSearchProcessor(null))
                 .writer(UpdateCourseToOpenSearchWriter(null))
@@ -66,7 +66,7 @@ public class UpdateCourseToOpenSearchBatch {
     public RepositoryItemReader<Course> UpdateCourseToOpenSearchReader() {
         return new RepositoryItemReaderBuilder<Course>()
                 .name("CourseSaveToOpenSearchReader")
-                .pageSize(10)
+                .pageSize(5)
                 .arguments(List.of())
                 .methodName("findByUpdatedTrue")
                 .repository(courseCrawlingRepository)

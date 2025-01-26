@@ -57,7 +57,7 @@ public class CourseSaveToOpenSearchBatch {
     @Bean
     public Step CourseSaveToOpenSearchStep() {
         return new StepBuilder("CourseSaveToOpenSearchStep", jobRepository)
-                .<Course, CourseOpenSearchRequestDto> chunk(10,platformTransactionManager)
+                .<Course, CourseOpenSearchRequestDto> chunk(5,platformTransactionManager)
                 .reader(CourseSaveToOpenSearchReader())
                 .processor(CourseSaveToOpenSearchProcessor(null))
                 .writer(CourseSaveToOpenSearchWriter(null))
@@ -68,7 +68,7 @@ public class CourseSaveToOpenSearchBatch {
     public RepositoryItemReader<Course> CourseSaveToOpenSearchReader() {
         return new RepositoryItemReaderBuilder<Course>()
                 .name("CourseSaveToOpenSearchReader")
-                .pageSize(10)
+                .pageSize(5)
                 .methodName("findAll")
                 .repository(courseCrawlingRepository)
                 .sorts(Map.of("id", Sort.Direction.ASC))
