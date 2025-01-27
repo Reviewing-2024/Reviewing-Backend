@@ -82,7 +82,8 @@ public class OpenSearchService {
         try {
             GetResponse<Object> response = openSearchClient.get(g -> g
                     .index(indexName)
-                    .id(String.valueOf(courseId)), Object.class);
+                    .id(String.valueOf(courseId))
+                    .sourceExcludes("*"), Object.class);
 
             return response.found();
         } catch (IOException e) {
