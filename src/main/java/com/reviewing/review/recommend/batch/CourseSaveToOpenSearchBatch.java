@@ -57,15 +57,15 @@ public class CourseSaveToOpenSearchBatch {
     @Bean
     public Step CourseSaveToOpenSearchStep() {
         return new StepBuilder("CourseSaveToOpenSearchStep", jobRepository)
-                .<Course, CourseOpenSearchRequestDto> chunk(3,platformTransactionManager)
+                .<Course, CourseOpenSearchRequestDto> chunk(10,platformTransactionManager)
                 .reader(CourseSaveToOpenSearchReader())
                 .processor(CourseSaveToOpenSearchProcessor(null))
                 .writer(CourseSaveToOpenSearchWriter(null))
                 .faultTolerant()
-                .retryLimit(5)
+                .retryLimit(20)
                 .retry(RuntimeException.class)
                 .skip(RuntimeException.class)
-                .skipLimit(10)
+                .skipLimit(40)
                 .build();
     }
 
@@ -73,7 +73,7 @@ public class CourseSaveToOpenSearchBatch {
     public RepositoryItemReader<Course> CourseSaveToOpenSearchReader() {
         return new RepositoryItemReaderBuilder<Course>()
                 .name("CourseSaveToOpenSearchReader")
-                .pageSize(3)
+                .pageSize(10)
                 .methodName("findAll")
                 .repository(courseCrawlingRepository)
                 .sorts(Map.of("id", Sort.Direction.ASC))
@@ -86,7 +86,6 @@ public class CourseSaveToOpenSearchBatch {
         return course -> {
             // 중복 검사
             if (openSearchService.searchCourse(course.getId(), indexName)) {
-                log.info("이미 존재");
                 return null;
             }
             String title = course.getTitle();
@@ -144,8 +143,8 @@ public class CourseSaveToOpenSearchBatch {
                         .document(courseOpenSearchRequestDto.getDocument()) // 변환된 문서 데이터
                 );
                 openSearchClient.index(indexRequest);
+                log.info("등록");
             }
-            log.info("등록");
         };
     }
 

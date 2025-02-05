@@ -93,6 +93,7 @@ public class RecommendService {
 
         } catch (Exception e) {
             log.error("강의 추천 에러 발생");
+            log.info(e.getMessage());
             return Collections.emptyList();
         }
     }
