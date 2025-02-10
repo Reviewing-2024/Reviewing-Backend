@@ -14,6 +14,9 @@
 또 관심 있는 주제에 대해 적절한 강의를 추천하는 강의 추천 기능도 제공하고 있어요!
 
 ## 주요 기능
+### 강의 조회
+플랫폼/카테고리별로 강의를 조회할 수 있습니다.
+![Image](https://github.com/user-attachments/assets/b295dd4f-90b3-49e6-b287-4c3d806f1c79)
 ### 강의 리뷰 작성
 1. 수강한 강의들 중 작성하고 싶은 강의의 리뷰를 작성해 주세요!
 ![Image](https://github.com/user-attachments/assets/0e8424f7-5e78-4dbb-a5e2-1b75d0a39191)
