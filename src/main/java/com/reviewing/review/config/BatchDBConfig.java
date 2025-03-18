@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 
-@Configuration
+//@Configuration
 public class BatchDBConfig {
 
     @Primary
