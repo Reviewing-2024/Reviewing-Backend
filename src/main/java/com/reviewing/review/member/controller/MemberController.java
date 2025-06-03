@@ -4,7 +4,9 @@ import com.reviewing.review.config.jwt.JwtTokenProvider;
 import com.reviewing.review.member.domain.kakao.KakaoMemberInfoDto;
 import com.reviewing.review.member.domain.kakao.KakaoTokenDto;
 import com.reviewing.review.member.entity.Member;
+import com.reviewing.review.member.service.ChannelTalkService;
 import com.reviewing.review.member.service.MemberService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -20,6 +22,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final ChannelTalkService channelTalkService;
 
     /**
      * 카카오 로그인
@@ -40,6 +43,19 @@ public class MemberController {
         headers.add("Authorization", "Bearer " + accessToken);
 
         return ResponseEntity.ok().headers(headers).body(member);
+    }
+
+    @GetMapping("/channelTalk/encode")
+    public ResponseEntity<String> channelTalkMemberIdEncode(HttpServletRequest request) {
+
+        String jwtHeader = request.getHeader("Authorization");
+        String token = jwtHeader.replace("Bearer ", "");
+        Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
+        if (memberId == null) {
+            return ResponseEntity.status(600).body(null);
+        }
+
+        return ResponseEntity.ok().body(channelTalkService.encode(String.valueOf(memberId)));
     }
 
 }
