@@ -25,7 +25,7 @@ public class ReviewRepository {
 
     private final EntityManager em;
 
-    public void createReview(UUID courseId, Long memberId, ReviewState reviewState, Review review) {
+    public Review createReview(UUID courseId, Long memberId, ReviewState reviewState, Review review) {
 
         Member findMember = em.find(Member.class, memberId);
 
@@ -38,6 +38,7 @@ public class ReviewRepository {
         review.setReviewState(reviewState);
 
         em.persist(review);
+        return review;
     }
 
     public List<ReviewResponseDto> findReviewsByCourse(UUID courseId) {
