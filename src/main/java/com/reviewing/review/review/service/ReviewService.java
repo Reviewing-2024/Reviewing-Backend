@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
+    private final SlackService slackService;
 
     public void createReview(UUID courseId, Long memberId, ReviewRequestDto reviewRequestDto,
             String certification) {
@@ -35,7 +36,8 @@ public class ReviewService {
                 .certification(certification)
                 .build();
 
-        reviewRepository.createReview(courseId, memberId, reviewState, review);
+        Review newReview = reviewRepository.createReview(courseId, memberId, reviewState, review);
+        slackService.sendMessageToSlack(newReview);
     }
 
     public List<ReviewResponseDto> findReviewsByCourse(UUID courseId) {

@@ -59,6 +59,12 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-batch'
 	testImplementation 'org.springframework.batch:spring-batch-test'
 
+	// slack
+	implementation("com.slack.api:bolt:1.45.3")
+	implementation("com.slack.api:bolt-servlet:1.45.3")
+	implementation("com.slack.api:bolt-jetty:1.45.3")
+	implementation("org.slf4j:slf4j-simple:1.7.36")
+
 }
 
 tasks.named('test') {
