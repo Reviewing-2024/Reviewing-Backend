@@ -233,7 +233,8 @@ public class CourseRepository {
                         "select new com.reviewing.review.course.domain.CourseResponseDto("
                                 + "c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes, c.comments) "
                                 + "from Course c "
-                                + "where c.id = :courseId ",
+                                + "where c.id = :courseId "
+                                + "order by c.id asc ",
                         CourseResponseDto.class)
                 .setParameter("courseId", courseId)
                 .getSingleResult();
