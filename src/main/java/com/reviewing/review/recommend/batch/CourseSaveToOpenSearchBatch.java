@@ -1,7 +1,5 @@
 package com.reviewing.review.recommend.batch;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.reviewing.review.course.entity.CategoryCourse;
 import com.reviewing.review.course.entity.Course;
 import com.reviewing.review.crawling.repository.CategoryCourseRepository;
@@ -89,6 +87,7 @@ public class CourseSaveToOpenSearchBatch {
                 return null;
             }
             String title = course.getTitle();
+            String teacher = course.getTeacher();
             String platform = course.getPlatform().getName();
             BigDecimal rating = course.getRating();
             int wishes = course.getWishes();
@@ -98,39 +97,27 @@ public class CourseSaveToOpenSearchBatch {
                     .collect(Collectors.joining(", "));
 
             String inputCourseText = String.format(
-                    "Title: %s, Platform: %s, Category: %s, Rating: %.1f, Wishes: %d",
+                    "Title: %s, Platform: %s,Teacher: %s, Category: %s, Rating: %.1f, Wishes: %d",
                     title,
                     platform,
+                    teacher,
                     categoriesText,
                     rating,
                     wishes
             );
-            List<Double> embedding = embeddingService.generateEmbedding(escapeJson(inputCourseText));
-
-            Map<String, Object> embeddingMap = new HashMap<>();
-            for (int i = 0; i < embedding.size(); i++) {
-                embeddingMap.put("dim_" + i, embedding.get(i)); // dim_0, dim_1, ...
-            }
+            List<Double> embedding = embeddingService.generateEmbeddingV2(inputCourseText); //
 
             // 문서 데이터 생성
             Map<String, Object> document = new HashMap<>();
             document.put("id", course.getId());
-            document.put("embedding", embeddingMap);
+            document.put("embedding", embedding);
+            document.put("title", title);
+            document.put("teacher", teacher);
 
             return new CourseOpenSearchRequestDto(
                     String.valueOf(course.getId()), document);
         };
     }
-
-    public String escapeJson(String input) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            return objectMapper.writeValueAsString(input).replaceAll("^\"|\"$", "");
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("JSON Escape 실패", e);
-        }
-    }
-
 
     @Bean
     @StepScope
@@ -143,7 +130,6 @@ public class CourseSaveToOpenSearchBatch {
                         .document(courseOpenSearchRequestDto.getDocument()) // 변환된 문서 데이터
                 );
                 openSearchClient.index(indexRequest);
-                log.info("등록");
             }
         };
     }
