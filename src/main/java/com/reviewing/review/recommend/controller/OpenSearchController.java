@@ -40,17 +40,8 @@ public class OpenSearchController {
                 .addString("date", value)
                 .toJobParameters();
 
-        runAsyncJob(jobParameters);
-        return "시작";
-    }
-
-    @Async
-    public void runAsyncJob(JobParameters jobParameters) {
-        try {
-            jobLauncher.run(jobRegistry.getJob("CourseSaveToOpenSearchJob"), jobParameters);
-        } catch (Exception e) {
-            log.error("배치 실패", e);
-        }
+        openSearchService.createEmbeddingsAndSaveOpenSearch(jobParameters);
+        return "강의 embedding 저장 시작";
     }
 
     @PutMapping("/opensearch/courses")
@@ -60,12 +51,9 @@ public class OpenSearchController {
                 .addString("indexName", indexName)
                 .addString("date",value)
                 .toJobParameters();
-        try {
-            jobLauncher.run(jobRegistry.getJob("UpdateCourseToOpenSearchJob"), jobParameters);
-            return "성공";
-        } catch (Exception e) {
-            return "실패";
-        }
+
+        openSearchService.updateCourseEmbeddingsToOpenSearch(jobParameters);
+        return "강의 embedding 업데이트 시작";
     }
 
 }
