@@ -45,6 +45,8 @@ public class CourseSaveToOpenSearchBatch {
     private final OpenSearchClient openSearchClient;
     private final OpenSearchService openSearchService;
 
+    private int totalCnt = 0;
+
     @Bean
     public Job CourseSaveToOpenSearchJob() {
         return new JobBuilder("CourseSaveToOpenSearchJob",jobRepository)
@@ -130,7 +132,10 @@ public class CourseSaveToOpenSearchBatch {
                         .document(courseOpenSearchRequestDto.getDocument()) // 변환된 문서 데이터
                 );
                 openSearchClient.index(indexRequest);
+                totalCnt++;
             }
+
+            log.info("{}개 저장중", totalCnt);
         };
     }
 

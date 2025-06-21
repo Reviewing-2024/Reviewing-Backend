@@ -43,6 +43,8 @@ public class UpdateCourseToOpenSearchBatch {
     private final EmbeddingService embeddingService;
     private final OpenSearchClient openSearchClient;
 
+    private int totalCnt = 0;
+
     @Bean
     public Job UpdateCourseToOpenSearchJob() {
         return new JobBuilder("UpdateCourseToOpenSearchJob",jobRepository)
@@ -122,7 +124,9 @@ public class UpdateCourseToOpenSearchBatch {
                         .document(courseOpenSearchRequestDto.getDocument()) // 변환된 문서 데이터
                 );
                 openSearchClient.index(indexRequest);
+                totalCnt++;
             }
+            log.info("{}개 저장중", totalCnt);
         };
     }
 

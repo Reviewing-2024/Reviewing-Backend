@@ -12,6 +12,10 @@ import org.opensearch.client.opensearch.core.GetResponse;
 import org.opensearch.client.opensearch.core.SearchRequest;
 import org.opensearch.client.opensearch.indices.DeleteIndexRequest;
 import org.opensearch.client.opensearch.indices.DeleteIndexResponse;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.configuration.JobRegistry;
+import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,8 +25,43 @@ public class OpenSearchService {
 
     private final RestClient restClient;
     private final OpenSearchClient openSearchClient;
+    private final JobLauncher jobLauncher;
+    private final JobRegistry jobRegistry;
 
-    // OpenSearch 인덱스 생성
+    // openSearch 강의 존재 검색
+    public boolean searchCourse(UUID courseId, String indexName) {
+        try {
+            GetResponse<Object> response = openSearchClient.get(g -> g
+                    .index(indexName)
+                    .id(String.valueOf(courseId))
+                    .sourceExcludes("*"), Object.class);
+
+            return response.found();
+        } catch (IOException e) {
+            log.info("실패: {}", courseId);
+            throw new RuntimeException("OpenSearch 조회 실패 ", e);
+        }
+    }
+
+    @Async
+    public void createEmbeddingsAndSaveOpenSearch(JobParameters jobParameters) {
+        try {
+            jobLauncher.run(jobRegistry.getJob("CourseSaveToOpenSearchJob"), jobParameters);
+        } catch (Exception e) {
+            log.error("배치 실패", e);
+        }
+    }
+
+    @Async
+    public void updateCourseEmbeddingsToOpenSearch(JobParameters jobParameters) {
+        try {
+            jobLauncher.run(jobRegistry.getJob("UpdateCourseToOpenSearchJob"), jobParameters);
+        } catch (Exception e) {
+            log.error("배치 실패", e);
+        }
+    }
+
+    // OpenSearch 인덱스 생성 -> 사용x
     public void createIndex(String indexName) {
         try {
 
@@ -47,7 +86,7 @@ public class OpenSearchService {
         }
     }
 
-    // OpenSearch 인덱스 삭제
+    // OpenSearch 인덱스 삭제 -> 사용x
     public void deleteIndex(String indexName) {
         try {
             DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest.Builder()
@@ -58,7 +97,7 @@ public class OpenSearchService {
         }
     }
 
-    // OpenSearch field 제한 변경
+    // OpenSearch field 제한 변경 -> 사용x
     public void updateFieldLimit(String indexName) {
         try {
             String settingsJson = """
@@ -74,21 +113,6 @@ public class OpenSearchService {
             System.out.println("Field limit updated: " + response.getStatusLine().getStatusCode());
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    // openSearch 강의 존재 검색
-    public boolean searchCourse(UUID courseId, String indexName) {
-        try {
-            GetResponse<Object> response = openSearchClient.get(g -> g
-                    .index(indexName)
-                    .id(String.valueOf(courseId))
-                    .sourceExcludes("*"), Object.class);
-
-            return response.found();
-        } catch (IOException e) {
-            log.info("실패: {}", courseId);
-            throw new RuntimeException("OpenSearch 조회 실패 ", e);
         }
     }
 
