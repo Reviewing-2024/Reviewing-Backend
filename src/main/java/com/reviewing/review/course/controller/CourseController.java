@@ -5,9 +5,11 @@ import com.reviewing.review.course.domain.CategoryRequestDto;
 import com.reviewing.review.course.domain.CategoryResponseDto;
 import com.reviewing.review.course.domain.CourseResponseDto;
 import com.reviewing.review.course.entity.Platform;
+import com.reviewing.review.course.repository.CourseRepository;
 import com.reviewing.review.course.service.CourseService;
 import jakarta.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ public class CourseController {
 
     private final CourseService courseService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final CourseRepository courseRepository;
 
     @GetMapping("/platform")
     public ResponseEntity<List<Platform>> findPlatforms(){
@@ -90,8 +93,14 @@ public class CourseController {
 
         String jwtHeader = request.getHeader("Authorization");
 
-        List<CourseResponseDto> courses = courseService.searchCoursesByKeyword(keyword,
-                lastCourseId);
+        List<UUID> searchCourses = courseService.searchCoursesByKeyword(keyword, lastCourseId);
+
+        List<CourseResponseDto> courses = new ArrayList<>();
+
+        for (UUID courseId : searchCourses) {
+            CourseResponseDto courseResponseDto = courseRepository.findCourseById(courseId);
+            courses.add(courseResponseDto);
+        }
 
         if (jwtHeader == null) {
             return ResponseEntity.ok().body(courses);

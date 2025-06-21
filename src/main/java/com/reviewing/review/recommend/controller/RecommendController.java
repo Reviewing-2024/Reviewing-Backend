@@ -8,6 +8,7 @@ import com.reviewing.review.recommend.service.RecommendService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,11 +21,15 @@ public class RecommendController {
     private final RecommendService recommendService;
     private final EmbeddingService embeddingService;
 
+    @Value("${opensearch.index}")
+    private String INDEX;
+
     @PostMapping("/recommendation")
     public List<RecommendResponseDto> recommendCourse(
             @RequestBody RecommendRequestDto recommendRequestDto) {
 
-        List<SearchResponseDto> searchResponses =  recommendService.search("course", embeddingService.generateEmbedding(recommendRequestDto.getQuestion()), 5);
+        List<SearchResponseDto> searchResponses = recommendService.search(INDEX,
+                embeddingService.generateEmbeddingV2(recommendRequestDto.getQuestion()), 5);
 
         return recommendService.findCourseBySearchResponses(searchResponses);
 

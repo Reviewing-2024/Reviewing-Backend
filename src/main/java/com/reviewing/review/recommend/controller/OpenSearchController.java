@@ -7,8 +7,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.boot.autoconfigure.batch.BatchProperties.Job;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -40,12 +39,17 @@ public class OpenSearchController {
                 .addString("indexName", indexName)
                 .addString("date", value)
                 .toJobParameters();
+
+        runAsyncJob(jobParameters);
+        return "시작";
+    }
+
+    @Async
+    public void runAsyncJob(JobParameters jobParameters) {
         try {
             jobLauncher.run(jobRegistry.getJob("CourseSaveToOpenSearchJob"), jobParameters);
-            return "성공";
         } catch (Exception e) {
-            log.error("실패: {}", e.getMessage());
-            return "실패";
+            log.error("배치 실패", e);
         }
     }
 
