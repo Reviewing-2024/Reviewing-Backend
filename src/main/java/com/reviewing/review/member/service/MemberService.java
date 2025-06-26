@@ -9,6 +9,7 @@ import com.reviewing.review.member.domain.kakao.KakaoTokenDto;
 import com.reviewing.review.member.domain.kakao.KakaoUserInfoDto;
 import com.reviewing.review.member.entity.Member;
 import com.reviewing.review.member.repository.MemberRepository;
+import com.reviewing.review.review.service.SlackService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +29,7 @@ import org.springframework.web.client.RestTemplate;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final SlackService slackService;
 
     @Value("${Kakao.clientId}")
     private String clientId;
@@ -108,7 +110,9 @@ public class MemberService {
         Member member = memberRepository.findMemberByKakaoId(kakaoMemberInfo.getKakaoId());
         if (member == null) {
             // 회원가입
-            return memberRepository.saveMemberByKakao(kakaoMemberInfo);
+            member = memberRepository.saveMemberByKakao(kakaoMemberInfo);
+            slackService.sendMessageToSlackForNewMember(member);
+            return member;
         }
         return member;
     }

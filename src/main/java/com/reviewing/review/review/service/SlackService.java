@@ -38,9 +38,11 @@ public class SlackService {
 
     @Value("${slack.bot-token}")
     private String token;
-
     @Value(value="${slack.channel.monitor}")
     private String channel;
+    @Value(value="${slack.channel.member}")
+    private String channelForMember;
+
 
     public void sendMessageToSlack(Review review) {
 
@@ -88,4 +90,25 @@ public class SlackService {
         }
     }
 
+    public void sendMessageToSlackForNewMember(Member member) {
+
+        List<TextObject> textObjects = new ArrayList<>();
+        textObjects.add(markdownText("*이름:* " + member.getNickname() + "\n"));
+        MethodsClient methods = Slack.getInstance().methods(token);
+        List<LayoutBlock> blocks = new ArrayList<>();
+        blocks.add(header(header -> header.text(plainText("🎉새로운 회원이 가입했습니다!"))));
+        blocks.add(divider());
+        blocks.add(section(section -> section.fields(textObjects)));
+
+        ChatPostMessageRequest request = ChatPostMessageRequest.builder()
+                .channel(channelForMember)
+                .blocks(blocks).build();
+
+        try {
+            methods.chatPostMessage(request);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to send message to Slack", e);
+        }
+
+    }
 }
