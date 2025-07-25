@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @RequiredArgsConstructor
 @Slf4j
-@Transactional
 public class RecommendRepository {
 
     private final EntityManager em;

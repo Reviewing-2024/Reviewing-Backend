@@ -8,6 +8,7 @@ import com.reviewing.review.course.entity.CourseWish;
 import com.reviewing.review.course.entity.Platform;
 import com.reviewing.review.member.entity.Member;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
 import jakarta.persistence.NoResultException;
 import java.math.BigDecimal;
 import java.util.List;
@@ -17,7 +18,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
-@Transactional
 @RequiredArgsConstructor
 public class CourseRepository {
 
@@ -201,7 +201,12 @@ public class CourseRepository {
     }
 
     public void createCourseWish(UUID courseId, Long memberId) {
-        Course course = em.find(Course.class, courseId);
+
+        Course course = em.createQuery("select c from Course c where c.id = :courseId",Course.class)
+                .setParameter("courseId",courseId)
+                .setLockMode(LockModeType.PESSIMISTIC_WRITE)
+                .getSingleResult();
+
         Member member = em.find(Member.class, memberId);
 
         CourseWish courseWish = CourseWish.builder()
@@ -210,9 +215,17 @@ public class CourseRepository {
                 .build();
 
         em.persist(courseWish);
+
+        course.setWishes(course.getWishes() + 1);
+        course.setUpdated(true);
     }
 
     public void removeCourseWish(UUID courseId, Long memberId) {
+        Course course = em.createQuery("select c from Course c where c.id = :courseId",Course.class)
+                .setParameter("courseId",courseId)
+                .setLockMode(LockModeType.PESSIMISTIC_WRITE)
+                .getSingleResult();
+
         CourseWish courseWish = em.createQuery(
                         "select cw from CourseWish cw where cw.course.id = :courseId and cw.member.id = :memberId",
                         CourseWish.class)
@@ -221,6 +234,9 @@ public class CourseRepository {
                 .getSingleResult();
 
         em.remove(courseWish);
+
+        course.setWishes(course.getWishes() - 1);
+        course.setUpdated(true);
     }
 
     public void changeCourseUpdated(UUID courseId) {
