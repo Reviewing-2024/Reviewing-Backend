@@ -15,15 +15,14 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
 @Slf4j
-@Transactional
 public class ReviewRepository {
 
     private final EntityManager em;
+    private final ReviewRepositoryV2 reviewRepositoryV2;
 
     public Review createReview(UUID courseId, Long memberId, ReviewState reviewState, Review review) {
 
@@ -68,18 +67,19 @@ public class ReviewRepository {
     }
 
     public void createReviewLike(Long reviewId, Long memberId) {
-        Review review = em.find(Review.class, reviewId);
+        Review review = reviewRepositoryV2.findReviewByIdWithPessimisticLock(reviewId);
         Member member = em.find(Member.class, memberId);
 
         ReviewLike reviewLike = ReviewLike.builder()
                 .review(review)
                 .member(member)
                 .build();
-
         em.persist(reviewLike);
-    }
 
+        review.setLikes(review.getLikes() + 1);
+    }
     public void removeReviewLike(Long reviewId, Long memberId) {
+        Review review = reviewRepositoryV2.findReviewByIdWithPessimisticLock(reviewId);
 
         ReviewLike reviewLike = em.createQuery(
                         "select rl from ReviewLike rl where rl.review.id = :reviewId and rl.member.id = :memberId",
@@ -89,10 +89,12 @@ public class ReviewRepository {
                 .getSingleResult();
 
         em.remove(reviewLike);
+
+        review.setLikes(review.getLikes() - 1);
     }
 
     public void createReviewDislike(Long reviewId, Long memberId) {
-        Review review = em.find(Review.class, reviewId);
+        Review review = reviewRepositoryV2.findReviewByIdWithPessimisticLock(reviewId);
         Member member = em.find(Member.class, memberId);
 
         ReviewDislike reviewDislike = ReviewDislike.builder()
@@ -101,9 +103,12 @@ public class ReviewRepository {
                 .build();
 
         em.persist(reviewDislike);
+
+        review.setDislikes(review.getDislikes() + 1);
     }
 
     public void removeReviewDislike(Long reviewId, Long memberId) {
+        Review review = reviewRepositoryV2.findReviewByIdWithPessimisticLock(reviewId);
 
         ReviewDislike reviewDislike = em.createQuery(
                         "select rd from ReviewDislike rd where rd.review.id = :reviewId and rd.member.id = :memberId",
@@ -113,6 +118,8 @@ public class ReviewRepository {
                 .getSingleResult();
 
         em.remove(reviewDislike);
+
+        review.setDislikes(review.getDislikes() - 1);
     }
 
     public ReviewResponseDto findReviewById(Long reviewId) {
@@ -155,28 +162,6 @@ public class ReviewRepository {
             return null;
         }
 
-    }
-
-    public void updateReviewLikeCount(Long reviewId, boolean liked) {
-        Review findReview = em.find(Review.class, reviewId);
-        int likes = findReview.getLikes();
-
-        if (liked) {
-            findReview.setLikes(likes + 1);
-            return;
-        }
-        findReview.setLikes(likes - 1);
-    }
-
-    public void updateReviewDislikeCount(Long reviewId, boolean disliked) {
-        Review findReview = em.find(Review.class, reviewId);
-        int dislikes = findReview.getDislikes();
-
-        if (disliked) {
-            findReview.setDislikes(dislikes + 1);
-            return;
-        }
-        findReview.setDislikes(dislikes - 1);
     }
 
     public ReviewStateByMemberDto findReviewByCourseIdAndMemberId(UUID courseId, Long memberId) {

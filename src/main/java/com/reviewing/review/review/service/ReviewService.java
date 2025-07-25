@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
@@ -67,24 +68,21 @@ public class ReviewService {
         return reviews;
     }
 
-    public synchronized void createReviewLike(Long reviewId, Long memberId) {
+    public void createReviewLike(Long reviewId, Long memberId) {
+
         reviewRepository.createReviewLike(reviewId, memberId);
-        reviewRepository.updateReviewLikeCount(reviewId, true);
     }
 
     public void removeReviewLike(Long reviewId, Long memberId) {
         reviewRepository.removeReviewLike(reviewId, memberId);
-        reviewRepository.updateReviewLikeCount(reviewId, false);
     }
 
     public void createReviewDislike(Long reviewId, Long memberId) {
         reviewRepository.createReviewDislike(reviewId, memberId);
-        reviewRepository.updateReviewDislikeCount(reviewId, true);
     }
 
     public void removeReviewDislike(Long reviewId, Long memberId) {
         reviewRepository.removeReviewDislike(reviewId, memberId);
-        reviewRepository.updateReviewDislikeCount(reviewId, false);
     }
 
     public ReviewResponseDto findReviewById(Long reviewId, Long memberId) {
