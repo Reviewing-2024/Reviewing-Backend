@@ -118,7 +118,7 @@ public class ReviewController {
 
         if (liked) { // liked = true 일 때 -> 좋아요 취소
             if (!reviewService.checkReviewLikedByMember(reviewId, memberId)) {
-                return ResponseEntity.status(607).body(null);
+                return ResponseEntity.status(608).body(null);
             }
             reviewService.removeReviewLike(reviewId, memberId);
             ReviewResponseDto reviewResponseDto = reviewService.findReviewById(reviewId, memberId);
@@ -127,7 +127,7 @@ public class ReviewController {
 
         // liked = false 일 때 -> 좋아요
         if (reviewService.checkReviewLikedByMember(reviewId, memberId)) {
-            return ResponseEntity.status(608).body(null);
+            return ResponseEntity.status(607).body(null);
         }
         reviewService.createReviewLike(reviewId, memberId);
         ReviewResponseDto reviewResponseDto = reviewService.findReviewById(reviewId, memberId);

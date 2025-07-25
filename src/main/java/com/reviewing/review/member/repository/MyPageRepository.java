@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
-@Transactional
 public class MyPageRepository {
 
     private final EntityManager em;

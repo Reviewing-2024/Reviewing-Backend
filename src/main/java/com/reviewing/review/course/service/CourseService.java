@@ -20,10 +20,12 @@ import org.opensearch.client.opensearch.core.SearchRequest;
 import org.opensearch.client.opensearch.core.SearchResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class CourseService {
 
     private final CourseRepository courseRepository;
@@ -56,16 +58,10 @@ public class CourseService {
 
     public void createCourseWish(UUID courseId, Long memberId) {
         courseRepository.createCourseWish(courseId, memberId);
-
-        courseRepository.changeCourseUpdated(courseId);
-        courseRepository.updateCourseWishCount(courseId, true);
     }
 
     public void removeCourseWish(UUID courseId, Long memberId) {
         courseRepository.removeCourseWish(courseId, memberId);
-
-        courseRepository.changeCourseUpdated(courseId);
-        courseRepository.updateCourseWishCount(courseId, false);
     }
 
     public CourseResponseDto findCourseById(UUID courseId) {
