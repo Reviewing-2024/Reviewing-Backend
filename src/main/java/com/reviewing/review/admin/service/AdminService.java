@@ -51,6 +51,9 @@ public class AdminService {
     }
 
     public BigDecimal calculateReviewRating(BigDecimal newTotalRating, int newTotalReviewCount) {
+        if (newTotalReviewCount == 0) {
+            return BigDecimal.ZERO;
+        }
         return newTotalRating.divide(
                 BigDecimal.valueOf(newTotalReviewCount), 1, RoundingMode.HALF_UP
         );
