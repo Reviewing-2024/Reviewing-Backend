@@ -52,6 +52,12 @@ public class Review {
     @Column(nullable = false)
     private int dislikes = 0;
 
+    @Column(nullable = false)
+    private boolean isDeleted = false;
+    
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime deletedAt;
+
     @Builder
     public Review(String contents, BigDecimal rating, LocalDateTime createdAt, String certification) {
         this.contents = contents;

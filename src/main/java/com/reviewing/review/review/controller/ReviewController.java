@@ -3,7 +3,6 @@ package com.reviewing.review.review.controller;
 import com.reviewing.review.config.jwt.JwtTokenProvider;
 import com.reviewing.review.review.domain.ReviewRequestDto;
 import com.reviewing.review.review.domain.ReviewResponseDto;
-import com.reviewing.review.review.repository.ReviewRepository;
 import com.reviewing.review.review.service.ReviewService;
 import com.reviewing.review.review.service.S3Service;
 import jakarta.servlet.http.HttpServletRequest;
@@ -66,19 +65,6 @@ public class ReviewController {
 
         return ResponseEntity.status(reviewService.checkBeforeReviewCreate(courseId, memberId)).body(null);
     }
-
-    // 테스트용
-//    @PostMapping(value = "/{courseId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-//    public void createReview(@PathVariable Long courseId,
-//            @RequestPart ReviewRequestDto reviewRequestDto,
-//            @RequestPart MultipartFile certificationFile) throws IOException {
-//
-//        Long memberId = ;
-//
-//        String certification = s3Service.saveFile(certificationFile, memberId, courseId);
-//
-//        reviewService.createReview(courseId, memberId, reviewRequestDto, certification);
-//    }
 
     @GetMapping("/{courseId}")
     public ResponseEntity<List<ReviewResponseDto>> findReviewsByCourse(
@@ -161,6 +147,24 @@ public class ReviewController {
         reviewService.createReviewDislike(reviewId, memberId);
         ReviewResponseDto reviewResponseDto =  reviewService.findReviewById(reviewId, memberId);
         return ResponseEntity.ok().body(reviewResponseDto);
+    }
+
+    @DeleteMapping("/{reviewId}")
+    public ResponseEntity<String> deleteReview(@PathVariable Long reviewId,
+            HttpServletRequest request) {
+        String jwtHeader = request.getHeader("Authorization");
+        String token = jwtHeader.replace("Bearer ", "");
+        Long memberId = jwtTokenProvider.getMemberIdByRefreshToken(token);
+        if (memberId == null) {
+            return ResponseEntity.status(600).body(null);
+        }
+
+        try {
+            reviewService.softDeleteReview(reviewId, memberId);
+            return ResponseEntity.ok().body("리뷰가 삭제되었습니다.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
 }
