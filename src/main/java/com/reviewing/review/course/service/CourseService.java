@@ -99,10 +99,6 @@ public class CourseService {
         return findCourseWish != null;
     }
 
-//    public List<CourseResponseDto> searchCoursesByKeyword(String keyword, UUID lastCourseId) {
-//        return courseRepository.searchCoursesByKeyword(keyword, lastCourseId);
-//    }
-
     public List<UUID> searchCoursesByKeyword(String keyword, UUID lastCourseId) {
         try {
             SearchRequest.Builder builder = new SearchRequest.Builder()
