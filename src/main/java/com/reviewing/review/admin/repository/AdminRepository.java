@@ -3,6 +3,7 @@ package com.reviewing.review.admin.repository;
 import com.reviewing.review.admin.domain.AdminReviewResponseDto;
 import com.reviewing.review.review.entity.Review;
 import com.reviewing.review.review.domain.ReviewStateType;
+import com.reviewing.review.course.entity.Course;
 import jakarta.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -10,7 +11,6 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
@@ -24,7 +24,7 @@ public class AdminRepository {
                         + "(r.course.id, r.course.title, r.course.teacher, r.course.thumbnailImage, r.course.thumbnailVideo,r.course.url, "
                         + "r.id,r.contents, r.reviewState.state,r.certification,r.reviewState.updatedAt) "
                         + "from Review r "
-                        + "where r.reviewState.state = :status order by r.id desc ", AdminReviewResponseDto.class)
+                        + "where r.reviewState.state = :status and r.isDeleted = false order by r.id desc ", AdminReviewResponseDto.class)
                 .setParameter("status", status)
                 .getResultList();
 
@@ -48,24 +48,31 @@ public class AdminRepository {
         fineReview.getReviewState().setUpdatedAt(LocalDateTime.now());
     }
 
-    public void updateReviewRating(Review review, BigDecimal newReviewRating) {
-        review.getCourse().setRating(newReviewRating);
-    }
-
-    public int getTotalReviewCountByReviewId(UUID courseId) {
+    public int getTotalReviewCountByCourseId(UUID courseId) {
 
         return em.createQuery("select r "
                         + "from Review r "
                         + "where r.reviewState.state = 'APPROVED' "
-                        + "and r.course.id = :courseId", Review.class)
+                        + "and r.course.id = :courseId and r.isDeleted = false", Review.class)
                 .setParameter("courseId", courseId)
                 .getResultList()
                 .size();
-
     }
 
-    public void updateReviewCount(Long reviewId, int newTotalReviewCount) {
-        Review findReview = em.find(Review.class, reviewId);
-        findReview.getCourse().setComments(newTotalReviewCount);
+    public BigDecimal getTotalRatingByCourseId(UUID courseId) {
+        try {
+            return em.createQuery("select sum(r.rating) "
+                            + "from Review r "
+                            + "where r.course.id = :courseId and r.reviewState.state = 'APPROVED' and r.isDeleted = false", BigDecimal.class)
+                    .setParameter("courseId", courseId)
+                    .getSingleResult();
+        } catch (Exception e) {
+            return BigDecimal.ZERO;
+        }
     }
+
+    public Course findCourseById(UUID courseId) {
+        return em.find(Course.class, courseId);
+    }
+
 }
