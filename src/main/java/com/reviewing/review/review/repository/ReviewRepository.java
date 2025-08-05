@@ -10,6 +10,7 @@ import com.reviewing.review.review.entity.ReviewState;
 import com.reviewing.review.review.domain.ReviewStateByMemberDto;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +47,7 @@ public class ReviewRepository {
                                 + "r.id, r.member.nickname, r.contents, r.rating, r.likes, r.dislikes, "
                                 + "r.createdAt) "
                                 + "from Review r "
-                                + "where r.course.id = :courseId and r.reviewState.state = 'APPROVED' "
+                                + "where r.course.id = :courseId and r.reviewState.state = 'APPROVED' and r.isDeleted = false "
                                 + "order by r.createdAt desc",
                         ReviewResponseDto.class)
                 .setParameter("courseId", courseId)
@@ -59,7 +60,7 @@ public class ReviewRepository {
                                 + "r.id, r.member.nickname, r.contents, r.rating, r.likes, r.dislikes, "
                                 + "r.createdAt) "
                                 + "from Review r "
-                                + "where r.course.id = :courseId and r.reviewState.state = 'APPROVED' "
+                                + "where r.course.id = :courseId and r.reviewState.state = 'APPROVED' and r.isDeleted = false "
                                 + "order by r.createdAt desc",
                         ReviewResponseDto.class)
                 .setParameter("courseId", courseId)
@@ -128,7 +129,7 @@ public class ReviewRepository {
                                 + "r.id, r.member.nickname, r.contents, r.rating, r.likes, r.dislikes, "
                                 + "r.createdAt) "
                                 + "from Review r "
-                                + "where r.id = :reviewId and r.reviewState.state = 'APPROVED' ",
+                                + "where r.id = :reviewId and r.reviewState.state = 'APPROVED' and r.isDeleted = false ",
                         ReviewResponseDto.class)
                 .setParameter("reviewId", reviewId)
                 .getSingleResult();
@@ -170,13 +171,38 @@ public class ReviewRepository {
                             "select new com.reviewing.review.review.domain.ReviewStateByMemberDto"
                                     + "(r.course.id, r.id, r.member.id, r.reviewState.state) "
                                     + "from Review r "
-                                    + "where r.course.id=:courseId and r.member.id=:memberId",
+                                    + "where r.course.id=:courseId and r.member.id=:memberId and r.isDeleted = false",
                             ReviewStateByMemberDto.class)
                     .setParameter("courseId", courseId)
                     .setParameter("memberId", memberId)
                     .getSingleResult();
         } catch (NoResultException e) {
             return null;
+        }
+    }
+
+    public void softDeleteReview(Long reviewId) {
+        Review review = em.find(Review.class, reviewId);
+        if (review != null) {
+            review.setDeleted(true);
+            review.setDeletedAt(LocalDateTime.now());
+        }
+    }
+
+    public Review findReviewByReviewId(Long reviewId) {
+        return em.find(Review.class, reviewId);
+    }
+
+    public boolean isReviewWrittenByMember(Long reviewId, Long memberId) {
+        try {
+            Review review = em.createQuery("select r from Review r "
+                            + "where r.id = :reviewId and r.member.id = :memberId", Review.class)
+                    .setParameter("reviewId", reviewId)
+                    .setParameter("memberId", memberId)
+                    .getSingleResult();
+            return review != null;
+        } catch (NoResultException e) {
+            return false;
         }
     }
 }

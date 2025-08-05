@@ -7,10 +7,12 @@ import com.reviewing.review.review.domain.ReviewStateType;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.reviewing.review.course.entity.Course;
 
 @Service
 @RequiredArgsConstructor
@@ -36,20 +38,16 @@ public class AdminService {
 
     public void changeReviewApprove(Long reviewId) {
 
-        Review findReview = adminRepository.findReviewById(reviewId);
+        Review findReview = adminRepository.findReviewById(reviewId); // 새로 등록한 리뷰
 
-        BigDecimal thisReviewRating = findReview.getRating();
-        BigDecimal courseRating = findReview.getCourse().getRating();
+        BigDecimal thisReviewRating = findReview.getRating(); // 새로 등록한 리뷰 평점
+        UUID courseId = findReview.getCourse().getId();
 
-        int totalReviewCount = adminRepository.getTotalReviewCountByReviewId(findReview.getCourse().getId());
-
-        BigDecimal newTotalRating = thisReviewRating.add(courseRating);
-        int newTotalReviewCount = totalReviewCount + 1;
-
-        adminRepository.updateReviewRating(findReview,
-                calculateReviewRating(newTotalRating, newTotalReviewCount));
+        // 공통 평점 계산 메서드 사용 (리뷰 추가)
+        updateCourseRating(courseId, thisReviewRating, true);
+        
+        // 리뷰 상태를 승인으로 변경
         adminRepository.changeReviewApprove(findReview);
-        adminRepository.updateReviewCount(reviewId, newTotalReviewCount);
     }
 
     public BigDecimal calculateReviewRating(BigDecimal newTotalRating, int newTotalReviewCount) {
@@ -60,5 +58,30 @@ public class AdminService {
 
     public void changeReviewReject(Long reviewId, String rejectionReason) {
         adminRepository.changeReviewReject(reviewId, rejectionReason);
+    }
+
+    public void updateCourseRating(UUID courseId, BigDecimal reviewRating, boolean isAdding) {
+        BigDecimal currentTotalRatingSum = adminRepository.getTotalRatingByCourseId(courseId);
+        int currentReviewCount = adminRepository.getTotalReviewCountByCourseId(courseId);
+        
+        BigDecimal newTotalRating;
+        int newReviewCount;
+        
+        if (isAdding) {
+            newTotalRating = currentTotalRatingSum.add(reviewRating);
+            newReviewCount = currentReviewCount + 1;
+        } else {
+            newTotalRating = currentTotalRatingSum.subtract(reviewRating);
+            newReviewCount = currentReviewCount - 1;
+        }
+        
+        BigDecimal newAverageRating = calculateReviewRating(newTotalRating, newReviewCount);
+        
+        Course course = adminRepository.findCourseById(courseId);
+        if (course != null) {
+            course.setRating(newAverageRating);
+            course.setComments(newReviewCount);
+            course.setUpdated(true);
+        }
     }
 }

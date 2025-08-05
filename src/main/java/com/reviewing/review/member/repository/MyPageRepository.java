@@ -9,7 +9,6 @@ import jakarta.persistence.TypedQuery;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
@@ -25,7 +24,7 @@ public class MyPageRepository {
                         + "r.reviewState.rejectionReason, "
                         + "r.createdAt) "
                         + "from Review r "
-                        + "where r.member.id = :memberId ");
+                        + "where r.member.id = :memberId and r.isDeleted = false ");
 
         if (status != null) {
             query.append("and r.reviewState.state = :status ");

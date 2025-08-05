@@ -20,6 +20,7 @@ public class ReviewResponseDto {
     private int dislikes;
     private boolean liked = false;
     private boolean disliked = false;
+    private boolean myReview = false;
     private String createdAt;
 
     public ReviewResponseDto(Long id, String nickname, String contents, BigDecimal rating,

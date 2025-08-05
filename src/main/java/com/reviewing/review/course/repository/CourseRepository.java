@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
@@ -187,19 +186,6 @@ public class CourseRepository {
                 .getResultList();
     }
 
-    public List<CourseResponseDto> searchCoursesByKeyword(String keyword, UUID lastCourseId) {
-        return em.createQuery("select new com.reviewing.review.course.domain.CourseResponseDto"
-                                + "(c.id, c.title, c.teacher, c.thumbnailImage, c.thumbnailVideo, c.rating, c.slug, c.url, c.wishes, c.comments) "
-                                + "from Course c "
-                                + "where c.title like :keyword and (:lastCourseId is null or c.id > :lastCourseId)"
-                                + "order by c.id asc ",
-                        CourseResponseDto.class)
-                .setParameter("lastCourseId", lastCourseId)
-                .setParameter("keyword", "%" + keyword + "%")
-                .setMaxResults(PAGE_SIZE)
-                .getResultList();
-    }
-
     public void createCourseWish(UUID courseId, Long memberId) {
 
         Course course = em.createQuery("select c from Course c where c.id = :courseId",Course.class)
@@ -239,11 +225,6 @@ public class CourseRepository {
         course.setUpdated(true);
     }
 
-    public void changeCourseUpdated(UUID courseId) {
-        Course findCourse = em.find(Course.class, courseId);
-        findCourse.setUpdated(true);
-    }
-
     public CourseResponseDto findCourseById(UUID courseId) {
         return em.createQuery(
                         "select new com.reviewing.review.course.domain.CourseResponseDto("
@@ -278,30 +259,6 @@ public class CourseRepository {
                                 + "where c.platform.name = :platform", CategoryResponseDto.class)
                 .setParameter("platform", platform)
                 .getResultList();
-    }
-
-    public CourseWish checkCourseWish(UUID courseId, Long memberId) {
-        try {
-            return em.createQuery(
-                            "select cw from CourseWish cw where cw.course.id = :courseId and cw.member.id = :memberId",
-                            CourseWish.class)
-                    .setParameter("courseId", courseId)
-                    .setParameter("memberId", memberId)
-                    .getSingleResult();
-        } catch (NoResultException e) {
-            return null;
-        }
-    }
-
-    public void updateCourseWishCount(UUID courseId, boolean wished) {
-        Course findCourse = em.find(Course.class, courseId);
-        int wishes = findCourse.getWishes();
-
-        if (wished) {
-            findCourse.setWishes(wishes + 1);
-            return;
-        }
-        findCourse.setWishes(wishes - 1);
     }
 
     public CourseWish findCourseWish(UUID courseId, Long memberId) {
